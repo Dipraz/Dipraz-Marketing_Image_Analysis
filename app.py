@@ -29,15 +29,25 @@ def analyze_image_base64(image_base64):
         model="gpt-4o",
         messages=[
             {"role": "system", "content": "You are an assistant that provides concise structured analysis of marketing images."},
-            {"role": "user", "content": f"data:image/png;base64,{image_base64}"}
+            {"role": "user", "content": f"Analyze the following image and provide a one-word or short-phrase evaluation for each attribute: text_amount (Low/High), color_usage (Effective/Not Effective), visual_cues (Present/Absent), emotion (Positive/Negative/Neutral), focus (Central message/Not focused), customer_centric (Yes/No), credibility (High/Moderate/Low), user_interaction (High/Moderate/Low), cta_presence (Yes/No), cta_clarity (Clear/Unclear). Image: data:image/png;base64,{image_base64}"}
         ],
         max_tokens=1000,
         temperature=0.3
     )
     raw_response = response.choices[0].message.content.strip()
-    attributes = ["text_amount", "color_usage", "visual_cues", "emotion", "focus", "customer_centric", "credibility", "user_interaction", "cta_presence", "cta_clarity"]
     values = raw_response.split(',')
-    structured_response = {attr: val.strip() for attr, val in zip(attributes, values)}
+    structured_response = {
+        "text_amount": values[0].strip(),
+        "color_usage": values[1].strip(),
+        "visual_cues": values[2].strip(),
+        "emotion": values[3].strip(),
+        "focus": values[4].strip(),
+        "customer_centric": values[5].strip(),
+        "credibility": values[6].strip(),
+        "user_interaction": values[7].strip(),
+        "cta_presence": values[8].strip(),
+        "cta_clarity": values[9].strip()
+    }
     return structured_response
 
 # Function for detailed marketing analysis
