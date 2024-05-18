@@ -29,7 +29,7 @@ def analyze_image_base64(image_base64):
     response = client.chat.completions.create(
         model="gpt-4o",
         messages=[
-            {"role": "system", "content":"Analyze the provided image for various marketing aspects. Respond in single words or short phrases separated by commas for each attribute:"text amount (High or Low), color usage (Effective or Not effective), visual cues (Present or Absent), emotion (Positive or Negative), focus (Central message or Scattered),"customer centric (Yes or No), credibility (High or Low), user interaction (High, Moderate, or Low), CTA presence (Yes or No), CTA clarity (Clear or Unclear)."},
+            {"role": "system", "content": "Analyze the provided image for various marketing aspects. Respond in single words or short phrases separated by commas for each attribute: text amount (High or Low), color usage (Effective or Not effective), visual cues (Present or Absent), emotion (Positive or Negative), focus (Central message or Scattered),customer centric (Yes or No), credibility (High or Low), user interaction (High, Moderate, or Low), CTA presence (Yes or No), CTA clarity (Clear or Unclear)."},
             {"role": "user", "content": f"data:image/png;base64,{image_base64}"}
         ],
         max_tokens=1000,
