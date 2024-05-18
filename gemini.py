@@ -38,8 +38,9 @@ else:
 
     def analyze_image(uploaded_file):
         prompt = (
-            "Analyze the provided image for various marketing aspects and respond in single words or short phrases separated by commas, covering: "
-            "text amount, color usage, visual cues, emotion, focus, customer centric, credibility, user interaction, CTA presence, CTA clarity."
+            "Analyze the provided image for various marketing aspects. Respond in single words or short phrases separated by commas for each attribute: "
+            "text amount (High or Low), color usage (Effective or Not effective), visual cues (Present or Absent), emotion (Positive or Negative), focus (Central message or Scattered), "
+            "customer-centric (Yes or No), credibility (High or Low), user interaction (High, Moderate, or Low), CTA presence (Yes or No), CTA clarity (Clear or Unclear)."
         )
         image = Image.open(uploaded_file)
         response = model.generate_content([prompt, image])
