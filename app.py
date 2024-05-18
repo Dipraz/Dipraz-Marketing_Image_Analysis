@@ -97,24 +97,35 @@ def cognitive_load_analysis(image_base64):
 
 # Streamlit app setup
 st.title('Marketing Image Analysis AI Assistant (gpt-4o)')
-uploaded_file = st.file_uploader("Upload your marketing image here:")
+
+with st.sidebar:
+    st.header("Options")
+    basic_analysis = st.button('Basic Analysis')
+    detailed_analysis = st.button('Detailed Marketing Analysis')
+    cognitive_analysis = st.button('Cognitive Load and Trust Analysis')
+
+col1, col2 = st.columns(2)
+uploaded_file = col1.file_uploader("Upload your marketing image here:")
 
 if uploaded_file is not None:
     image = Image.open(uploaded_file)
-    st.image(image, caption="Uploaded Image", use_column_width=True)
+    col2.image(image, caption="Uploaded Image", use_column_width=True)
     image_base64 = encode_image(image)
 
-    if st.button('Basic Analysis'):
-        basic_analysis_result = analyze_image_base64(image_base64)
-        st.write("Basic Analysis Results:")
-        st.json(basic_analysis_result)
+    if basic_analysis:
+        with st.spinner("Performing basic analysis..."):
+            basic_analysis_result = analyze_image_base64(image_base64)
+            st.write("## Basic Analysis Results:")
+            st.json(basic_analysis_result)
 
-    if st.button('Detailed Marketing Analysis'):
-        detailed_result = detailed_marketing_analysis(image_base64)
-        st.write("Detailed Marketing Analysis Results:")
-        st.write(detailed_result)
+    if detailed_analysis:
+        with st.spinner("Performing detailed marketing analysis..."):
+            detailed_result = detailed_marketing_analysis(image_base64)
+            st.write("## Detailed Marketing Analysis Results:")
+            st.write(detailed_result)
 
-    if st.button('Cognitive Load and Trust Analysis'):
-        cognitive_result = cognitive_load_analysis(image_base64)
-        st.write("Cognitive Load and Trust Analysis Results:")
-        st.write(cognitive_result)
+    if cognitive_analysis:
+        with st.spinner("Performing cognitive load and trust analysis..."):
+            cognitive_result = cognitive_load_analysis(image_base64)
+            st.write("## Cognitive Load and Trust Analysis Results:")
+            st.write(cognitive_result)
