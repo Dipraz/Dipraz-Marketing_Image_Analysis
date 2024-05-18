@@ -135,7 +135,7 @@ else:
             return None
 
     # Streamlit app setup
-    st.title('Marketing Image Analysis AI Assistant')
+    st.title('Marketing Image Analysis AI Assistant (gemini-1.5-flash-latest)')
 
     with st.sidebar:
         st.header("Options")
