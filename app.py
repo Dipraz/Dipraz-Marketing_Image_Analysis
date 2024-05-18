@@ -29,7 +29,7 @@ def analyze_image_base64(image_base64):
     response = client.chat.completions.create(
         model="gpt-4o",
         messages=[
-            {"role": "system", "content": "Analyze the provided image for various marketing aspects. Respond in single words or short phrases separated by commas for each attribute: text amount (High or Low), color usage (Effective or Not effective), visual cues (Present or Absent), emotion (Positive or Negative), focus (Central message or Scattered),customer centric (Yes or No), credibility (High or Low), user interaction (High, Moderate, or Low), CTA presence (Yes or No), CTA clarity (Clear or Unclear)."},
+            {"role": "system", "content": "You are an assistant that provides concise structured analysis of marketing images."},
             {"role": "user", "content": f"data:image/png;base64,{image_base64}"}
         ],
         max_tokens=1000,
@@ -44,7 +44,7 @@ def analyze_image_base64(image_base64):
 
 # Function for detailed marketing analysis
 def detailed_marketing_analysis(image_base64):
-    prompt = "Analyze the provided image for various marketing aspects. For each aspect, provide a score from 1 to 5, a short explanation, and suggestions for improvement:\n"
+    prompt = "Analyze the provided image for marketing effectiveness. Provide a score from 1 to 5 (1 being low, 5 being high) and a concise explanation for each aspect, along with suggestions for improvement. The results should be presented in a table format (Aspect, Score, Explanation, Improvement). Here are the aspects to consider:\n"
     prompt += "1. Attraction and Focus: Does the content prioritize important information and draw attention effectively?\n"
     prompt += "2. Distinction: Does the content contain pictures that grab user attention? Does it appeal to the primal brain with and without text?\n"
     prompt += "3. Purpose and Value: Is the purpose and value clear within 3 seconds? Is the content product or customer-centric?\n"
@@ -74,7 +74,7 @@ def detailed_marketing_analysis(image_base64):
 
 # Function for cognitive load and trust analysis
 def cognitive_load_analysis(image_base64):
-    prompt = "Analyze the provided image based on detailed cognitive load, attention, engagement, and trust criteria:\n"
+    prompt = "Analyze the provided image for its marketing effectiveness based on the following detailed criteria. For each criterion, provide a score from 1 to 5 (1 being poor and 5 being excellent) and a short explanation with some improvement suggestions:\n"
     prompt += "- Does the image prioritize important information effectively?\n"
     prompt += "- Does it use visual cues and color to highlight important information?\n"
     prompt += "- Does the image contain labels, buttons, and if so, are they clearly labeled?\n"
@@ -96,7 +96,7 @@ def cognitive_load_analysis(image_base64):
     return response.choices[0].message.content.strip()
 
 # Streamlit app setup
-st.title('Marketing Image Analysis AI Assistant')
+st.title('Marketing Image Analysis AI Assistant (gpt-4o)')
 uploaded_file = st.file_uploader("Upload your marketing image here:")
 
 if uploaded_file is not None:
