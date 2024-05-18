@@ -2,9 +2,10 @@ import streamlit as st
 from dotenv import load_dotenv
 import os
 from PIL import Image
+import numpy as np
+import openai
 import base64
 import io
-import openai
 
 # Initialize OpenAI client
 client = openai.OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
@@ -29,25 +30,16 @@ def analyze_image_base64(image_base64):
         model="gpt-4o",
         messages=[
             {"role": "system", "content": "You are an assistant that provides concise structured analysis of marketing images."},
-            {"role": "user", "content": f"Analyze the following image and provide a one-word or short-phrase evaluation for each attribute: text_amount (Low/High), color_usage (Effective/Not Effective), visual_cues (Present/Absent), emotion (Positive/Negative/Neutral), focus (Central message/Not focused), customer_centric (Yes/No), credibility (High/Moderate/Low), user_interaction (High/Moderate/Low), cta_presence (Yes/No), cta_clarity (Clear/Unclear). Image: data:image/png;base64,{image_base64}"}
+            {"role": "user", "content": f"data:image/png;base64,{image_base64}"}
         ],
         max_tokens=1000,
         temperature=0.3
     )
-    raw_response = response.choices[0].message.content.strip()
+    # Access response content using .content property within .choices[0]
+    raw_response = response.choices[0].message.content.strip()  
+    attributes = ["text_amount", "color_usage", "visual_cues", "emotion", "focus", "customer_centric", "credibility", "user_interaction", "cta_presence", "cta_clarity"]
     values = raw_response.split(',')
-    structured_response = {
-        "text_amount": values[0].strip(),
-        "color_usage": values[1].strip(),
-        "visual_cues": values[2].strip(),
-        "emotion": values[3].strip(),
-        "focus": values[4].strip(),
-        "customer_centric": values[5].strip(),
-        "credibility": values[6].strip(),
-        "user_interaction": values[7].strip(),
-        "cta_presence": values[8].strip(),
-        "cta_clarity": values[9].strip()
-    }
+    structured_response = {attr: val.strip() for attr, val in zip(attributes, values)}
     return structured_response
 
 # Function for detailed marketing analysis
@@ -76,6 +68,8 @@ def detailed_marketing_analysis(image_base64):
         max_tokens=1000,
         temperature=0.5
     )
+    
+    # Access response content using .message["content"]
     return response.choices[0].message.content.strip()
 
 # Function for cognitive load and trust analysis
@@ -98,6 +92,7 @@ def cognitive_load_analysis(image_base64):
         max_tokens=500,
         temperature=0.5
     )
+    # Access response content using .message["content"]
     return response.choices[0].message.content.strip()
 
 # Streamlit app setup
@@ -109,32 +104,17 @@ if uploaded_file is not None:
     st.image(image, caption="Uploaded Image", use_column_width=True)
     image_base64 = encode_image(image)
 
-    st.markdown("### Choose Analysis Type")
+    if st.button('Basic Analysis'):
+        basic_analysis_result = analyze_image_base64(image_base64)
+        st.write("Basic Analysis Results:")
+        st.json(basic_analysis_result)
 
-    with st.spinner("Preparing analysis options..."):
-        analysis_type = st.radio(
-            "Select the type of analysis you want:",
-            ('Basic Analysis', 'Detailed Marketing Analysis', 'Cognitive Load and Trust Analysis')
-        )
+    if st.button('Detailed Marketing Analysis'):
+        detailed_result = detailed_marketing_analysis(image_base64)
+        st.write("Detailed Marketing Analysis Results:")
+        st.write(detailed_result)
 
-    if analysis_type:
-        if analysis_type == 'Basic Analysis' and st.button('Run Basic Analysis'):
-            with st.spinner('Analyzing image...'):
-                basic_analysis_result = analyze_image_base64(image_base64)
-                st.success('Analysis Complete!')
-                st.write("Basic Analysis Results:")
-                st.json(basic_analysis_result)
-
-        elif analysis_type == 'Detailed Marketing Analysis' and st.button('Run Detailed Marketing Analysis'):
-            with st.spinner('Analyzing image...'):
-                detailed_result = detailed_marketing_analysis(image_base64)
-                st.success('Analysis Complete!')
-                st.write("Detailed Marketing Analysis Results:")
-                st.write(detailed_result)
-
-        elif analysis_type == 'Cognitive Load and Trust Analysis' and st.button('Run Cognitive Load and Trust Analysis'):
-            with st.spinner('Analyzing image...'):
-                cognitive_result = cognitive_load_analysis(image_base64)
-                st.success('Analysis Complete!')
-                st.write("Cognitive Load and Trust Analysis Results:")
-                st.write(cognitive_result)
+    if st.button('Cognitive Load and Trust Analysis'):
+        cognitive_result = cognitive_load_analysis(image_base64)
+        st.write("Cognitive Load and Trust Analysis Results:")
+        st.write(cognitive_result)
