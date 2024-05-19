@@ -129,7 +129,7 @@ else:
 
     def headline_analysis(uploaded_file):
         prompt = (
-            "Evaluate the provided image headline for its effectiveness using the designated criteria. Rate each criterion on a scale from 1 to 5 (1 being poor, 5 being excellent), and provide a concise explanation for each score. Present your results in a table format with columns labeled: Criterion, Score, Explanation. Below the table, calculate and display the total sum of all scores. Ensure that this analysis process yields consistent scoring results, regardless of how many times or when it is run. Conclude with three possible suggestions for improved headlines. The criteria to assess are: \n"
+            "Evaluate the provided image headline for its effectiveness using the designated criteria. Rate each criterion on a scale from 1 to 5 (1 being poor, 5 being excellent), and provide a concise explanation for each score. Present your results in a table format with columns labeled: Criterion, Score, Explanation. Below the table, calculate and display the total sum of all scores. Ensure that this analysis process yields consistent scoring results, regardless of how many times or when it is run. Conclude with three possible improved headlines. The criteria to assess are: \n"
             "1. Clarity & Concision: How clearly does the headline convey the main point?\n"
             "2. Customer Focus: Does the headline emphasize a customer-centric approach?\n"
             "3. Relevance: How accurately does the headline reflect the content?\n"
