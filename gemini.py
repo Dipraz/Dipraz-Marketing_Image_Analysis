@@ -109,7 +109,7 @@ else:
 
     def marketing_effectiveness(uploaded_file):
         prompt = (
-            "Analyze the provided image for its marketing effectiveness based on the following detailed criteria. For each criterion, provide a score from 1 to 5 (1 being poor and 5 being excellent), also Under the table, please write the total sum of scores. and a short explanation with some improvement suggestions. Ensure that this analysis method delivers consistent results mainly score, regardless of how many times or when it is run. The criteria to consider are :\n"
+            "Analyze the provided image for its marketing effectiveness based on the following detailed criteria. For each criterion, provide a score from 1 to 5 (1 being poor and 5 being excellent), also after the responses please write the total sum of the scores. and a concise explanation with some improvement suggestions. Ensure that this analysis method delivers consistent results mainly score, regardless of how many times or when it is run. The criteria to consider are :\n"
             "1. Information Prioritization: Does the image effectively highlight the most important information?\n"
             "2. Visual Cues and Color Usage: Does the image use visual cues and colors to draw attention to key elements?\n"
             "3. Labeling and Button Clarity: Are any labels or buttons present clearly labeled and easy to understand?\n"
