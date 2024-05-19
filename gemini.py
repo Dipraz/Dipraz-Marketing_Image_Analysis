@@ -53,8 +53,8 @@ else:
 
     def detailed_marketing_analysis(uploaded_file):
         prompt = (
-            "Analyze the provided image for marketing effectiveness. Provide a score from 1 to 5 (1 being low, 5 being high) and a concise explanation for each aspect, along with suggestions for improvement. The results should be presented in a table format (Aspect, Score, Explanation, Improvement). Here are the aspects to consider:\n"
-            "1. Attraction and Focus: Does the content prioritize important information and draw attention effectively?\n"
+            "Analyze the provided image for marketing effectiveness. For each aspect listed below, provide a score from 1 to 5 (1 being low, 5 being high) along with a concise explanation and suggestions for improvement. Present the results in a table format with the columns: Aspect, Score, Explanation, Improvement. Ensure that this analysis method delivers consistent results mainly score, regardless of how many times or when it is run. The aspects to consider are : \n"
+            "1. Attention: Evaluate the order of content consumption in the uploaded image. Begin by identifying and analyzing the headline for its prominence and position. Follow with an evaluation of any additional text, focusing on visibility and sequence of reader engagement. Proceed to assess the positioning of images in relation to the text. Conclude with an examination of interactive elements such as buttons. Ensure your analysis adheres to a fixed sequence from the most to the least immediately engaging elements, applying principles of visual hierarchy and attention patterns.\n"
             "2. Distinction: Does the content contain pictures that grab user attention? Does it appeal to the primal brain with and without text?\n"
             "3. Purpose and Value: Is the purpose and value clear within 3 seconds? Is the content product or customer-centric?\n"
             "4. Headline Review: Evaluate the headline for clarity, conciseness, customer centricity, SEO keyword integration, emotional appeal, uniqueness, urgency, benefit to the reader, audience targeting, length, use of numbers/lists, brand consistency, and power words.\n"
@@ -63,10 +63,9 @@ else:
             "7. Motivation and Influence: Examine if the content aligns with user motivators, demonstrates authority, uses scarcity, and provides social proof.\n"
             "8. Calls to Action: Analyze the presence, prominence, benefits, and language of CTAs.\n"
             "9. Experience and Memorability: Comment on the user interaction, content difficulty, emotion created, participation encouragement, learning styles, interactivity, context, reinforcement, practical value, and social currency.\n"
-            "10. Attention: Discuss the order in which the content is consumed (e.g., headline first, then text, or image then text then button, etc).\n"
-            "11. Distinction: Is the image a stock image or something unique?\n"
-            "12. Memory: Does the content include a range of learning styles (e.g., image, text, infographics, video, etc)?\n"
-            "13. Effort: Does the content have multiple messages and lots of text? Is it long and difficult to read?\n"
+            "10. Attraction and Focus: Does the content prioritize important information and draw attention effectively?\n"
+            "11. Memory: Does the content include a range of learning styles (e.g., image, text, infographics, video, etc)?\n"
+            "12. Effort: Does the content have multiple messages and lots of text? Is it long and difficult to read?\n"
         )
         image = Image.open(uploaded_file)
         response = model.generate_content([prompt, image])
@@ -110,7 +109,7 @@ else:
 
     def marketing_effectiveness(uploaded_file):
         prompt = (
-            "Analyze the provided image for its marketing effectiveness based on the following detailed criteria. For each criterion, provide a score from 1 to 5 (1 being poor and 5 being excellent) and a short explanation with some improvement suggestions:\n"
+            "Analyze the provided image for its marketing effectiveness based on the following detailed criteria. For each criterion, provide a score from 1 to 5 (1 being poor and 5 being excellent), also Under the table, please write the total sum of scores. and a short explanation with some improvement suggestions. Ensure that this analysis method delivers consistent results mainly score, regardless of how many times or when it is run. The criteria to consider are :\n"
             "1. Information Prioritization: Does the image effectively highlight the most important information?\n"
             "2. Visual Cues and Color Usage: Does the image use visual cues and colors to draw attention to key elements?\n"
             "3. Labeling and Button Clarity: Are any labels or buttons present clearly labeled and easy to understand?\n"
@@ -130,7 +129,7 @@ else:
 
     def headline_analysis(uploaded_file):
         prompt = (
-            "Analyze the provided image headline for its effectiveness based on the following criteria. For each criterion, provide a score from 1 to 5 (1 being poor and 5 being excellent) and a short, concise explanation. Also, provide 3 possible short suggestions for improved headlines. The results should be presented in a table format (Criterion, Score, Explanation, Improvement). Under the table, please write the total sum of scores. Here are the criteria to consider:\n"
+            "Analyze the provided image headline for its effectiveness based on the following criteria. For each criterion, provide a score from 1 to 5 (1 being poor and 5 being excellent) and a short, concise explanation. Also, provide 3 possible brief suggestions for improved headlines after the table. The results should be presented in a table format with the columns: Criterion, Score, Explanation, and Improvement. Under the table, please write the total sum of scores. Ensure that this analysis method delivers consistent results mainly score, regardless of how many times or when it is run. The criteria to consider are :\n"
             "1. Clarity & Concision: How clearly does the headline convey the main point?\n"
             "2. Customer Focus: Does the headline emphasize a customer-centric approach?\n"
             "3. Relevance: How accurately does the headline reflect the content?\n"
