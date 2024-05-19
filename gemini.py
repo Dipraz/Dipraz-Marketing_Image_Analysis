@@ -129,7 +129,7 @@ else:
 
     def headline_analysis(uploaded_file):
         prompt = (
-            "Analyze the provided image headline for its effectiveness based on the following criteria. For each criterion, provide a score from 1 to 5 (1 being poor and 5 being excellent) and a short, concise explanation. Also, provide 3 possible brief suggestions for improved headlines after the table. The results should be presented in a table format with the columns: Criterion, Score, Explanation, and Improvement. Under the table, please write the total sum of scores. Ensure that this analysis method delivers consistent results mainly score, regardless of how many times or when it is run. The criteria to consider are :\n"
+            "Analyze the provided image headline for it's effectiveness based on the following criteria. For each criterion, provide a score from 1 to 5 (1 being poor and 5 being excellent) and a concise explanation. Also, provide 3 possible brief suggestions for improved headlines after the table. The results should be presented in a table format with the columns: Criterion, Score, and Explanation. Under the table, please write the total sum of scores. Ensure that this analysis method delivers consistent results mainly score, regardless of how many times or when it is run. The criteria to consider are :\n"
             "1. Clarity & Concision: How clearly does the headline convey the main point?\n"
             "2. Customer Focus: Does the headline emphasize a customer-centric approach?\n"
             "3. Relevance: How accurately does the headline reflect the content?\n"
@@ -156,8 +156,7 @@ else:
                 criteria_dict = {
                     "Criterion": "N/A",
                     "Score": "N/A",
-                    "Explanation": "N/A",
-                    "Improvement": "N/A"
+                    "Explanation": "N/A"
                 }
                 for line in lines:
                     if ": " in line:
@@ -168,8 +167,6 @@ else:
                             criteria_dict["Score"] = value
                         elif key.startswith("Explanation"):
                             criteria_dict["Explanation"] = value
-                        elif key.startswith("Improvement"):
-                            criteria_dict["Improvement"] = value
                 if any(value != "N/A" for value in criteria_dict.values()):
                     results.append(criteria_dict)
 
