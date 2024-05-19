@@ -33,7 +33,7 @@ else:
         prompt = (
             "Analyze the provided image for various marketing aspects. Respond in single words or short phrases separated by commas for each attribute: "
             "text amount (High or Low), color usage (Effective or Not effective), visual cues (Present or Absent), emotion (Positive or Negative), focus (Central message or Scattered), "
-            "customer centric (Yes or No), credibility (High or Low), user interaction (High, Moderate, or Low), CTA presence (Yes or No), CTA clarity (Clear or Unclear)."
+            "customer-centric (Yes or No), credibility (High or Low), user interaction (High, Moderate, or Low), CTA presence (Yes or No), CTA clarity (Clear or Unclear)."
         )
         image = Image.open(uploaded_file)
         response = model.generate_content([prompt, image])
@@ -53,7 +53,7 @@ else:
 
     def detailed_marketing_analysis(uploaded_file):
         prompt = (
-            "Analyze the provided image for marketing effectiveness. Provide a score from 1 to 5 (1 being low, 5 being high) and a concise explanation for each aspect, along with suggestions for improvement. The results should be presented in a table format (Aspect, Score, Explanation, Improvement). Here are the aspects to consider:\n"
+            "Analyze the provided image for marketing effectiveness. Provide a score from 1 to 5 (1 being low, 5 being high) and a concise explanation for each aspect, along with suggestions for improvement. The results should be presented in a table format (Aspect, Score, Explanation, Improvement), Under the table, please write the total sum of scores. Here are the aspects to consider:\n"
             "1. Attraction and Focus: Does the content prioritize important information and draw attention effectively?\n"
             "2. Distinction: Does the content contain pictures that grab user attention? Does it appeal to the primal brain with and without text?\n"
             "3. Purpose and Value: Is the purpose and value clear within 3 seconds? Is the content product or customer-centric?\n"
@@ -130,7 +130,7 @@ else:
 
     def headline_analysis(uploaded_file):
         prompt = (
-            "Analyze the provided image headline for its effectiveness based on the following criteria. For each criterion, provide a score from 1 to 5 (1 being poor and 5 being excellent) and a short concise explanation, along with 3 possible short suggestions for improved headlines.The results should be presented in a table format (Criterion, Score, Explanation, Improvement). Here are the criteria to consider:\n"
+            "Analyze the provided image headline for its effectiveness based on the following criteria. For each criterion, provide a score from 1 to 5 (1 being poor and 5 being excellent) and a short, concise explanation. Also, provide 3 possible short suggestions for improved headlines. The results should be presented in a table format (Criterion, Score, Explanation, Improvement). Under the table, please write the total sum of scores. Here are the criteria to consider:\n"
             "1. Clarity & Concision: How clearly does the headline convey the main point?\n"
             "2. Customer Focus: Does the headline emphasize a customer-centric approach?\n"
             "3. Relevance: How accurately does the headline reflect the content?\n"
