@@ -53,7 +53,7 @@ else:
 
     def detailed_marketing_analysis(uploaded_file):
         prompt = (
-            "Analyze the provided image for marketing effectiveness. Provide a score from 1 to 5 (1 being low, 5 being high) and a concise explanation for each aspect, along with suggestions for improvement. The results should be presented in a table format (Aspect, Score, Explanation, Improvement), Under the table, please write the total sum of scores. Here are the aspects to consider:\n"
+            "Analyze the provided image for marketing effectiveness. Provide a score from 1 to 5 (1 being low, 5 being high) and a concise explanation for each aspect, along with suggestions for improvement. The results should be presented in a table format (Aspect, Score, Explanation, Improvement). Under the table, please write the total sum of scores. Here are the aspects to consider:\n"
             "1. Attraction and Focus: Does the content prioritize important information and draw attention effectively?\n"
             "2. Distinction: Does the content contain pictures that grab user attention? Does it appeal to the primal brain with and without text?\n"
             "3. Purpose and Value: Is the purpose and value clear within 3 seconds? Is the content product or customer-centric?\n"
