@@ -25,13 +25,6 @@ else:
     # Initialize Generative AI model
     model = genai.GenerativeModel(model_name="gemini-1.5-flash-latest")
 
-    # Initialize session state variables
-    if 'uploaded_file' not in st.session_state:
-        st.session_state.uploaded_file = None
-    if 'result' not in st.session_state:
-        st.session_state.result = None
-
-    # Function to resize image (if necessary)
     def resize_image(image, max_size=(500, 500)):
         image.thumbnail(max_size)
         return image
@@ -40,7 +33,7 @@ else:
         prompt = (
             "Analyze the provided image for various marketing aspects. Respond in single words or short phrases separated by commas for each attribute: "
             "text amount (High or Low), color usage (Effective or Not effective), visual cues (Present or Absent), emotion (Positive or Negative), focus (Central message or Scattered), "
-            "customer-centric (Yes or No), credibility (High or Low), user interaction (High, Moderate, or Low), CTA presence (Yes or No), CTA clarity (Clear or Unclear)."
+            "customer centric (Yes or No), credibility (High or Low), user interaction (High, Moderate, or Low), CTA presence (Yes or No), CTA clarity (Clear or Unclear)."
         )
         image = Image.open(uploaded_file)
         response = model.generate_content([prompt, image])
@@ -103,7 +96,8 @@ else:
                             aspect_dict["Explanation"] = value
                         elif key.startswith("Improvement"):
                             aspect_dict["Improvement"] = value
-                results.append(aspect_dict)
+                if any(value != "N/A" for value in aspect_dict.values()):
+                    results.append(aspect_dict)
 
             if results:
                 st.write("Detailed Marketing Analysis Results:")
@@ -134,14 +128,70 @@ else:
             st.error("Unexpected response structure from the model.")
             return None
 
+    def headline_analysis(uploaded_file):
+        prompt = (
+            "Analyze the provided image headline for its effectiveness based on the following criteria. For each criterion, provide a score from 1 to 5 (1 being poor and 5 being excellent) and a short concise explanation, along with 3 possible short suggestions for improved headlines.The results should be presented in a table format (Criterion, Score, Explanation, Improvement). Here are the criteria to consider:\n"
+            "1. Clarity & Concision: How clearly does the headline convey the main point?\n"
+            "2. Customer Focus: Does the headline emphasize a customer-centric approach?\n"
+            "3. Relevance: How accurately does the headline reflect the content?\n"
+            "4. Keywords: Are relevant SEO keywords included naturally?\n"
+            "5. Emotional Appeal: Does the headline evoke curiosity or an emotional response?\n"
+            "6. Uniqueness: How original and creative is the headline?\n"
+            "7. Urgency & Curiosity: Does the headline create a sense of urgency or pique curiosity?\n"
+            "8. Benefit-Driven: Does the headline convey a clear benefit or value proposition?\n"
+            "9. Target Audience: Is the headline tailored to resonate with the specific target audience?\n"
+            "10. Length & Format: Does the headline fall within an ideal length of 6-12 words?\n"
+            "11. Numbers & Lists: Does the headline effectively use numbers or a list format?\n"
+        )
+        image = Image.open(uploaded_file)
+        response = model.generate_content([prompt, image])
+
+        if response.candidates:
+            raw_response = response.candidates[0].content.parts[0].text.strip()
+            st.write(f"Raw response: {raw_response}")  # Debug: display raw response
+            criterias = raw_response.split("\n\n")
+
+            results = []
+            for criteria in criterias:
+                lines = criteria.split("\n")
+                criteria_dict = {
+                    "Criterion": "N/A",
+                    "Score": "N/A",
+                    "Explanation": "N/A",
+                    "Improvement": "N/A"
+                }
+                for line in lines:
+                    if ": " in line:
+                        key, value = line.split(": ", 1)
+                        if key.startswith("Criterion"):
+                            criteria_dict["Criterion"] = value
+                        elif key.startswith("Score"):
+                            criteria_dict["Score"] = value
+                        elif key.startswith("Explanation"):
+                            criteria_dict["Explanation"] = value
+                        elif key.startswith("Improvement"):
+                            criteria_dict["Improvement"] = value
+                if any(value != "N/A" for value in criteria_dict.values()):
+                    results.append(criteria_dict)
+
+            if results:
+                st.write("Headline Analysis Results:")
+                st.table(pd.DataFrame(results))
+            else:
+                st.error("Error: Unable to parse detailed headline analysis results.")
+        else:
+            st.error("Unexpected response structure from the model.")
+        return None
+
     # Streamlit app setup
-    st.title('Marketing Image Analysis AI Assistant (gemini-1.5-flash-latest)')
+    st.title('Marketing Image Analysis AI Assistant')
 
     with st.sidebar:
         st.header("Options")
         basic_analysis = st.button('Basic Analysis')
         detailed_analysis = st.button('Detailed Marketing Analysis')
         marketing_success = st.button('Marketing Success Analysis')
+        headline_analysis_button = st.button('Headline Analysis')
 
     col1, col2 = st.columns(2)
     uploaded_file = col1.file_uploader("Upload your marketing image here:")
@@ -174,3 +224,11 @@ else:
                 if marketing_success_result:
                     st.write("## Marketing Effectiveness Analysis Results:")
                     st.write(marketing_success_result)
+
+        if headline_analysis_button:
+            with st.spinner("Performing headline analysis..."):
+                uploaded_file.seek(0)
+                headline_result = headline_analysis(uploaded_file)
+                if headline_result:
+                    st.write("## Headline Analysis Results:")
+                    st.table(pd.DataFrame(headline_result))
