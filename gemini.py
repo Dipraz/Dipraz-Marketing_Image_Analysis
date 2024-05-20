@@ -22,8 +22,20 @@ else:
     # Configure the Generative AI API key
     genai.configure(api_key=api_key)
 
-    # Initialize Generative AI model
-    model = genai.GenerativeModel(model_name="gemini-1.5-flash-latest")
+    # Define generation configuration
+    generation_config = {
+        "temperature": 0.3,
+        "top_p": 0.95,
+        "top_k": 64,
+        "max_output_tokens": 8192,
+        "response_mime_type": "text/plain",
+    }
+
+    # Initialize Generative AI model with generation configuration
+    model = genai.GenerativeModel(
+        model_name="gemini-1.5-flash-latest",
+        generation_config=generation_config,
+    )
 
     def resize_image(image, max_size=(500, 500)):
         image.thumbnail(max_size)
