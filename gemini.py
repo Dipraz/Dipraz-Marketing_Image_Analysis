@@ -45,7 +45,7 @@ else:
                 structured_response = {attr: val.strip() for attr, val in zip(attributes, values)}
                 return structured_response
             else:
-                st.error("Unexpected response structure from the model. Please check prompt and model output format.")
+                st.error("Unexpected response structure from the model. Please check the prompt and model output format.")
                 return None
         else:
             st.error("Unexpected response structure from the model.")
@@ -53,13 +53,13 @@ else:
 
     def detailed_marketing_analysis(uploaded_file):
         prompt = (
-            "Analyze the provided image for marketing effectiveness. For each aspect listed below, provide a score from 1 to 5 (1 being low, 5 being high) along with a concise explanation and suggestions for improvement. Present the results in a table format with the columns: Aspect, Score, Explanation, and Improvement. Also after the table please write the total sum of the scores and a concise explanation with some improvement overall suggestions. Ensure that this analysis method delivers consistent results mainly score, regardless of how many times or when it is run. The aspects to consider are : \n"
-            "1. Attention: Evaluate the order of content consumption in the uploaded image. Begin by identifying and analyzing the headline for its prominence and position. Follow with an evaluation of any additional text, focusing on visibility and sequence of reader engagement. Proceed to assess the positioning of images in relation to the text. Conclude with an examination of interactive elements such as buttons. Ensure your analysis adheres to a fixed sequence from the most to the least immediately engaging elements, applying principles of visual hierarchy and attention patterns.\n"
+            "Analyze the provided image for marketing effectiveness. For each aspect listed below, provide a score from 1 to 5 (1 being low, 5 being high) along with a concise explanation and suggestions for improvement. Present the results in a table format with the columns: Aspect, Score, Explanation, and Improvement. Also after the table, please write the total sum of the scores and a concise explanation with some improvement overall suggestions. Ensure that this analysis method delivers consistent results mainly score, regardless of how many times or when it is run. The aspects to consider are: \n"
+            "1. Attention: Evaluate the order of content consumption in the uploaded image. Start by identifying and analyzing the headline for its prominence and position. Next, evaluate any additional text for visibility and reader engagement sequence. Assess the positioning of images in relation to the text, followed by an examination of interactive elements such as buttons. Discuss the order in which the content is consumed (e.g., headline first, then text, or image then text then button, etc.). Determine if the content prioritizes important information and draws attention effectively.\n"
             "2. Distinction: Does the content contain pictures that grab user attention? Does it appeal to the primal brain with and without text?\n"
             "3. Purpose and Value: Is the purpose and value clear within 3 seconds? Is the content product or customer-centric?\n"
             "4. Headline Review: Evaluate the headline for clarity, conciseness, customer centricity, SEO keyword integration, emotional appeal, uniqueness, urgency, benefit to the reader, audience targeting, length, use of numbers/lists, brand consistency, and power words.\n"
             "5. Engagement: Discuss the text amount, reading age, grouping, lists, and customer value.\n"
-            "6. Trust: Assess the credibility, reliability, and intimacy conveyed by the content. Is the content brand or customer-centric?\n"
+            "6. Trust: Assess the trustworthiness of the content based on visual and textual elements. Evaluate the credibility, reliability, and intimacy conveyed by the content. Determine if the content is brand-centric or customer-centric, noting that customer-centric content generally has higher trustworthiness? \n"
             "7. Motivation and Influence: Examine if the content aligns with user motivators, demonstrates authority, uses scarcity, and provides social proof.\n"
             "8. Calls to Action: Analyze the presence, prominence, benefits, and language of CTAs.\n"
             "9. Experience and Memorability: Comment on the user interaction, content difficulty, emotion created, participation encouragement, learning styles, interactivity, context, reinforcement, practical value, and social currency.\n"
@@ -179,6 +179,19 @@ else:
             st.error("Unexpected response structure from the model.")
         return None
 
+    def flash_analysis(uploaded_file):
+        prompt = (
+            "Describe in detail what you see in the provided image. List the key elements and information present in the image. Ensure that the description is consistent regardless of how many times or when it is run."
+        )
+        image = Image.open(uploaded_file)
+        response = model.generate_content([prompt, image])
+
+        if response.candidates:
+            return response.candidates[0].content.parts[0].text.strip()
+        else:
+            st.error("Unexpected response structure from the model.")
+            return None
+
     # Streamlit app setup
     st.title('Marketing Image Analysis AI Assistant')
 
@@ -188,6 +201,7 @@ else:
         detailed_analysis = st.button('Detailed Marketing Analysis')
         marketing_success = st.button('Marketing Success Analysis')
         headline_analysis_button = st.button('Headline Analysis')
+        flash_analysis_button = st.button('Flash Analysis')  # New button for Flash analysis
 
     col1, col2 = st.columns(2)
     uploaded_file = col1.file_uploader("Upload your marketing image here:")
@@ -228,3 +242,11 @@ else:
                 if headline_result:
                     st.write("## Headline Analysis Results:")
                     st.table(pd.DataFrame(headline_result))
+
+        if flash_analysis_button:  # Handle Flash analysis button click
+            with st.spinner("Performing Flash analysis..."):
+                uploaded_file.seek(0)
+                flash_result = flash_analysis(uploaded_file)
+                if flash_result:
+                    st.write("## Flash Analysis Results:")
+                    st.write(flash_result)
