@@ -84,7 +84,6 @@ else:
 
         if response.candidates:
             raw_response = response.candidates[0].content.parts[0].text.strip()
-            st.write(f"Raw response: {raw_response}")  # Debug: display raw response
             st.write("Detailed Marketing Analysis Results:")
             st.markdown(raw_response, unsafe_allow_html=True)  # Assuming the response is in HTML table format
         else:
@@ -206,7 +205,8 @@ else:
                 detailed_result = detailed_marketing_analysis(uploaded_file)
                 if detailed_result:
                     st.write("## Detailed Marketing Analysis Results:")
-                    st.write(detailed_result)
+                    # Ensure that the result is only displayed once
+                    st.markdown(detailed_result)
 
         if marketing_success:
             with st.spinner("Performing marketing effectiveness and success analysis..."):
