@@ -85,43 +85,15 @@ else:
         if response.candidates:
             raw_response = response.candidates[0].content.parts[0].text.strip()
             st.write(f"Raw response: {raw_response}")  # Debug: display raw response
-            aspects = raw_response.split("\n\n")
-
-            results = []
-            for aspect in aspects:
-                lines = aspect.split("\n")
-                aspect_dict = {
-                    "Aspect": "N/A",
-                    "Score": "N/A",
-                    "Explanation": "N/A",
-                    "Improvement": "N/A"
-                }
-                for line in lines:
-                    if ": " in line:
-                        key, value = line.split(": ", 1)
-                        if key.startswith("Aspect"):
-                            aspect_dict["Aspect"] = value
-                        elif key.startswith("Score"):
-                            aspect_dict["Score"] = value
-                        elif key.startswith("Explanation"):
-                            aspect_dict["Explanation"] = value
-                        elif key.startswith("Improvement"):
-                            aspect_dict["Improvement"] = value
-                if any(value != "N/A" for value in aspect_dict.values()):
-                    results.append(aspect_dict)
-
-            if results:
-                st.write("Detailed Marketing Analysis Results:")
-                st.table(pd.DataFrame(results))
-            else:
-                st.error("Error: Unable to parse detailed marketing analysis results.")
+            st.write("Detailed Marketing Analysis Results:")
+            st.markdown(raw_response, unsafe_allow_html=True)  # Assuming the response is in HTML table format
         else:
             st.error("Unexpected response structure from the model.")
         return None
 
     def marketing_effectiveness(uploaded_file):
         prompt = (
-            "Analyze the provided image for its marketing effectiveness based on the following detailed criteria. For each criterion, provide a score from 1 to 5 (1 being poor and 5 being excellent), also after the responses please write the total sum of the scores. and a concise explanation with some improvement suggestions. Ensure that this analysis method delivers consistent results mainly score, regardless of how many times or when it is run. The criteria to consider are :\n"
+            "Analyze the provided image for its marketing effectiveness based on the following detailed criteria. For each criterion, provide a score from 1 to 5 (1 being poor and 5 being excellent), also after the responses please write the total sum of the scores, and a concise explanation with some improvement suggestions. Ensure that this analysis method delivers consistent results mainly score, regardless of how many times or when it is run. The criteria to consider are :\n"
             "1. Information Prioritization: Does the image effectively highlight the most important information?\n"
             "2. Visual Cues and Color Usage: Does the image use visual cues and colors to draw attention to key elements?\n"
             "3. Labeling and Button Clarity: Are any labels or buttons present clearly labeled and easy to understand?\n"
@@ -158,38 +130,37 @@ else:
 
         if response.candidates:
             raw_response = response.candidates[0].content.parts[0].text.strip()
-            st.write(f"Raw response: {raw_response}")  # Debug: display raw response
-            criterias = raw_response.split("\n\n")
-
-            results = []
-            for criteria in criterias:
-                lines = criteria.split("\n")
-                criteria_dict = {
-                    "Criterion": "N/A",
-                    "Score": "N/A",
-                    "Explanation": "N/A"
-                }
-                for line in lines:
-                    if ": " in line:
-                        key, value = line.split(": ", 1)
-                        if key.startswith("Criterion"):
-                            criteria_dict["Criterion"] = value
-                        elif key.startswith("Score"):
-                            criteria_dict["Score"] = value
-                        elif key.startswith("Explanation"):
-                            criteria_dict["Explanation"] = value
-                if any(value != "N/A" for value in criteria_dict.values()):
-                    results.append(criteria_dict)
-
-            if results:
-                st.write("Headline Analysis Results:")
-                st.table(pd.DataFrame(results))
-            else:
-                st.error("Error: Unable to parse detailed headline analysis results.")
+            st.write("Headline Analysis Results:")
+            st.markdown(raw_response, unsafe_allow_html=True)  # Assuming the response is in HTML table format
         else:
             st.error("Unexpected response structure from the model.")
         return None
 
+
+
+    def headline_detailed_analysis(uploaded_file):
+        prompt = (
+            "Analyze the headline of the provided image based on the following criteria.Please ensure the analysis is thorough and provides valuable insights. Present the results in a table format with the columns: Criteria, Assessment, and Explanation. After presenting the table, provide an overall summary, including a concise explanation and some improvement suggestions. Ensure that this analysis yields consistent results regardless of how many times or when it is run. The criteria to assess are:\n"
+            "1. Word Count: Number of words in the headline.\n"
+            "2. Character Count: Total number of characters, including spaces.\n"
+            "3. Common Words: Count of frequently used words.\n"
+            "4. Uncommon Words: Count of less frequent words.\n"
+            "5. Emotional Words: Number of words conveying emotions (positive, negative, etc.).\n"
+            "6. Power Words: Number of words used to grab attention or influence.\n"
+            "7. Sentiment: Overall sentiment of the headline (positive, negative, neutral).\n"
+            "8. Reading Grade Level: Reading grade level of the headline text.\n"
+        )
+        image = Image.open(uploaded_file)
+        response = model.generate_content([prompt, image])
+
+        if response.candidates:
+            raw_response = response.candidates[0].content.parts[0].text.strip()
+            st.write("Headline Optimization Report Results:")
+            st.markdown(raw_response, unsafe_allow_html=True)  # Assuming the response is in HTML table format
+        else:
+            st.error("Unexpected response structure from the model.")
+        return None
+    
     def flash_analysis(uploaded_file):
         prompt = (
             "Describe in detail what you see in the provided image. List the key elements and information present in the image. Ensure that the description is consistent regardless of how many times or when it is run."
@@ -202,7 +173,7 @@ else:
         else:
             st.error("Unexpected response structure from the model.")
             return None
-
+        
     # Streamlit app setup
     st.title('Marketing Image Analysis AI Assistant')
 
@@ -212,8 +183,9 @@ else:
         detailed_analysis = st.button('Detailed Marketing Analysis')
         marketing_success = st.button('Marketing Success Analysis')
         headline_analysis_button = st.button('Headline Analysis')
-        flash_analysis_button = st.button('Flash Analysis')  # New button for Flash analysis
-
+        detailed_headline_analysis_button = st.button('Headline Optimization Report') 
+        flash_analysis_button = st.button('Flash Analysis') 
+        
     col1, col2 = st.columns(2)
     uploaded_file = col1.file_uploader("Upload your marketing image here:")
 
@@ -252,8 +224,16 @@ else:
                 headline_result = headline_analysis(uploaded_file)
                 if headline_result:
                     st.write("## Headline Analysis Results:")
-                    st.table(pd.DataFrame(headline_result))
+                    st.write(headline_result)
 
+        if detailed_headline_analysis_button:  # Handle Detailed Headline Analysis button click
+            with st.spinner("Performing Headline Optimization Report analysis..."):
+                uploaded_file.seek(0)
+                detailed_headline_result = headline_detailed_analysis(uploaded_file)
+                if detailed_headline_result:
+                    st.write("## Headline Optimization Report Results:")
+                    st.write(detailed_headline_result)
+                    
         if flash_analysis_button:  # Handle Flash analysis button click
             with st.spinner("Performing Flash analysis..."):
                 uploaded_file.seek(0)
