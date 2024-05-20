@@ -142,7 +142,7 @@ else:
     def headline_analysis(uploaded_file):
         prompt = (
             "Evaluate the provided image headline for its effectiveness using the designated criteria. Rate each criterion on a scale from 1 to 5 (1 being poor, 5 being excellent), and provide a concise explanation for each score. Present your results in a table format with columns labeled: Criterion, Score, Explanation. Below the table, calculate and display the total sum of all scores. Ensure that this analysis process yields consistent scoring results, regardless of how many times or when it is run. Conclude with three possible improved headlines. The criteria to assess are: \n"
-            "1. Clarity & Concision: How clearly does the headline convey the main point?\n"
+            "1. Clarity & Conciseness: How clearly does the headline convey the main point?\n"
             "2. Customer Focus: Does the headline emphasize a customer-centric approach?\n"
             "3. Relevance: How accurately does the headline reflect the content?\n"
             "4. Keywords: Are relevant SEO keywords included naturally?\n"
@@ -152,7 +152,6 @@ else:
             "8. Benefit-Driven: Does the headline convey a clear benefit or value proposition?\n"
             "9. Target Audience: Is the headline tailored to resonate with the specific target audience?\n"
             "10. Length & Format: Does the headline fall within an ideal length of 6-12 words?\n"
-            "11. Numbers & Lists: Does the headline effectively use numbers or a list format?\n"
         )
         image = Image.open(uploaded_file)
         response = model.generate_content([prompt, image])
