@@ -136,11 +136,9 @@ else:
             st.error("Unexpected response structure from the model.")
         return None
 
-
-
     def headline_detailed_analysis(uploaded_file):
         prompt = (
-            "Analyze the headline of the provided image based on the following criteria.Please ensure the analysis is thorough and provides valuable insights. Present the results in a table format with the columns: Criteria, Assessment, and Explanation. After presenting the table, provide an overall summary, including a concise explanation and some improvement suggestions. Ensure that this analysis yields consistent results regardless of how many times or when it is run. The criteria to assess are:\n"
+            "Analyze the headline of the provided image based on the following criteria. Present the results in a table format with the columns: Criteria, Assessment, and Explanation. After presenting the table, provide an overall summary, including a concise explanation and some improvement suggestions. Ensure that this analysis yields consistent results regardless of how many times or when it is run. The criteria to assess are:\n"
             "1. Word Count: Number of words in the headline.\n"
             "2. Character Count: Total number of characters, including spaces.\n"
             "3. Common Words: Count of frequently used words.\n"
@@ -160,7 +158,7 @@ else:
         else:
             st.error("Unexpected response structure from the model.")
         return None
-    
+
     def flash_analysis(uploaded_file):
         prompt = (
             "Describe in detail what you see in the provided image. List the key elements and information present in the image. Ensure that the description is consistent regardless of how many times or when it is run."
