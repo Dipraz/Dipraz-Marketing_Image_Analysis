@@ -43,7 +43,7 @@ else:
 
     def analyze_image(uploaded_file):
         prompt = (
-            "Analyze the provided image for various marketing aspects. Respond in single words or short phrases separated by commas for each attribute: "
+            "Imagine you are a marketing consultant reviewing an image for a client. Analyze the provided image for various marketing aspects. Respond in single words or short phrases separated by commas for each attribute: "
             "text amount (High or Low), color usage (Effective or Not effective), visual cues (Present or Absent), emotion (Positive or Negative), focus (Central message or Scattered), "
             "customer-centric (Yes or No), credibility (High or Low), user interaction (High, Moderate, or Low), CTA presence (Yes or No), CTA clarity (Clear or Unclear)."
         )
@@ -65,7 +65,7 @@ else:
 
     def detailed_marketing_analysis(uploaded_file):
         prompt = (
-            "Analyze the provided image for marketing effectiveness. For each aspect listed below, provide a score from 1 to 5 (1 being low, 5 being high) along with a concise explanation and suggestions for improvement. Present the results in a table format with the columns: Aspect, Score, Explanation, and Improvement. Also after the table, please write the total sum of the scores and a concise explanation with some improvement overall suggestions. Ensure that this analysis method delivers consistent results mainly score, regardless of how many times or when it is run. The aspects to consider are: \n"
+            "Imagine you are a marketing consultant reviewing an image for a client.Analyze the provided image for marketing effectiveness. For each aspect listed below, provide a score from 1 to 5 (1 being low, 5 being high) along with a concise explanation and suggestions for improvement. Present the results in a table format with the columns: Aspect, Score, Explanation, and Improvement. Also after the table, please write the total sum of the scores and a concise explanation with some improvement overall suggestions. Ensure that this analysis method delivers consistent results mainly score, regardless of how many times or when it is run. The aspects to consider are: \n"
             "1. Attention: Evaluate the order of content consumption in the uploaded image. Start by identifying and analyzing the headline for its prominence and position. Next, evaluate any additional text for visibility and reader engagement sequence. Assess the positioning of images in relation to the text, followed by an examination of interactive elements such as buttons. Discuss the order in which the content is consumed (e.g., headline first, then text, or image then text then button, etc.). Determine if the content prioritizes important information, and draws and holds attention effectively.\n"
             "2. Distinction: Does the content contain pictures that grab user attention? Does it appeal to the primal brain with and without text?\n"
             "3. Purpose and Value: Is the purpose and value clear within 3 seconds? Is the content product or customer-centric?\n"
@@ -92,14 +92,15 @@ else:
 
     def marketing_effectiveness(uploaded_file):
         prompt = (
-            "Analyze the provided image for its marketing effectiveness based on the following detailed criteria. For each criterion, provide a score from 1 to 5 (1 being poor and 5 being excellent), also after the responses please write the total sum of the scores, and a concise explanation with some improvement suggestions. Ensure that this analysis method delivers consistent results mainly score, regardless of how many times or when it is run. The criteria to consider are :\n"
-            "1. Information Prioritization: Does the image effectively highlight the most important information?\n"
-            "2. Visual Cues and Color Usage: Does the image use visual cues and colors to draw attention to key elements?\n"
-            "3. Labeling and Button Clarity: Are any labels or buttons present clearly labeled and easy to understand?\n"
-            "4. Attention Capturing: How well does the image capture and hold the viewer's attention?\n"
-            "5. Headline Clarity and Impact: If a headline is present, how clear and impactful is it?\n"
-            "6. Engagement Level: Evaluate the text quantity and how well the information is grouped. Is the text engaging?\n"
-            "7. Trustworthiness: Assess the trustworthiness of the content based on visual and textual elements.\n"
+            "Imagine you are a marketing consultant reviewing an image for a client. Analyze the provided image and assess its marketing effectiveness based on the following criteria.  For each criterion, provide a score from 1 to 5 (1 being poor, 5 being excellent) along with a concise explanation that highlights how the image content contributes to the score. After evaluating each criterion, present a bulleted summary with improvement suggestions for each aspect that scored lower than 4. Ensure that this analysis process yields consistent scoring results, regardless of how many times or when it is run."
+            "The criteria to consider are: \n"
+            "  1. Information Prioritization: Does the image effectively highlight the most important information? Consider factors like size, placement, and visual hierarchy. \n"
+            "  2. Visual Cues and Color Usage: Does the image use visual cues and colors to draw attention to key elements? Analyze how color choices, contrast, and elements like arrows or frames guide the viewer's attention. \n"
+            "  3. Labeling and Button Clarity: Are any labels or buttons present clearly labeled and easy to understand? Evaluate the use of text size, font choice, and placement for optimal readability. \n"
+            "  4. Attention Capturing: How well does the image capture and hold the viewer's attention? Consider elements like composition, negative space, and use of contrasting elements. \n"
+            "  5. Headline Clarity and Impact (if applicable): If a headline is present, how clear and impactful is it? Assess the headline's readability, relevance to the image content, and potential to evoke curiosity or action. \n"
+            "  6. Engagement Level: Evaluate the text quantity and how well the information is grouped. Is the text engaging? Analyze the text-to-image ratio, use of bullet points or call-to-action elements, and overall readability. \n"
+            "  7. Trustworthiness: Assess the trustworthiness of the content based on visual and textual elements. Consider factors like image quality, professionalism, and consistency with brand identity. \n"
         )
         image = Image.open(uploaded_file)
         response = model.generate_content([prompt, image])
@@ -112,17 +113,17 @@ else:
 
     def headline_analysis(uploaded_file):
         prompt = (
-            "Evaluate the provided image headline for its effectiveness using the designated criteria. Rate each criterion on a scale from 1 to 5 (1 being poor, 5 being excellent), and provide a concise explanation for each score. Present your results in a table format with columns labeled: Criterion, Score, Explanation. Below the table, calculate and display the total sum of all scores. Ensure that this analysis process yields consistent scoring results, regardless of how many times or when it is run. Conclude with three possible improved headlines. The criteria to assess are: \n"
-            "1. Clarity & Conciseness: How clearly does the headline convey the main point?\n"
-            "2. Customer Focus: Does the headline emphasize a customer-centric approach?\n"
-            "3. Relevance: How accurately does the headline reflect the content?\n"
-            "4. Keywords: Are relevant SEO keywords included naturally?\n"
-            "5. Emotional Appeal: Does the headline evoke curiosity or an emotional response?\n"
-            "6. Uniqueness: How original and creative is the headline?\n"
-            "7. Urgency & Curiosity: Does the headline create a sense of urgency or pique curiosity?\n"
-            "8. Benefit-Driven: Does the headline convey a clear benefit or value proposition?\n"
-            "9. Target Audience: Is the headline tailored to resonate with the specific target audience?\n"
-            "10. Length & Format: Does the headline fall within an ideal length of 6-12 words?\n"
+            "Imagine you are a marketing consultant reviewing an image and its headline for a client. Analyze the provided image content alongside the headline text to assess the headline's effectiveness. Rate each criterion on a scale from 1 to 5 (1 being poor, 5 being excellent), and provide a concise explanation for each score based on the synergy between the image and headline. Present your results in a table format with columns labeled: Criterion, Score, Explanation. Below the table, calculate and display the total sum of all scores. Ensure that this analysis process yields consistent scoring results, regardless of how many times or when it is run. Conclude with three possible improved headlines that better align with the image content. The criteria to assess are: \n"
+            "  1. Clarity & Conciseness: How clearly does the headline convey the main point?\n"
+            "  2. Customer Focus: Does the headline emphasize a customer-centric approach?\n"
+            "  3. Relevance: How accurately does the headline reflect the content of the image?\n"
+            "  4. Keywords: Are relevant SEO keywords included naturally?\n"
+            "  5. Emotional Appeal: Does the headline evoke curiosity or an emotional response, considering the image content?\n"
+            "  6. Uniqueness: How original and creative is the headline?\n"
+            "  7. Urgency & Curiosity: Does the headline create a sense of urgency or pique curiosity, considering the image?\n"
+            "  8. Benefit-Driven: Does the headline convey a clear benefit or value proposition, aligned with the image content?\n"
+            "  9. Target Audience: Is the headline tailored to resonate with the specific target audience, considering the image's visual cues?\n"
+            "  10. Length & Format: Does the headline fall within an ideal length of 6-12 words?\n"
         )
         image = Image.open(uploaded_file)
         response = model.generate_content([prompt, image])
@@ -137,15 +138,16 @@ else:
 
     def headline_detailed_analysis(uploaded_file):
         prompt = (
-            "Analyze the headline of the provided image based on the following criteria. Present the results in a table format with the columns: Criteria, Assessment, and Explanation. After presenting the table, provide an overall summary, including a concise explanation and some improvement suggestions. Ensure that this analysis yields consistent results regardless of how many times or when it is run. The criteria to assess are:\n"
-            "1. Word Count: Number of words in the headline.\n"
-            "2. Character Count: Total number of characters, including spaces.\n"
-            "3. Common Words: Count of frequently used words.\n"
-            "4. Uncommon Words: Count of less frequent words.\n"
-            "5. Emotional Words: Number of words conveying emotions (positive, negative, etc.).\n"
-            "6. Power Words: Number of words used to grab attention or influence.\n"
-            "7. Sentiment: Overall sentiment of the headline (positive, negative, neutral).\n"
-            "8. Reading Grade Level: Reading grade level of the headline text.\n"
+            "Imagine you are analyzing a marketing image for a human client. You are an expert assessing the headline's effectiveness. Analyze the headline text extracted from the image and present the results in a table format with the following columns: Criteria, Assessment, and Explanation. After the table, provide an overall summary, including a concise explanation and some improvement suggestions. Ensure the analysis is consistent across multiple runs."
+            "The criteria to assess are: \n"
+            "  1. Word Count: Number of words in the headline.\n"
+            "  2. Character Count: Total number of characters, including spaces.\n"
+            "  3. Common Words: Count of frequently used words.\n"
+            "  4. Uncommon Words: Count of less frequent words.\n"
+            "  5. Emotional Words: Number of words conveying emotions (positive, negative, etc.).\n"
+            "  6. Power Words: Number of words used to grab attention or influence.\n"
+            "  7. Sentiment: Overall sentiment of the headline (positive, negative, neutral).\n"
+            "  8. Reading Grade Level: Reading grade level of the headline text.\n"
         )
         image = Image.open(uploaded_file)
         response = model.generate_content([prompt, image])
@@ -160,8 +162,9 @@ else:
 
     def flash_analysis(uploaded_file):
         prompt = (
-            "Describe in detail what you see in the provided image. List the key elements and information present in the image. Ensure that the description is consistent regardless of how many times or when it is run."
+            "Imagine you are a visual content analyst reviewing an image for a client. Analyze the provided image and generate a detailed description that captures the key elements and information relevant to marketing purposes. Focus on objective details like objects, people, colors, text, and their arrangement. Additionally, identify any potential cultural references or symbols that might be relevant to the target audience. Ensure the description is consistent across multiple runs, avoiding subjective interpretations or emotional responses."
         )
+
         image = Image.open(uploaded_file)
         response = model.generate_content([prompt, image])
 
