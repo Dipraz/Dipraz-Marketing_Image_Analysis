@@ -230,7 +230,7 @@ else:
         headline_analysis_button = st.button('Headline Analysis')
         detailed_headline_analysis_button = st.button('Headline Optimization Report') 
         flash_analysis_button = st.button('Flash Analysis') 
-        ux_marketing_analysis_button = st.button('UX and Marketing Analysis')
+        ux_marketing_analysis_button = st.button('UX Design and Marketing Analysis')
 
     col1, col2 = st.columns(2)
     uploaded_file = col1.file_uploader("Upload your marketing image here:")
