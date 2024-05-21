@@ -179,6 +179,46 @@ else:
             st.error("Unexpected response structure from the model.")
             return None
 
+    def ux_marketing_analysis(uploaded_file):
+        prompt = (
+            "Imagine you are a UX design and marketing analysis consultant reviewing a UX design image for a client. Analyze the provided image for its effectiveness in both UX design and marketing contexts. For each aspect listed below, provide a score from 1 to 5 (1 being low, 5 being high) along with a concise explanation for all aspects and suggestions for improvement. Present the results in a table format with the columns: Aspect, Score, Explanation, and Improvement. Also, after the table, write the total sum of the scores and a concise explanation with some overall improvement suggestions. Ensure your scoring remains consistent for each aspect, regardless of how many times you analyze the image.\n"
+            "The aspects to consider are:\n"
+            "1. General Analysis: Evaluate the overall effectiveness of the UX design. How well does the design communicate its intended message?\n"
+            "2. Creative Score: Assess the creativity of the design. Does it stand out and capture attention through innovative elements?\n"
+            "3. Attract: Analyze the ability of the design to attract users. Are the visual elements appealing and engaging?\n"
+            "4. Focus: Evaluate how well the design directs user attention to key areas. Does it guide users effectively to important information?\n"
+            "5. Distinction: Determine if the design differentiates itself from competitors. Is it unique and memorable?\n"
+            "6. Purpose and Value: Assess the clarity of the design’s purpose and value proposition. Is the message clear within a few seconds of viewing?\n"
+            "7. Headline (if present):\n"
+            "   - Clarity & Conciseness: Evaluate the headline's clarity and conciseness.\n"
+            "   - Customer Focus: Does the headline emphasize a customer-centric approach?\n"
+            "   - SEO keywords and emotional appeal: Does the headline incorporate SEO keywords and evoke an emotional response?\n"
+            "8. Calls to Action (CTAs): Analyze the presence, prominence, benefits, and language of CTAs. Are they clear and compelling?\n"
+            "9. Effort: Evaluate the clarity and conciseness of the text. Does it convey the message effectively without being overly wordy?\n"
+            "10. Engage: Assess the level of user engagement the design promotes. Does it encourage interaction and participation?\n"
+            "11. Clarity: Evaluate the clarity of the design elements. Are the visuals and text easy to understand?\n"
+            "12. First Impressions: Analyze the initial impact of the design. Does it create a strong positive first impression?\n"
+            "13. Enjoyability: Assess the enjoyability of the user experience. Is the design pleasant and satisfying to interact with?\n"
+            "14. Cognitive Demand: Evaluate the cognitive load required to understand and navigate the design. Is it intuitive and easy to use?\n"
+            "15. Experience: Assess the overall user experience. How well does the design facilitate a smooth and enjoyable interaction?\n"
+            "16. Trust: Analyze the trustworthiness of the design. Does it convey credibility and reliability?\n"
+            "17. Act: Evaluate how well the design encourages users to take action. Are the calls to action effective and persuasive?\n"
+            "18. Motivation: Assess the design’s ability to motivate users. Does it align with user motivators and demonstrate authority or provide social proof?\n"
+            "19. Influence: Analyze the influence of the design. Does it effectively persuade users and drive desired behaviors?\n"
+            "20. Memorability: Evaluate how memorable the design is. Does it leave a lasting impression?\n"
+        )
+
+        image = Image.open(uploaded_file)
+        response = model.generate_content([prompt, image])
+
+        if response.candidates:
+            raw_response = response.candidates[0].content.parts[0].text.strip()
+            st.write("UX and Marketing Analysis Results:")
+            st.markdown(raw_response, unsafe_allow_html=True)  # Assuming the response is in HTML table format
+        else:
+            st.error("Unexpected response structure from the model.")
+        return None
+
     # Streamlit app setup
     st.title('Marketing Image Analysis AI Assistant')
 
@@ -190,6 +230,7 @@ else:
         headline_analysis_button = st.button('Headline Analysis')
         detailed_headline_analysis_button = st.button('Headline Optimization Report') 
         flash_analysis_button = st.button('Flash Analysis') 
+        ux_marketing_analysis_button = st.button('UX and Marketing Analysis')
 
     col1, col2 = st.columns(2)
     uploaded_file = col1.file_uploader("Upload your marketing image here:")
@@ -246,3 +287,8 @@ else:
                 if flash_result:
                     st.write("## Flash Analysis Results:")
                     st.write(flash_result)
+
+        if ux_marketing_analysis_button:
+            with st.spinner("Performing UX and Marketing Analysis..."):
+                uploaded_file.seek(0)
+                ux_marketing_analysis(uploaded_file)
