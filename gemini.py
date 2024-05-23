@@ -104,7 +104,7 @@ else:
             "4. Headline Review: Evaluate the headline for clarity, conciseness, customer centricity, SEO keyword integration, emotional appeal, uniqueness, urgency, benefit to the reader, audience targeting, length, use of numbers/lists, brand consistency, and power words.\n"
             "5. Engagement: Discuss the text amount, reading age, grouping, lists, and customer value.\n"
             "6. Trust: Assess the trustworthiness of the content based on visual and textual elements. Evaluate the credibility, reliability, and intimacy conveyed by the content. Determine if the content is brand-centric or customer-centric, noting that customer-centric content generally has higher trustworthiness? \n"
-            "7. Motivation and Influence: Examine if the content aligns with user motivators, demonstrates authority, uses scarcity, and provides social proof.\n"
+            "7. Motivation & Influence: Examine if the content aligns with user motivators, demonstrates authority, uses scarcity, and provides social proof.\n"
             "8. Calls to Action: Analyze the presence, prominence, benefits, and language of CTAs.\n"
             "9. Experience and Memorability: Comment on the user interaction, content difficulty, emotion created, participation encouragement, learning styles, interactivity, context, reinforcement, practical value, and social currency.\n"
             "10. Attraction and Focus: Does the content prioritize important information and draw attention effectively?\n"
@@ -141,6 +141,37 @@ else:
         image = Image.open(uploaded_file)
         response = model.generate_content([prompt, image])
 
+        if response.candidates:
+            raw_response = response.candidates[0].content.parts[0].text.strip()
+            st.write("Detailed Marketing Analysis Results_V1:")
+            st.markdown(raw_response, unsafe_allow_html=True)  # Assuming the response is in HTML table format
+        else:
+            st.error("Unexpected response structure from the model.")
+        return None
+    
+    def combined_marketing_analysis_V5(uploaded_file):
+        prompt = (
+            "Imagine you are a marketing consultant reviewing an image for a client. Analyze the provided image for marketing effectiveness. First, provide a concise responses for the following:\n"
+            "\n"
+            "1. Asset Type: Provide the type of marketing asset, e.g., email, social media post, advertisement, etc.\n"
+            "2. Purpose: State the purpose of the asset, e.g., to sell a product, to get more signups, to drive traffic to a webpage, etc.\n"
+            "\n"
+            "Then, for each aspect listed below, provide a score from 1 to 5 (1 being low, 5 being high) and a concise explanation for each aspect, along with suggestions for improvement. The results should be presented in a table format with the columns: Aspect, Score, Explanation, and Improvement. After the table, provide the total sum of the scores and a concise explanation with some overall improvement suggestions. Here are the aspects to consider:\n"
+            "\n"
+            "The aspects to consider are:\n"
+            "1. Attention: Evaluate the order of content consumption in the uploaded image. Start by identifying and analyzing the headline for its prominence and position. Next, evaluate any additional text for visibility and reader engagement sequence. Assess the positioning of images in relation to the text, followed by an examination of interactive elements such as buttons. Discuss the order in which the content is consumed (e.g., headline first, then text, or image then text then button, etc.). Determine if the content prioritizes important information, and draws and holds attention effectively.\n"
+            "2. Distinction: Does the content contain pictures that grab user attention? Does it appeal to the primal brain with and without text?\n"
+            "3. Purpose and Value: Is the purpose and value clear within 3 seconds? Is the content product or customer-centric?\n"
+            "4. Headline Review: Evaluate the headline for clarity, conciseness, customer centricity, SEO keyword integration, emotional appeal, uniqueness, urgency, benefit to the reader, audience targeting, length, brand consistency, and power words.\n"
+            "5. Engagement: Discuss the text amount, reading age, grouping, lists, and customer value.\n"
+            "6. Trust: Assess the trustworthiness of the content based on visual and textual elements. Assess the credibility, reliability, and intimacy conveyed by the content. Is the content brand or customer-centric (customer-centric content has a higher trustworthiness)?\n"
+            "7. Motivation & Influence: Examine if the content aligns with user motivators, demonstrates authority, uses scarcity, and provides social proof.\n"
+            "8. Calls to Action: Analyze the presence, prominence, benefits, and language of CTAs.\n"
+            "9. Experience & Memorability: Comment on the user interaction, content difficulty, emotion created, participation encouragement, learning styles, interactivity, context, reinforcement, practical value, and social currency.\n"
+            "10. Effort: Evaluate the clarity and conciseness of the text. Does it convey the message effectively without being overly wordy? (1: Very Dense & Difficult, 5: Clear & Easy to Understand)\n"
+        )
+        image = Image.open(uploaded_file)
+        response = model.generate_content([prompt, image])
         if response.candidates:
             raw_response = response.candidates[0].content.parts[0].text.strip()
             st.write("Detailed Marketing Analysis Results_V1:")
@@ -310,6 +341,7 @@ else:
         detailed_analysis_V1 = st.button('Detailed Marketing Analysis V1')
         detailed_analysis_V2 = st.button('Detailed Marketing Analysis V2')
         detailed_analysis_V3 = st.button('Detailed Marketing Analysis V3')
+        combined_analysis_V5 = st.button('Combined Detailed Marketing Analysis V5')
         marketing_success = st.button('Marketing Success Analysis')
         headline_analysis_button = st.button('Headline Analysis')
         detailed_headline_analysis_button = st.button('Headline Optimization Report') 
@@ -353,13 +385,20 @@ else:
                 if detailed_result_V2:
                     st.write("## Detailed Marketing Analysis_V2 Results:")
                     st.markdown(detailed_result_V2)
+        if combined_analysis_V5:
+            with st.spinner("Performing combined marketing analysis_V3..."):
+                uploaded_file.seek(0)
+                detailed_result_V5 = combined_marketing_analysis_V5(uploaded_file)
+                if detailed_result_V5:
+                    st.write("## Combined Marketing Analysis_V5 Results:")
+                    st.markdown(detailed_result_V5)
         if detailed_analysis_V3:
             with st.spinner("Performing detailed marketing analysis_V3..."):
                 uploaded_file.seek(0)
                 detailed_result_V3 = detailed_marketing_analysis_v3(uploaded_file)
                 if detailed_result_V3:
-                    st.write("## Detailed Marketing Analysis_V3 Results:")
-                    st.markdown(detailed_result_V3)                  
+                    st.write("## Combined Marketing Analysis_V3 Results:")
+                    st.markdown(detailed_result_V3)                    
         if marketing_success:
             with st.spinner("Performing marketing effectiveness and success analysis..."):
                 uploaded_file.seek(0)
