@@ -330,7 +330,19 @@ else:
         else:
             st.error("Unexpected response structure from the model.")
         return None
+    def custom_prompt_analysis(uploaded_file, custom_prompt, model):
+        prompt = custom_prompt
 
+        image = Image.open(uploaded_file)
+        response = model.generate_content([prompt, image])
+
+        if response.candidates:
+            raw_response = response.candidates[0].content.parts[0].text.strip()
+            st.write("## User Prompt Analysis Results:")
+            st.markdown(raw_response, unsafe_allow_html=True)  # Assuming the response is in HTML table format
+        else:
+            st.error("Unexpected response structure from the model.")
+            return None
     # Streamlit app setup
     st.title('Marketing Image Analysis AI Assistant')
 
@@ -347,6 +359,8 @@ else:
         detailed_headline_analysis_button = st.button('Headline Optimization Report') 
         flash_analysis_button = st.button('Flash Analysis') 
         ux_marketing_analysis_button = st.button('UX Design and Marketing Analysis')
+        st.text_area("Enter your custom prompt for image analysis:", key="custom_prompt")
+        custom_prompt_button = st.button('Custom Prompt Analysis')
 
     col1, col2 = st.columns(2)
     uploaded_file = col1.file_uploader("Upload your marketing image here:")
@@ -438,3 +452,12 @@ else:
                 if ux_result:
                     st.write("## UX Design Analysis Results:")
                     st.markdown(ux_result)
+                    
+        if custom_prompt_button:
+            with st.spinner("Performing custom prompt analysis..."):
+                uploaded_file.seek(0)
+                custom_prompt = st.session_state.custom_prompt
+                custom_prompt_result = custom_prompt_analysis(uploaded_file, custom_prompt, model)
+                if custom_prompt_result:
+                    st.write("## Custom Prompt Analysis Results:")
+                    st.markdown(custom_prompt_result)
