@@ -61,6 +61,7 @@ else:
                 raw_response = response.candidates[0].content.parts[0].text.strip()
                 st.write("Detailed Object Detection Analysis Results:")
                 st.markdown(raw_response, unsafe_allow_html=True)  # Assuming the response is in HTML table format
+                return raw_response
             else:
                 st.error("Unexpected response structure from the model.")
             return None
@@ -90,6 +91,7 @@ else:
                 raw_response = response.candidates[0].content.parts[0].text.strip()
                 st.write("Detailed Sentiment Analysis Results:")
                 st.markdown(raw_response, unsafe_allow_html=True)  # Assuming the response is in HTML table format
+                return raw_response
             else:
                 st.error("Unexpected response structure from the model.")
             return None
@@ -121,6 +123,7 @@ else:
                 raw_response = response.candidates[0].content.parts[0].text.strip()
                 st.write("Persons detail Analysis Results:")
                 st.markdown(raw_response, unsafe_allow_html=True)  # Assuming the response is in HTML table format
+                return raw_response
             else:
                 st.error("Unexpected response structure from the model.")
             return None
@@ -153,6 +156,7 @@ else:
                 raw_response = response.candidates[0].content.parts[0].text.strip()
                 st.write("Detailed Image analysis Results:")
                 st.markdown(raw_response, unsafe_allow_html=True)  # Assuming the response is in HTML table format
+                return raw_response
             else:
                 st.error("Unexpected response structure from the model.")
             return None
@@ -181,9 +185,19 @@ else:
                 raw_response = response.candidates[0].content.parts[0].text.strip()
                 st.write("## User Prompt Analysis Results:")
                 st.markdown(raw_response, unsafe_allow_html=True)  # Assuming the response is in HTML table format
+                return raw_response
             else:
                 st.error("Unexpected response structure from the model.")
             return None
+
+        def download_analysis_results(analysis_results):
+            if analysis_results:
+                st.download_button(
+                    label="Download Analysis Results",
+                    data=analysis_results,
+                    file_name="analysis_results.txt",
+                    mime="text/plain"
+                )
 
         # Streamlit app setup
         st.title('Image Analysis AI Assistant')
@@ -195,7 +209,7 @@ else:
             people_analysis_button = st.button('People Details Analysis')
             detailed_analysis_button = st.button('Detailed Image Analysis')
             flash_analysis_button = st.button('Flash Analysis')
-            st.text_area("Enter your custom prompt for image analysis:", key="custom_prompt")
+            custom_prompt_text_area = st.text_area("Enter your custom prompt for image analysis:", key="custom_prompt")
             custom_prompt_button = st.button('Custom Prompt Analysis')
 
         col1, col2 = st.columns(2)
@@ -213,6 +227,7 @@ else:
                     if object_analysis_result:
                         st.write("## Object Detection Analysis Results:")
                         st.markdown(object_analysis_result)
+                        download_analysis_results(object_analysis_result)
 
             if sentiment_analysis_button:
                 with st.spinner("Performing sentiment analysis..."):
@@ -221,6 +236,7 @@ else:
                     if sentiment_analysis_result:
                         st.write("## Sentiment Analysis Results:")
                         st.markdown(sentiment_analysis_result)
+                        download_analysis_results(sentiment_analysis_result)
 
             if people_analysis_button:
                 with st.spinner("Performing people details analysis..."):
@@ -229,6 +245,7 @@ else:
                     if people_details_result:
                         st.write("## People Details Analysis Results:")
                         st.markdown(people_details_result)
+                        download_analysis_results(people_details_result)
 
             if detailed_analysis_button:
                 with st.spinner("Performing detailed analysis..."):
@@ -237,6 +254,7 @@ else:
                     if detailed_result:
                         st.write("## Detailed Analysis Results:")
                         st.markdown(detailed_result)
+                        download_analysis_results(detailed_result)
 
             if flash_analysis_button:
                 with st.spinner("Performing flash analysis..."):
@@ -245,6 +263,7 @@ else:
                     if flash_result:
                         st.write("## Flash Analysis Results:")
                         st.markdown(flash_result)
+                        download_analysis_results(flash_result)
 
             if custom_prompt_button:
                 with st.spinner("Performing custom prompt analysis..."):
@@ -254,3 +273,4 @@ else:
                     if custom_prompt_result:
                         st.write("## Custom Prompt Analysis Results:")
                         st.markdown(custom_prompt_result)
+                        download_analysis_results(custom_prompt_result)
