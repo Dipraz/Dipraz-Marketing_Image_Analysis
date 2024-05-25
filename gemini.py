@@ -192,7 +192,7 @@ else:
             "The aspects to consider are:\n"
             "1. Creative Score: Assess the creativity of the design. Does it stand out and capture attention through innovative elements?\n"
             "2. Attention: Evaluate the order of content consumption in the uploaded image. Start by identifying and analyzing the headline for its prominence and position. Next, evaluate any additional text for visibility and reader engagement sequence. Assess the positioning of images in relation to the text, followed by an examination of interactive elements such as buttons. Discuss the order in which the content is consumed (e.g., headline first, then text,or image then text then button, etc.). Determine if the content prioritizes important information, and draws and holds attention effectively.\n"            
-            "3. Distinction: Does the content contain pictures that grab user attention? Does it appeal to the primal brain with and without text?\n"
+            "3. Distinction: Determine if the design differentiates itself from competitors. Is it unique and memorable?\n"
             "4. Purpose and Value: Is the purpose and value clear within 3 seconds? Is the content product or customer-centric?\n"
             "5. Clarity: Evaluate the clarity of the design elements. Are the visuals and text easy to understand?\n"
             "6. First Impressions: Analyze the initial impact of the design. Does it create a strong positive first impression?\n"
