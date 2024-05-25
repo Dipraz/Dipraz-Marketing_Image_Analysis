@@ -23,7 +23,7 @@ else:
 
     # Define generation configuration
     generation_config = {
-        "temperature": 0.3,
+        "temperature": 0.4,
         "top_p": 0.95,
         "top_k": 64,
         "max_output_tokens": 8192,
@@ -67,7 +67,7 @@ else:
             "Imagine you are a marketing consultant reviewing an image for a client. Analyze the provided image for marketing effectiveness. For each aspect listed below, provide a score from 1 to 5 (1 being low, 5 being high) along with a concise explanation for all aspects and suggestions for improvement. Present the results in a table format with the columns: Aspect, Score, Explanation, and Improvement. Also, after the table, write the total sum of the scores and a concise explanation with some overall improvement suggestions. Ensure your scoring remains consistent for each aspect, regardless of how many times you analyze the image.\n"
             "The aspects to consider are:\n"
             "1. Order of Content Consumption: Analyze the uploaded image to understand the order of content consumption. Start by identifying and analyzing the headline for its prominence and position. Next, evaluate any additional text for visibility and reader engagement sequence. Assess the positioning of images in relation to the text, followed by an examination of interactive elements such as buttons. Discuss the order in which the content is consumed (e.g., headline first, then text, or image then text then button, etc.). Determine if the content prioritizes important information, and draws and holds attention effectively.\n"
-            "2. Visual Appeal: Does the image contain visually appealing elements that grab user attention? Does it appeal on its own, without text?\n"
+            "2. Visual Appeal: Does the image contain visually-appealing elements that grab user attention? Does it appeal on its own, without text?\n"
             "3. Purpose & Value Clarity: Is the purpose and value proposition of the content clear within 3 seconds of viewing the image? Is the content product or customer-centric?\n"
             "4. Headline (if present):\n"
             "   - Clarity & Conciseness: Evaluate the headline's clarity and conciseness.\n"
@@ -185,19 +185,19 @@ else:
             "Imagine you are a UX design and marketing analysis consultant reviewing an image for a client. Analyze the provided image for marketing effectiveness. First, provide detailed responses for the following:\n"
             "\n"
             "1. Asset Type: Clearly identify and describe the type of marketing asset. Examples include email, social media posts, advertisements, flyer, brochures, landing pages, etc.\n"
-            "2. Purpose: Clearly state the specific purpose of this marketing asset. Examples include selling a product, getting more signups, driving traffic to a webpage, increasing brand awareness, engaging with customers, etc.\n"
+            "2. Purpose: Clearly state the specific purpose of this marketing asset. Examples include selling a product, getting more signups, driving traffic to a webpage, increasing brand awareness, engaging with customers, etc. In this case, the purpose should be to drive traffic to the www.markify.io website.\n"
             "\n"
             "Then, for each aspect listed below, provide a score from 1 to 5 (1 being low, 5 being high) and a concise explanation for each aspect, along with suggestions for improvement. The results should be presented in a table format with the columns: Aspect, Score, Explanation, and Improvement. After the table, provide the total sum of the scores and a concise explanation with some overall improvement suggestions. Here are the aspects to consider:\n"
             "\n"
             "The aspects to consider are:\n"
             "1. Creative Score: Assess the creativity of the design. Does it stand out and capture attention through innovative elements?\n"
-            "2. Attention: Evaluate the order of content consumption in the uploaded image. Start by identifying and analyzing the headline for its prominence and position. Next, evaluate any additional text for visibility and reader engagement sequence. Assess the positioning of images in relation to the text, followed by an examination of interactive elements such as buttons. Discuss the order in which the content is consumed (e.g., headline first, then text,or image then text then button, etc.). Determine if the content prioritizes important information, and draws and holds attention effectively.\n"            
-            "3. Distinction: Determine if the design differentiates itself from competitors. Is it unique and memorable?\n"
+            "2. Attention: Evaluate the order of content consumption in the uploaded image. Start by identifying and analyzing the headline for its prominence and position. Next, evaluate any additional text for visibility and reader engagement sequence. Assess the positioning of images in relation to the text, followed by an examination of interactive elements such as buttons. Discuss the order in which the content is consumed (e.g., headline first, then text, or image then text then button, etc.). Determine if the content prioritizes important information, and draws and holds attention effectively.\n"
+            "3. Distinction: Does the content contain pictures that grab user attention? Does it appeal to the primal brain with and without text?\n"
             "4. Purpose and Value: Is the purpose and value clear within 3 seconds? Is the content product or customer-centric?\n"
             "5. Clarity: Evaluate the clarity of the design elements. Are the visuals and text easy to understand?\n"
             "6. First Impressions: Analyze the initial impact of the design. Does it create a strong positive first impression?\n"
             "7. Cognitive Demand: Evaluate the cognitive load required to understand and navigate the design. Is it intuitive and easy to use?\n"
-            "8. Headline Review: Evaluate the headline for clarity, conciseness, customer centricity, SEO keyword integration, emotional appeal, uniqueness, urgency, benefit to the reader, audience targeting,length, use of numbers/lists, brand consistency, and power words.\n"
+            "8. Headline Review: Evaluate the headline for clarity, conciseness, customer centricity, SEO keyword integration, emotional appeal, uniqueness, urgency, benefit to the reader, audience targeting, length, use of numbers/lists, brand consistency, and power words.\n"
             "9. Headline SEO keywords and emotional appeal: Does the headline incorporate SEO keywords and evoke an emotional response?\n"
             "10. Visual Cues and Color Usage: Does the image use visual cues and colors to draw attention to key elements? Analyze how color choices, contrast, and elements like arrows or frames guide the viewer's attention.\n"
             "11. Labeling and Button Clarity: Are any labels or buttons present clearly labeled and easy to understand? Evaluate the use of text size, font choice, and placement for optimal readability.\n"
