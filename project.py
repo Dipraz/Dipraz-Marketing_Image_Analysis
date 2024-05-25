@@ -215,6 +215,8 @@ else:
         col1, col2 = st.columns(2)
         uploaded_file = col1.file_uploader("Upload your image here:")
 
+        analysis_result = None  # Initialize analysis result variable
+
         if uploaded_file is not None:
             image = Image.open(uploaded_file)
             image = resize_image(image)
@@ -223,54 +225,34 @@ else:
             if object_analysis_button:
                 with st.spinner("Performing object detection analysis..."):
                     uploaded_file.seek(0)
-                    object_analysis_result = object_detection_analysis(uploaded_file, model)
-                    if object_analysis_result:
-                        st.write("## Object Detection Analysis Results:")
-                        st.markdown(object_analysis_result)
-                        download_analysis_results(object_analysis_result)
+                    analysis_result = object_detection_analysis(uploaded_file, model)
 
             if sentiment_analysis_button:
                 with st.spinner("Performing sentiment analysis..."):
                     uploaded_file.seek(0)
-                    sentiment_analysis_result = sentiment_analysis_from_image(uploaded_file, model)
-                    if sentiment_analysis_result:
-                        st.write("## Sentiment Analysis Results:")
-                        st.markdown(sentiment_analysis_result)
-                        download_analysis_results(sentiment_analysis_result)
+                    analysis_result = sentiment_analysis_from_image(uploaded_file, model)
 
             if people_analysis_button:
                 with st.spinner("Performing people details analysis..."):
                     uploaded_file.seek(0)
-                    people_details_result = people_details_analysis(uploaded_file, model)
-                    if people_details_result:
-                        st.write("## People Details Analysis Results:")
-                        st.markdown(people_details_result)
-                        download_analysis_results(people_details_result)
+                    analysis_result = people_details_analysis(uploaded_file, model)
 
             if detailed_analysis_button:
                 with st.spinner("Performing detailed analysis..."):
                     uploaded_file.seek(0)
-                    detailed_result = detailed_image_analysis(uploaded_file, model)
-                    if detailed_result:
-                        st.write("## Detailed Analysis Results:")
-                        st.markdown(detailed_result)
-                        download_analysis_results(detailed_result)
+                    analysis_result = detailed_image_analysis(uploaded_file, model)
 
             if flash_analysis_button:
                 with st.spinner("Performing flash analysis..."):
                     uploaded_file.seek(0)
-                    flash_result = flash_analysis(uploaded_file)
-                    if flash_result:
-                        st.write("## Flash Analysis Results:")
-                        st.markdown(flash_result)
-                        download_analysis_results(flash_result)
+                    analysis_result = flash_analysis(uploaded_file)
 
             if custom_prompt_button:
                 with st.spinner("Performing custom prompt analysis..."):
                     uploaded_file.seek(0)
                     custom_prompt = st.session_state.custom_prompt
-                    custom_prompt_result = custom_prompt_analysis(uploaded_file, custom_prompt, model)
-                    if custom_prompt_result:
-                        st.write("## Custom Prompt Analysis Results:")
-                        st.markdown(custom_prompt_result)
-                        download_analysis_results(custom_prompt_result)
+                    analysis_result = custom_prompt_analysis(uploaded_file, custom_prompt, model)
+
+            # Download button logic (outside analysis functions)
+            if analysis_result:
+                download_analysis_results(analysis_result)
