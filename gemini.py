@@ -180,6 +180,49 @@ else:
             st.error("Unexpected response structure from the model.")
         return None
     
+    def combined_marketing_analysis_V6(uploaded_file):
+        prompt = (
+            "Imagine you are a UX design and marketing analysis consultant reviewing an image for a client. Analyze the provided image for marketing effectiveness. First, provide detailed responses for the following:\n"
+            "\n"
+            "1. Asset Type: Clearly identify and describe the type of marketing asset. Examples include email, social media post, advertisement, flyer, brochure, landing page, etc.\n"
+            "2. Purpose: Clearly state the specific purpose of this marketing asset. Examples include selling a product, getting more signups, driving traffic to a webpage, increasing brand awareness, engaging with customers, etc.\n"
+            "\n"
+            "Then, for each aspect listed below, provide a score from 1 to 5 (1 being low, 5 being high) and a concise explanation for each aspect, along with suggestions for improvement. The results should be presented in a table format with the columns: Aspect, Score, Explanation, and Improvement. After the table, provide the total sum of the scores and a concise explanation with some overall improvement suggestions. Here are the aspects to consider:\n"
+            "\n"
+            "The aspects to consider are:\n"
+            "1. Creative Score: Assess the creativity of the design. Does it stand out and capture attention through innovative elements?\n"
+            "2. Attention: Evaluate the order of content consumption in the uploaded image. Start by identifying and analyzing the headline for its prominence and position. Next, evaluate any additional text for visibility and reader engagement sequence. Assess the positioning of images in relation to the text, followed by an examination of interactive elements such as buttons. Discuss the order in which the content is consumed (e.g., headline first, then text, or image then text then button, etc.). Determine if the content prioritizes important information, and draws and holds attention effectively.\n"
+            "3. Distinction: Does the content contain pictures that grab user attention? Does it appeal to the primal brain with and without text?\n"
+            "4. Purpose and Value: Is the purpose and value clear within 3 seconds? Is the content product or customer-centric?\n"
+            "5. Clarity: Evaluate the clarity of the design elements. Are the visuals and text easy to understand?\n"
+            "6. First Impressions: Analyze the initial impact of the design. Does it create a strong positive first impression?\n"
+            "7. Cognitive Demand: Evaluate the cognitive load required to understand and navigate the design. Is it intuitive and easy to use?\n"
+            "8. Headline Review: Evaluate the headline for clarity, conciseness, customer centricity, SEO keyword integration, emotional appeal, uniqueness, urgency, benefit to the reader, audience targeting, length, use of numbers/lists, brand consistency, and power words.\n"
+            "9. Headline (if present):\n"
+            "   - Clarity & Conciseness: Evaluate the headline's clarity and conciseness.\n"
+            "   - Customer Focus: Does the headline emphasize a customer-centric approach?\n"
+            "   - SEO keywords and emotional appeal: Does the headline incorporate SEO keywords and evoke an emotional response?\n"
+            "10. Visual Cues and Color Usage: Does the image use visual cues and colors to draw attention to key elements? Analyze how color choices, contrast, and elements like arrows or frames guide the viewer's attention.\n"
+            "11. Labeling and Button Clarity: Are any labels or buttons present clearly labeled and easy to understand? Evaluate the use of text size, font choice, and placement for optimal readability.\n"
+            "12. Engagement: Assess the engagement level of the user experience. Is the UX design captivating and satisfying to interact with?\n"
+            "13. Trust: Assess the trustworthiness of the content based on visual and textual elements. Assess the credibility, reliability, and intimacy conveyed by the content. Is the content brand or customer-centric (customer-centric content has a higher trustworthiness)?\n"
+            "14. Motivation: Assess the designs ability to motivate users. Does it align with user motivators and demonstrate authority or provide social proof?\n"
+            "15. Influence: Analyze the influence of the design. Does it effectively persuade users and drive desired behaviors?\n"
+            "16. Calls to Action: Analyze the presence, prominence, benefits, and language of CTAs.\n"
+            "17. Experience: Assess the overall user experience. How well does the design facilitate a smooth and enjoyable interaction?\n"
+            "18. Memorability: Evaluate how memorable the design is. Does it leave a lasting impression?\n"
+            "19. Effort: Evaluate the clarity and conciseness of the text. Does it convey the message effectively without being overly wordy? (1: Very Dense & Difficult, 5: Clear & Easy to Understand)\n"
+        )
+        image = Image.open(uploaded_file)
+        response = model.generate_content([prompt, image])
+        if response.candidates:
+            raw_response = response.candidates[0].content.parts[0].text.strip()
+            st.write("Detailed Marketing Analysis Results_V1:")
+            st.markdown(raw_response, unsafe_allow_html=True)  # Assuming the response is in HTML table format
+        else:
+            st.error("Unexpected response structure from the model.")
+        return None
+    
     def detailed_marketing_analysis_v3(uploaded_file):
         prompt = (
             "Imagine you are a marketing consultant reviewing an image for a client. Analyze the provided image for marketing effectiveness. Provide a score from 1 to 5 (1 being low, 5 being high) and a concise explanation for each aspect, along with suggestions for improvement. The results should be presented in a table format (Aspect, Score, Explanation, Improvement).Also after the table, please write the total sum of the scores and a concise explanation with some improvement overall suggestions. Here are the aspects to consider:\n"
@@ -354,6 +397,7 @@ else:
         detailed_analysis_V2 = st.button('Detailed Marketing Analysis V2')
         detailed_analysis_V3 = st.button('Detailed Marketing Analysis V3')
         combined_analysis_V5 = st.button('Combined Detailed Marketing Analysis V5')
+        combined_analysis_V6 = st.button('Combined Detailed Marketing Analysis V6')
         marketing_success = st.button('Marketing Success Analysis')
         headline_analysis_button = st.button('Headline Analysis')
         detailed_headline_analysis_button = st.button('Headline Optimization Report') 
@@ -400,12 +444,19 @@ else:
                     st.write("## Detailed Marketing Analysis_V2 Results:")
                     st.markdown(detailed_result_V2)
         if combined_analysis_V5:
-            with st.spinner("Performing combined marketing analysis_V3..."):
+            with st.spinner("Performing combined marketing analysis_V5..."):
                 uploaded_file.seek(0)
                 detailed_result_V5 = combined_marketing_analysis_V5(uploaded_file)
                 if detailed_result_V5:
                     st.write("## Combined Marketing Analysis_V5 Results:")
                     st.markdown(detailed_result_V5)
+        if combined_analysis_V6:
+            with st.spinner("Performing combined marketing analysis_V6..."):
+                uploaded_file.seek(0)
+                detailed_result_V6 = combined_marketing_analysis_V6(uploaded_file)
+                if detailed_result_V6:
+                    st.write("## Combined Marketing Analysis_V6 Results:")
+                    st.markdown(detailed_result_V6)
         if detailed_analysis_V3:
             with st.spinner("Performing detailed marketing analysis_V3..."):
                 uploaded_file.seek(0)
