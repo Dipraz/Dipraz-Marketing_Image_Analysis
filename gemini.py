@@ -201,12 +201,12 @@ else:
             "9. Headline (if present):\n"
             "   - Clarity & Conciseness: Evaluate the headline's clarity and conciseness.\n"
             "   - Customer Focus: Does the headline emphasize a customer-centric approach?\n"
-            "   - SEO keywords and emotional appeal: Does the headline incorporate SEO keywords and evoke an emotional response?\n"
+            "   - SEO Keywords and Emotional Appeal: Does the headline incorporate SEO keywords and evoke an emotional response?\n"
             "10. Visual Cues and Color Usage: Does the image use visual cues and colors to draw attention to key elements? Analyze how color choices, contrast, and elements like arrows or frames guide the viewer's attention.\n"
             "11. Labeling and Button Clarity: Are any labels or buttons present clearly labeled and easy to understand? Evaluate the use of text size, font choice, and placement for optimal readability.\n"
             "12. Engagement: Assess the engagement level of the user experience. Is the UX design captivating and satisfying to interact with?\n"
             "13. Trust: Assess the trustworthiness of the content based on visual and textual elements. Assess the credibility, reliability, and intimacy conveyed by the content. Is the content brand or customer-centric (customer-centric content has a higher trustworthiness)?\n"
-            "14. Motivation: Assess the designs ability to motivate users. Does it align with user motivators and demonstrate authority or provide social proof?\n"
+            "14. Motivation: Assess the design's ability to motivate users. Does it align with user motivators and demonstrate authority or provide social proof?\n"
             "15. Influence: Analyze the influence of the design. Does it effectively persuade users and drive desired behaviors?\n"
             "16. Calls to Action: Analyze the presence, prominence, benefits, and language of CTAs.\n"
             "17. Experience: Assess the overall user experience. How well does the design facilitate a smooth and enjoyable interaction?\n"
@@ -217,7 +217,7 @@ else:
         response = model.generate_content([prompt, image])
         if response.candidates:
             raw_response = response.candidates[0].content.parts[0].text.strip()
-            st.write("Detailed Marketing Analysis Results_V1:")
+            st.write("Combined Marketing Analysis Results_V6:")
             st.markdown(raw_response, unsafe_allow_html=True)  # Assuming the response is in HTML table format
         else:
             st.error("Unexpected response structure from the model.")
