@@ -67,7 +67,7 @@ else:
             "Imagine you are a marketing consultant reviewing an image for a client. Analyze the provided image for marketing effectiveness. For each aspect listed below, provide a score from 1 to 5 (1 being low, 5 being high) along with a concise explanation for all aspects and suggestions for improvement. Present the results in a table format with the columns: Aspect, Score, Explanation, and Improvement. Also, after the table, write the total sum of the scores and a concise explanation with some overall improvement suggestions. Ensure your scoring remains consistent for each aspect, regardless of how many times you analyze the image.\n"
             "The aspects to consider are:\n"
             "1. Order of Content Consumption: Analyze the uploaded image to understand the order of content consumption. Start by identifying and analyzing the headline for its prominence and position. Next, evaluate any additional text for visibility and reader engagement sequence. Assess the positioning of images in relation to the text, followed by an examination of interactive elements such as buttons. Discuss the order in which the content is consumed (e.g., headline first, then text, or image then text then button, etc.). Determine if the content prioritizes important information, and draws and holds attention effectively.\n"
-            "2. Visual Appeal: Does the image contain visually-appealing elements that grab user attention? Does it appeal on its own, without text?\n"
+            "2. Visual Appeal: Does the image contain visually appealing elements that grab user attention? Does it appeal on its own, without text?\n"
             "3. Purpose & Value Clarity: Is the purpose and value proposition of the content clear within 3 seconds of viewing the image? Is the content product or customer-centric?\n"
             "4. Headline (if present):\n"
             "   - Clarity & Conciseness: Evaluate the headline's clarity and conciseness.\n"
@@ -153,7 +153,7 @@ else:
         prompt = (
             "Imagine you are a marketing consultant reviewing an image for a client. Analyze the provided image for marketing effectiveness. First, provide detailed responses for the following:\n"
             "\n"
-            "1. Asset Type: Clearly identify and describe the type of marketing asset. Examples include email, social media post, advertisement, flyer, brochure, landing page, etc.\n"
+            "1. Asset Type: Clearly identify and describe the type of marketing asset. Examples include email, social media posts, advertisements, flyers, brochures, landing pages, etc.\n"
             "2. Purpose: Clearly state the specific purpose of this marketing asset. Examples include selling a product, getting more signups, driving traffic to a webpage, increasing brand awareness, engaging with customers, etc.\n"
             "\n"
             "Then, for each aspect listed below, provide a score from 1 to 5 (1 being low, 5 being high) and a concise explanation for each aspect, along with suggestions for improvement. The results should be presented in a table format with the columns: Aspect, Score, Explanation, and Improvement. After the table, provide the total sum of the scores and a concise explanation with some overall improvement suggestions. Here are the aspects to consider:\n"
@@ -291,7 +291,7 @@ else:
 
     def headline_analysis(uploaded_file):
         prompt = (
-            "Imagine you are a marketing consultant reviewing an image and its headline for a client. Analyze the provided image content alongside the headline text to assess the headline's effectiveness. Rate each criterion on a scale from 1 to 5 (1 being poor, 5 being excellent), and provide a concise explanation for each score based on the synergy between the image and headline. Present your results in a table format with columns labeled: Criterion, Score, Explanation. Below the table, calculate and display the total sum of all scores. Ensure that this analysis process yields consistent scoring results, regardless of how many times or when it is run. Conclude with three possible improved headlines that better align with the image content. Then conclude with clearly stating the specific purpose of this marketing asset and providing a detailed explanation of how it aims to achieve this purpose. Examples include selling a product, getting more signups, driving traffic to a webpage, increasing brand awareness, engaging with customers, etc. The purpose of this asset should be to drive traffic to the www.markify.io website.\n"
+            "Imagine you are a marketing consultant reviewing an image and its headline for a client. Analyze the provided image content alongside the headline text to assess the headline's effectiveness. Rate each criterion on a scale from 1 to 5 (1 being poor, 5 being excellent), and provide a concise explanation for each score based on the synergy between the image and headline. Present your results in a table format with columns labeled: Criterion, Score, Explanation. Below the table, calculate and display the total sum of all scores. Ensure that this analysis process yields consistent scoring results, regardless of how many times or when it is run. Conclude with three possible improved headlines that better align with the image content.\n"
             "The criteria to assess are:\n"
             "1. Clarity & Conciseness: How clearly does the headline convey the main point?\n"
             "2. Customer Focus: Does the headline emphasize a customer-centric approach?\n"
@@ -317,7 +317,7 @@ else:
 
     def headline_detailed_analysis(uploaded_file):
         prompt = (
-            "Imagine you are a marketing consultant reviewing an image and its headline for a client. As an expert, you are assessing the headline's effectiveness. Analyze the headline text extracted from the image and present the results in a table format with the following columns: Criteria, Assessment, and Explanation. After the table, provide an overall summary, including a concise explanation and some improvement suggestions. Then conclude with clearly stating the specific purpose of this marketing asset and providing a detailed explanation of how it aims to achieve this purpose. Examples include selling a product, getting more signups, driving traffic to a webpage, increasing brand awareness, engaging with customers, etc. The purpose of this asset should be to drive traffic to the www.markify.io website. Ensure the analysis is consistent across multiple runs.\n"
+            "Imagine you are a marketing consultant reviewing an image and its headline for a client. As an expert, you are assessing the headline's effectiveness. Analyze the headline text extracted from the image and present the results in a table format with the following columns: Criteria, Assessment, and Explanation. After the table, provide an overall summary, including a concise explanation and some improvement suggestions.\n"
             "The criteria to assess are:\n"
             "1. Word Count: Total number of words in the headline.\n"
             "2. Letter Count: Total number of letters in the headline, excluding spaces and special characters.\n"
@@ -378,7 +378,7 @@ else:
             "15. Experience: Assess the overall user experience. How well does the design facilitate a smooth and enjoyable interaction?\n"
             "16. Trust: Analyze the trustworthiness of the design. Does it convey credibility and reliability?\n"
             "17. Act: Evaluate how well the design encourages users to take action. Are the calls to action effective and persuasive?\n"
-            "18. Motivation: Assess the designs ability to motivate users. Does it align with user motivators and demonstrate authority or provide social proof?\n"
+            "18. Motivation: Assess the ability of the design to motivate users. Does it align with user motivators and demonstrate authority or provide social proof?\n"
             "19. Influence: Analyze the influence of the design. Does it effectively persuade users and drive desired behaviors?\n"
             "20. Memorability: Evaluate how memorable the design is. Does it leave a lasting impression?\n"
         )
