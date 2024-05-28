@@ -42,7 +42,7 @@ else:
 
     def analyze_image(uploaded_file):
         prompt = (
-            "Imagine you are a marketing consultant reviewing an image for a client. Analyze the provided image for various marketing aspects. Respond in single words or short phrases separated by commas for each attribute: "
+            "Imagine you are a marketing consultant reviewing an image for a client. Analyze the provided image for various marketing aspects and Ensure your results remains consistent for each aspect, regardless of how many times you analyze the image. Respond in single words or short phrases separated by commas for each attribute: "
             "text amount (High or Low), color usage (Effective or Not effective), visual cues (Present or Absent), emotion (Positive or Negative), focus (Central message or Scattered), "
             "customer-centric (Yes or No), credibility (High or Low), user interaction (High, Moderate, or Low), CTA presence (Yes or No), CTA clarity (Clear or Unclear)."
         )
@@ -67,7 +67,7 @@ else:
             "Imagine you are a marketing consultant reviewing an image for a client. Analyze the provided image for marketing effectiveness. For each aspect listed below, provide a score from 1 to 5 (1 being low, 5 being high) along with a concise explanation for all aspects and suggestions for improvement. Present the results in a table format with the columns: Aspect, Score, Explanation, and Improvement. Also, after the table, write the total sum of the scores and a concise explanation with some overall improvement suggestions. Ensure your scoring remains consistent for each aspect, regardless of how many times you analyze the image.\n"
             "The aspects to consider are:\n"
             "1. Order of Content Consumption: Analyze the uploaded image to understand the order of content consumption. Start by identifying and analyzing the headline for its prominence and position. Next, evaluate any additional text for visibility and reader engagement sequence. Assess the positioning of images in relation to the text, followed by an examination of interactive elements such as buttons. Discuss the order in which the content is consumed (e.g., headline first, then text, or image then text then button, etc.). Determine if the content prioritizes important information, and draws and holds attention effectively.\n"
-            "2. Visual Appeal: Does the image contain visually appealing elements that grab user attention? Does it appeal on its own, without text?\n"
+            "2. Visual Appeal: Does the image contain visually-appealing elements that grab user attention? Does it appeal on its own, without text?\n"
             "3. Purpose & Value Clarity: Is the purpose and value proposition of the content clear within 3 seconds of viewing the image? Is the content product or customer-centric?\n"
             "4. Headline (if present):\n"
             "   - Clarity & Conciseness: Evaluate the headline's clarity and conciseness.\n"
@@ -153,7 +153,7 @@ else:
         prompt = (
             "Imagine you are a marketing consultant reviewing an image for a client. Analyze the provided image for marketing effectiveness. First, provide detailed responses for the following:\n"
             "\n"
-            "1. Asset Type: Clearly identify and describe the type of marketing asset. Examples include email, social media posts, advertisements, flyers, brochures, landing pages, etc.\n"
+            "1. Asset Type: Clearly identify and describe the type of marketing asset. Examples include email, social media post, advertisement, flyer, brochure, landing page, etc.\n"
             "2. Purpose: Clearly state the specific purpose of this marketing asset. Examples include selling a product, getting more signups, driving traffic to a webpage, increasing brand awareness, engaging with customers, etc.\n"
             "\n"
             "Then, for each aspect listed below, provide a score from 1 to 5 (1 being low, 5 being high) and a concise explanation for each aspect, along with suggestions for improvement. The results should be presented in a table format with the columns: Aspect, Score, Explanation, and Improvement. After the table, provide the total sum of the scores and a concise explanation with some overall improvement suggestions. Here are the aspects to consider:\n"
@@ -182,12 +182,12 @@ else:
     
     def combined_marketing_analysis_V6(uploaded_file):
         prompt = (
-            "Imagine you are a UX design and marketing analysis consultant reviewing an image for a client. Analyze the provided image for marketing effectiveness. First, provide concise responses for the following:\n"
+            "Imagine you are a UX design and marketing analysis consultant reviewing an image for a client. Analyze the provided image for marketing effectiveness. First, provide detailed responses for the following:\n"
             "\n"
-            "1. Asset Type: Clearly identify and describe the type of marketing asset. Examples include email, social media posts, advertisements, flyers, brochures, landing pages, etc.\n"
-            "2. Purpose: Clearly state the specific purpose of this marketing asset for drive people to the www.markify.io website.  \n"
+            "1. Asset Type: Clearly identify and describe the type of marketing asset. Examples include email, social media posts, advertisements, flyer, brochures, landing pages, etc.\n"
+            "2. Purpose: Clearly state the specific purpose of this marketing asset. Provide a detailed explanation of how it aims to achieve this purpose. Examples include selling a product, getting more signups, driving traffic to a webpage, increasing brand awareness, engaging with customers, etc.\n"
             "\n"
-            "Then, for each aspect listed below, provide a score from 1 to 5 (1 being low, 5 being high) and a concise explanation for each aspect, along with suggestions for improvement. The results should be presented in a table format with the columns: Aspect, Score, Explanation, and Improvement. After the table, provide the total sum of the scores and a concise explanation with some overall improvement suggestions. Here are the aspects to consider:\n"
+            "Then, for each aspect listed below, provide a score from 1 to 5 (1 being low, 5 being high) and a concise explanation for each aspect, along with suggestions for improvement. The results should be presented in a table format with the columns: Aspect, Score, Explanation, and Improvement. After the table, provide the total sum of the scores and a concise explanation with overall improvement suggestions. Ensure your scoring remains consistent for each aspect, regardless of how many times you analyze the image. Here are the aspects to consider:\n"
             "\n"
             "The aspects to consider are:\n"
             "1. Creative Score: Assess the creativity of the design. Does it stand out and capture attention through innovative elements?\n"
@@ -209,19 +209,28 @@ else:
             "17. Experience: Assess the overall user experience. How well does the design facilitate a smooth and enjoyable interaction?\n"
             "18. Memorability: Evaluate how memorable the design is. Does it leave a lasting impression?\n"
             "19. Effort: Evaluate the clarity and conciseness of the text. Does it convey the message effectively without being overly wordy? (1: Very Dense & Difficult, 5: Clear & Easy to Understand)\n"
-            "\n"
-            "Additionally, analyze the text on the asset (excluding the headline) using the following criteria. Provide a score from 1 to 5 and a concise explanation for each criterion:\n"
-            "\n"
-            "The text criteria to consider are:\n"
+        )
+        image = Image.open(uploaded_file)
+        response = model.generate_content([prompt, image])
+        if response.candidates:
+            raw_response = response.candidates[0].content.parts[0].text.strip()
+            st.write("Combined Marketing Analysis Results_V6:")
+            st.markdown(raw_response, unsafe_allow_html=True)  # Assuming the response is in HTML table format
+        else:
+            st.error("Unexpected response structure from the model.")
+        return None
+    def text_analysis(uploaded_file):
+        prompt = (
+            "Imagine you are a UX design and marketing analysis consultant reviewing the text on a marketing asset (excluding the headline) for a client. Analyze the provided text using the following criteria. For each aspect, provide a score from 1 to 5 (1 being low, 5 being high) along with a concise explanation and suggestions for improvement. Present the results in a table format with the columns: Aspect, Score, Explanation, and Improvements. After the table, provide the total sum of the scores and a concise explanation with overall improvement suggestions.Ensure your scoring remains consistent for each aspect, regardless of how many times you analyze the image. Here are the aspects to consider:\n"
             "1. Clarity: Evaluate the clarity and conciseness of the text. Does it convey the message effectively without being overly wordy?\n"
             "2. Customer Focus: Does the text emphasize a customer-centric approach?\n"
-            "3. Engagement: Discuss the text amount, reading age, grouping, lists, and customer value.\n"
-            "4. Effort: Evaluate the effort to read the text. Is the text broken into manageable chunks? Does the text make use of lists or bullet points? Does the text seem relatively short and easy to read?\n"
+            "3. Engagement: Discuss the text amount, readability, grouping, use of lists, and value to the customer.\n"
+            "4. Effort: Evaluate the effort required to read the text. Is it broken into manageable chunks? Does it use lists or bullet points? Is it relatively short and easy to read?\n"
             "5. Purpose and Value: Assess the clarity of the text’s purpose and value proposition. Is the message clear within a few seconds of reading?\n"
             "6. Motivation: Assess the text's ability to motivate users. Does it align with user motivators and demonstrate authority or provide social proof?\n"
             "7. Influence: Analyze the influence of the text. Does it effectively persuade users and drive desired behaviors?\n"
-            "8. Depth: Does the text have a range of depth of information (including links to further information) to address different interest levels of customers?\n"
-            "9. Trust: Assess the trustworthiness of the content based on the text. Assess the credibility, reliability, and intimacy conveyed by the content. Is the content brand or customer-centric (customer-centric content has a higher trustworthiness)?\n"
+            "8. Depth: Does the text provide a range of depth of information (including links to further information) to address different interest levels of customers?\n"
+            "9. Trust: Assess the trustworthiness of the content based on the text. Evaluate the credibility, reliability, and intimacy conveyed. Is the content brand-centric or customer-centric?\n"
             "10. Memorability: Evaluate how memorable the text is. Does it leave a lasting impression?\n"
             "11. Emotional Appeal: Does the text evoke an emotional response?\n"
             "12. Uniqueness: Is the text original and creative?\n"
@@ -235,15 +244,15 @@ else:
         response = model.generate_content([prompt, image])
         if response.candidates:
             raw_response = response.candidates[0].content.parts[0].text.strip()
-            st.write("Combined Marketing Analysis Results_V6:")
+            st.write("Text Analysis Results:")
             st.markdown(raw_response, unsafe_allow_html=True)  # Assuming the response is in HTML table format
         else:
             st.error("Unexpected response structure from the model.")
         return None
-    
+
     def detailed_marketing_analysis_v3(uploaded_file):
         prompt = (
-            "Imagine you are a marketing consultant reviewing an image for a client. Analyze the provided image for marketing effectiveness. Provide a score from 1 to 5 (1 being low, 5 being high) and a concise explanation for each aspect, along with suggestions for improvement. The results should be presented in a table format (Aspect, Score, Explanation, Improvement).Also after the table, please write the total sum of the scores and a concise explanation with some improvement overall suggestions. Here are the aspects to consider:\n"
+            "Imagine you are a marketing consultant reviewing an image for a client. Analyze the provided image for marketing effectiveness. Provide a score from 1 to 5 (1 being low, 5 being high) and a concise explanation for each aspect, along with suggestions for improvement. The results should be presented in a table format (Aspect, Score, Explanation, Improvement).Also after the table, please write the total sum of the scores and a concise explanation with improvement overall suggestions. Here are the aspects to consider:\n"
             "1. Attraction and Focus: Does the content prioritize important information and draw attention effectively?\n"
             "2. Distinction: Does the content contain pictures that grab user attention? Does it appeal to the primal brain with and without text?\n"
             "3. Purpose and Value: Is the purpose and value clear within 3 seconds? Is the content product or customer-centric?\n"
@@ -291,7 +300,7 @@ else:
 
     def headline_analysis(uploaded_file):
         prompt = (
-            "Imagine you are a marketing consultant reviewing an image and its headline for a client. Analyze the provided image content alongside the headline text to assess the headline's effectiveness. Rate each criterion on a scale from 1 to 5 (1 being poor, 5 being excellent), and provide a concise explanation for each score based on the synergy between the image and headline. Present your results in a table format with columns labeled: Criterion, Score, Explanation. Below the table, calculate and display the total sum of all scores. Ensure that this analysis process yields consistent scoring results, regardless of how many times or when it is run. Conclude with three possible improved headlines that better align with the image content.\n"
+            "Imagine you are a marketing consultant reviewing an image and its headline for a client. Analyze the provided image content alongside the headline text to assess the headline's effectiveness. Rate each criterion on a scale from 1 to 5 (1 being poor, 5 being excellent), and provide a concise explanation for each score based on the synergy between the image and headline. Present your results in a table format with columns labeled: Criterion, Score, Explanation. Below the table, calculate and display the total sum of all scores. Ensure that this analysis process yields consistent scoring results, regardless of how many times or when it is run. Conclude with three possible improved headlines that better align with the image content. Then conclude with clearly stating the specific purpose of this marketing asset and providing a detailed explanation of how it aims to achieve this purpose. Examples include selling a product, getting more signups, driving traffic to a webpage, increasing brand awareness, engaging with customers, etc. The purpose of this asset should be to drive traffic to the www.markify.io website.\n"
             "The criteria to assess are:\n"
             "1. Clarity & Conciseness: How clearly does the headline convey the main point?\n"
             "2. Customer Focus: Does the headline emphasize a customer-centric approach?\n"
@@ -317,7 +326,7 @@ else:
 
     def headline_detailed_analysis(uploaded_file):
         prompt = (
-            "Imagine you are a marketing consultant reviewing an image and its headline for a client. As an expert, you are assessing the headline's effectiveness. Analyze the headline text extracted from the image and present the results in a table format with the following columns: Criteria, Assessment, and Explanation. After the table, provide an overall summary, including a concise explanation and some improvement suggestions.\n"
+            "Imagine you are a marketing consultant reviewing an image and its headline for a client. As an expert, you are assessing the headline's effectiveness. Analyze the headline text extracted from the image and present the results in a table format with the following columns: Criteria, Assessment, and Explanation. After the table, provide an overall summary, including a concise explanation and some improvement suggestions. Then conclude with clearly stating the specific purpose of this marketing asset and providing a detailed explanation of how it aims to achieve this purpose. Examples include selling a product, getting more signups, driving traffic to a webpage, increasing brand awareness, engaging with customers, etc. The purpose of this asset should be to drive traffic to the www.markify.io website. Ensure the analysis is consistent across multiple runs.\n"
             "The criteria to assess are:\n"
             "1. Word Count: Total number of words in the headline.\n"
             "2. Letter Count: Total number of letters in the headline, excluding spaces and special characters.\n"
@@ -356,7 +365,7 @@ else:
 
     def ux_marketing_analysis(uploaded_file):
         prompt = (
-            "Imagine you are a UX design and marketing analysis consultant reviewing a UX design image for a client. Analyze the provided image for its effectiveness in both UX design and marketing contexts. For each aspect listed below, provide a score from 1 to 5 (1 being poor, 5 being excellent) along with a concise explanation for all aspects and suggestions for improvement. Present the results in a table format with the columns: Aspect, Score, Explanation, and Improvement. Also, after the table, write the total sum of the scores and a concise explanation with some overall improvement suggestions. Ensure your scoring remains consistent for each aspect, regardless of how many times you analyze the image.\n"
+            "Imagine you are a UX design and marketing analysis consultant reviewing a UX design image for a client. Analyze the provided image for its effectiveness in both UX design and marketing contexts. For each aspect listed below, provide a score from 1 to 5 (1 being poor, 5 being excellent) along with a concise explanation for all aspects and suggestions for improvement. Present the results in a table format with the columns: Aspect, Score, Explanation, and Improvement. Also, after the table, write the total sum of the scores and a concise explanation with overall improvement suggestions. Ensure your scoring remains consistent for each aspect, regardless of how many times you analyze the image.\n"
             "The aspects to consider are:\n"
             "1. General Analysis: Evaluate the overall effectiveness of the UX design. How well does the design communicate its intended message?\n"
             "2. Creative Score: Assess the creativity of the design. Does it stand out and capture attention through innovative elements?\n"
@@ -378,7 +387,7 @@ else:
             "15. Experience: Assess the overall user experience. How well does the design facilitate a smooth and enjoyable interaction?\n"
             "16. Trust: Analyze the trustworthiness of the design. Does it convey credibility and reliability?\n"
             "17. Act: Evaluate how well the design encourages users to take action. Are the calls to action effective and persuasive?\n"
-            "18. Motivation: Assess the ability of the design to motivate users. Does it align with user motivators and demonstrate authority or provide social proof?\n"
+            "18. Motivation: Assess the designs ability to motivate users. Does it align with user motivators and demonstrate authority or provide social proof?\n"
             "19. Influence: Analyze the influence of the design. Does it effectively persuade users and drive desired behaviors?\n"
             "20. Memorability: Evaluate how memorable the design is. Does it leave a lasting impression?\n"
         )
@@ -418,6 +427,7 @@ else:
         detailed_analysis_V3 = st.button('Detailed Marketing Analysis V3')
         combined_analysis_V5 = st.button('Combined Detailed Marketing Analysis V5')
         combined_analysis_V6 = st.button('Combined Detailed Marketing Analysis V6')
+        text_analysis_button = st.button('Text Analysis')
         marketing_success = st.button('Marketing Success Analysis')
         headline_analysis_button = st.button('Headline Analysis')
         detailed_headline_analysis_button = st.button('Headline Optimization Report') 
@@ -477,6 +487,14 @@ else:
                 if detailed_result_V6:
                     st.write("## Combined Marketing Analysis_V6 Results:")
                     st.markdown(detailed_result_V6)
+                    
+        if text_analysis_button:
+            with st.spinner("Performing text analysis..."):
+                uploaded_file.seek(0)
+                text_result = text_analysis(uploaded_file)
+                if text_result:
+                    st.write("## Text Analysis Results:")
+                    st.markdown(text_result)
         if detailed_analysis_V3:
             with st.spinner("Performing detailed marketing analysis_V3..."):
                 uploaded_file.seek(0)
