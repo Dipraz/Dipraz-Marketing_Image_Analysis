@@ -326,16 +326,16 @@ else:
 
     def headline_detailed_analysis(uploaded_file):
         prompt = (
-            "Imagine you are a marketing consultant reviewing an image and its headline for a client. As an expert, you are assessing the headline's effectiveness. Analyze the headline text extracted from the image and present the results in a table format with the following columns: Criteria, Assessment, and Explanation. After the table, provide an overall summary, including a concise explanation and some improvement suggestions.please Ensure the analysis is consistent across multiple runs.\n"
-            "The criteria to assess are:\n"
-            "1. Word Count: Total number of words in the headline.\n"
-            "2. Letter Count: Total number of letters in the headline, excluding spaces and special characters.\n"
-            "3. Common Words: Count of frequently used words.\n"
-            "4. Uncommon Words: Count of less frequently used words.\n"
-            "5. Emotional Words: Number of words conveying emotions (positive, negative, etc.).\n"
-            "6. Power Words: Number of words used to grab attention or influence.\n"
-            "7. Sentiment: Overall sentiment of the headline (positive, negative, neutral).\n"
-            "8. Reading Grade Level: Reading grade level of the headline text.\n"
+            "Imagine you are a marketing consultant reviewing an image and its headline for a client. As an expert, you are assessing the headline's effectiveness. Analyze the headline text extracted from the image and present the results in a table format with the following columns: Criteria, Assessment, and Explanation. Ensure the analysis is consistent across multiple runs. The criteria to assess are:\n"
+            "1. Word Count: Provide the total number of words in the headline.\n"
+            "2. Letter Count: Provide the total number of letters in the headline, excluding spaces and special characters. Count only alphabetic characters.\n"
+            "3. Common Words: Count the number of frequently used words in the headline.\n"
+            "4. Uncommon Words: Count the number of less frequently used words in the headline.\n"
+            "5. Emotional Words: Count the number of words that convey emotions (positive, negative, etc.).\n"
+            "6. Power Words: Count the number of words used to grab attention or influence.\n"
+            "7. Sentiment: Assess the overall sentiment of the headline (positive, negative, neutral).\n"
+            "8. Reading Grade Level: Provide the reading grade level of the headline text.\n"
+            "After the table, provide an overall summary, including a concise explanation and some improvement suggestions."
         )
 
         image = Image.open(uploaded_file)
