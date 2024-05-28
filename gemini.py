@@ -181,6 +181,7 @@ else:
             "8. Benefit-Driven: Does the headline convey a clear benefit or value proposition, aligned with the image content?\n"
             "9. Target Audience: Is the headline tailored to resonate with the specific target audience, considering the image's visual cues?\n"
             "10. Length & Format: Does the headline fall within an ideal length of 6-12 words?\n"
+            "When suggesting improved headlines, prioritize aspects like clarity, relevance, emotional appeal, and target audience over a specific format. Provide a few alternative headlines with varying structures to demonstrate potential improvements."
         )
         image = Image.open(uploaded_file)
         response = model.generate_content([prompt, image])
