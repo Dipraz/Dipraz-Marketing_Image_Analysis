@@ -458,11 +458,16 @@ else:
         prompt = (
             "Imagine you are a marketing consultant reviewing an image for a client. Your task is to analyze the provided image to identify its asset type, asset purpose, and target audience. Provide detailed and well-structured responses for each of the following aspects:\n"
             "\n"
-            "1. Asset Type: Clearly identify and describe the type of marketing asset. Examples include email, social media posts, advertisements, flyer, brochures, landing pages, etc. Discuss any visual elements that support your identification.\n"
-            "2. Asset Purpose: Clearly state the specific purpose of this marketing asset. Provide a detailed explanation of how it aims to achieve this purpose. Examples include selling a product, getting more signups, driving traffic to a webpage, increasing brand awareness, engaging with customers, etc. Include an analysis of the visual and textual elements that contribute to this purpose.\n"
-            "3. Target Audience: Identify the target audience for this marketing asset. Describe the demographics, interests, and needs of this audience. Examples include age group, gender, location, income level, education, interests, behaviors, etc. Explain how the visual and textual elements of the asset are tailored to appeal to this audience.\n"
+            "1. Asset Type: Clearly identify and describe the type of marketing asset, considering both the visual elements and any accompanying text. Discuss how the image's composition, style, and elements contribute to your identification. Examples of asset types include social media posts (images, videos), advertisements (print, online), or website elements (landing pages, product pages).\n"
+            "2. Asset Purpose: Clearly state the specific purpose of this marketing asset, analyzing both the visual and textual elements. Explain how the image's content and any accompanying text work together to achieve this purpose. Examples of asset purposes include generating brand awareness, promoting a specific product or service, or driving traffic to a website.\n"
+            "3. Target Audience: Identify the target audience for this marketing asset, considering the visual and textual elements. Analyze how the image's style, characters, and overall message are tailored to appeal to this audience. Examples of target audience demographics include age group, gender, and location. Interests, needs, and behaviors are also crucial to consider.\n"
             "\n"
-            "Ensure your analysis is thorough and provides actionable insights for each aspect. Your responses should be detailed, logically structured, and backed by specific elements observed in the image. Do not include any placeholder text or descriptions of the image itself."
+            "Ensure your analysis is thorough and provides actionable insights for each aspect. Your responses should be detailed, logically structured, and backed by specific elements observed in the image.\n"
+            "\n"
+            "Finally, provide suggestions for improving the marketing asset in the following areas:\n"
+            "* Enhancing the visual elements to attract a wider audience.\n"
+            "* Strengthening the message or call to action to be more effective.\n"
+            "* Tailoring the content to resonate better with the target audience."
         )
         image = Image.open(uploaded_file)
         response = model.generate_content([prompt, image])
