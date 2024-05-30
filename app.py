@@ -508,7 +508,9 @@ else:
         marketing_success = st.button('Marketing Success Analysis')
         headline_analysis_button = st.button('Headline Analysis')
         detailed_headline_analysis_button = st.button('Headline Optimization Report') 
-        asset_analysis_button = st.button('Asset Analysis')
+        asset_type = st.button('Asset Type')
+        asset_purpose = st.button('Asset Purpose')
+        target_audience = st.button('Target Audience')
         flash_analysis_button = st.button('Flash Analysis') 
         ux_marketing_analysis_button = st.button('UX Design and Marketing Analysis')
         st.text_area("Enter your custom prompt for image analysis:", key="custom_prompt")
@@ -604,13 +606,27 @@ else:
                     st.write("## Headline Optimization Report Results:")
                     st.markdown(detailed_headline_result)
                     
-        if asset_analysis_button:
+        if asset_type:
             with st.spinner("Performing Asset Analysis..."):
                 uploaded_file.seek(0)
-                detailed_asset_result = asset_analysis(uploaded_file)
-                if detailed_asset_result:
-                    st.write("## Headline Optimization Report Results:")
-                    st.markdown(detailed_asset_result)
+                asset_type_result = asset_analysis(uploaded_file)
+                if asset_type_result:
+                    st.write("## Asset Type Report Results:")
+                    st.markdown(asset_type_result)
+        if asset_purpose:
+            with st.spinner("Performing Asset Analysis..."):
+                uploaded_file.seek(0)
+                asset_purpose_result = asset_analysis(uploaded_file)
+                if asset_purpose_result:
+                    st.write("## Asset Purpose Report Results:")
+                    st.markdown(asset_purpose_result)
+        if target_audience:
+            with st.spinner("Performing Asset Analysis..."):
+                uploaded_file.seek(0)
+                target_audience_result = asset_analysis(uploaded_file)
+                if target_audience_result:
+                    st.write("## Target Audience Report Results:")
+                    st.markdown(target_audience_result)
 
         if flash_analysis_button:
             with st.spinner("Performing Flash analysis..."):
