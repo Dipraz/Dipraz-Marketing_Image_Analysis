@@ -62,38 +62,6 @@ else:
             st.error("Unexpected response structure from the model.")
             return None
 
-    def detailed_marketing_analysis(uploaded_file):
-        prompt = (
-            "Imagine you are a marketing consultant reviewing an image for a client. Analyze the provided image for marketing effectiveness. For each aspect listed below, provide a score from 1 to 5 (1 being low, 5 being high) along with a concise explanation for all aspects and suggestions for improvement. Present the results in a table format with the columns: Aspect, Score, Explanation, and Improvement. Also, after the table, write the total sum of the scores and a concise explanation with some overall improvement suggestions. Ensure your scoring remains consistent for each aspect, regardless of how many times you analyze the image.\n"
-            "The aspects to consider are:\n"
-            "1. Order of Content Consumption: Analyze the uploaded image to understand the order of content consumption. Start by identifying and analyzing the headline for its prominence and position. Next, evaluate any additional text for visibility and reader engagement sequence. Assess the positioning of images in relation to the text, followed by an examination of interactive elements such as buttons. Discuss the order in which the content is consumed (e.g., headline first, then text, or image then text then button, etc.). Determine if the content prioritizes important information, and draws and holds attention effectively.\n"
-            "2. Visual Appeal: Does the image contain visually-appealing elements that grab user attention? Does it appeal on its own, without text?\n"
-            "3. Purpose & Value Clarity: Is the purpose and value proposition of the content clear within 3 seconds of viewing the image? Is the content product or customer-centric?\n"
-            "4. Headline (if present):\n"
-            "   - Clarity & Conciseness: Evaluate the headline's clarity and conciseness.\n"
-            "   - Customer Focus: Does the headline emphasize a customer-centric approach?\n"
-            "   - Other sub-questions like SEO keywords, emotional appeal, etc.\n"
-            "5. Text Analysis (if present):\n"
-            "   - Text Quantity: Evaluate the amount of text present in the image.\n"
-            "   - Text Grouping & Readability: How is the text grouped and formatted for readability?\n"
-            "6. Trustworthiness: Assess the trustworthiness of the content based on visual and textual elements. Evaluate the credibility, reliability, and intimacy conveyed by the content. Determine if the content is brand-centric or customer-centric, noting that customer-centric content generally has higher trustworthiness.\n"
-            "7. Motivation & Influence: Examine if the content aligns with user motivators, demonstrates authority, uses scarcity, and provides social proof.\n"
-            "8. Calls to Action: Analyze the presence, prominence, benefits, and language of CTAs.\n"
-            "9. Experience & Memorability: Comment on the user interaction, content difficulty, emotion created, participation encouragement, learning styles, interactivity, context, reinforcement, practical value, and social currency.\n"
-            "10. Attraction & Focus: Does the content prioritize important information and draw attention effectively?\n"
-            "11. Memory: Does the content include a range of learning styles (e.g., image, text, infographics, video, etc)?\n"
-            "12. Effort: Evaluate the clarity and conciseness of the text. Does it convey the message effectively without being overly wordy? (1: Very Dense & Difficult, 5: Clear & Easy to Understand)\n"
-        )
-        image = Image.open(uploaded_file)
-        response = model.generate_content([prompt, image])
-
-        if response.candidates:
-            raw_response = response.candidates[0].content.parts[0].text.strip()
-            st.write("Detailed Marketing Analysis Results:")
-            st.markdown(raw_response, unsafe_allow_html=True)  # Assuming the response is in HTML table format
-        else:
-            st.error("Unexpected response structure from the model.")
-        return None
     
     def combined_marketing_analysis_V6(uploaded_file):
         prompt = (
@@ -237,7 +205,6 @@ else:
     with st.sidebar:
         st.header("Options")
         basic_analysis = st.button('Basic Analysis')
-        detailed_analysis = st.button('Detailed Marketing Analysis')
         combined_analysis_V6 = st.button('Combined Detailed Marketing Analysis V6')
         text_analysis_button = st.button('Text Analysis')
         headline_analysis_button = st.button('Headline Analysis')
@@ -260,13 +227,6 @@ else:
                     st.write("## Basic Analysis Results:")
                     st.json(basic_analysis_result)
 
-        if detailed_analysis:
-            with st.spinner("Performing detailed marketing analysis..."):
-                uploaded_file.seek(0)
-                detailed_result = detailed_marketing_analysis(uploaded_file)
-                if detailed_result:
-                    st.write("## Detailed Marketing Analysis Results:")
-                    st.markdown(detailed_result)
         if combined_analysis_V6:
             with st.spinner("Performing combined marketing analysis_V6..."):
                 uploaded_file.seek(0)
