@@ -479,7 +479,7 @@ else:
         else:
             st.error("Unexpected response structure from the model.")
         return None
-    def custom_prompt_analysis(uploaded_file, custom_prompt, model):
+    def custom_prompt_analysis_asset(uploaded_file, custom_prompt, model):
         prompt = custom_prompt
 
         image = Image.open(uploaded_file)
@@ -487,7 +487,33 @@ else:
 
         if response.candidates:
             raw_response = response.candidates[0].content.parts[0].text.strip()
-            st.write("## User Prompt Analysis Results:")
+            st.write("## User Prompt Analysis Results for Asset Types:")
+            st.markdown(raw_response, unsafe_allow_html=True)  # Assuming the response is in HTML table format
+        else:
+            st.error("Unexpected response structure from the model.")
+            return None
+    def custom_prompt_analysis_purpose(uploaded_file, custom_prompt, model):
+        prompt = custom_prompt
+
+        image = Image.open(uploaded_file)
+        response = model.generate_content([prompt, image])
+
+        if response.candidates:
+            raw_response = response.candidates[0].content.parts[0].text.strip()
+            st.write("## User Prompt Analysis Results for Asset Purpose:")
+            st.markdown(raw_response, unsafe_allow_html=True)  # Assuming the response is in HTML table format
+        else:
+            st.error("Unexpected response structure from the model.")
+            return None
+    def custom_prompt_analysis_audience(uploaded_file, custom_prompt, model):
+        prompt = custom_prompt
+
+        image = Image.open(uploaded_file)
+        response = model.generate_content([prompt, image])
+
+        if response.candidates:
+            raw_response = response.candidates[0].content.parts[0].text.strip()
+            st.write("## User Prompt Analysis Results for Target Audience:")
             st.markdown(raw_response, unsafe_allow_html=True)  # Assuming the response is in HTML table format
         else:
             st.error("Unexpected response structure from the model.")
@@ -513,142 +539,164 @@ else:
         target_audience = st.button('Target Audience')
         flash_analysis_button = st.button('Flash Analysis') 
         ux_marketing_analysis_button = st.button('UX Design and Marketing Analysis')
-        st.text_area("Enter your custom prompt for image analysis:", key="custom_prompt")
-        custom_prompt_button = st.button('Custom Prompt Analysis')
+        st.text_area("Enter your custom prompt for image analysis:", key="custom_prompt_asset")
+        custom_prompt_button_asset = st.button('Asset Type', key="custom_prompt_button_asset")
+        st.text_area("Enter your custom prompt for image analysis:", key="custom_prompt_purpose")
+        custom_prompt_button_asset_purpose = st.button('Asset Purpose', key="custom_prompt_button_asset_purpose")
+        st.text_area("Enter your custom prompt for image analysis:", key="custom_prompt_audience")
+        custom_prompt_button_target_audience = st.button('Target Audience', key="custom_prompt_button_target_audience")
 
-    col1, col2 = st.columns(2)
-    uploaded_file = col1.file_uploader("Upload your marketing image here:")
+col1, col2 = st.columns(2)
+uploaded_file = col1.file_uploader("Upload your marketing image here:")
 
-    if uploaded_file is not None:
-        image = Image.open(uploaded_file)
-        image = resize_image(image)
-        col2.image(image, caption="Uploaded Image", use_column_width=True)
+if uploaded_file is not None:
+    image = Image.open(uploaded_file)
+    image = resize_image(image)
+    col2.image(image, caption="Uploaded Image", use_column_width=True)
 
-        if basic_analysis:
-            with st.spinner("Performing basic analysis..."):
-                uploaded_file.seek(0)
-                basic_analysis_result = analyze_image(uploaded_file)
-                if basic_analysis_result:
-                    st.write("## Basic Analysis Results:")
-                    st.json(basic_analysis_result)
+    if basic_analysis:
+        with st.spinner("Performing basic analysis..."):
+            uploaded_file.seek(0)
+            basic_analysis_result = analyze_image(uploaded_file)
+            if basic_analysis_result:
+                st.write("## Basic Analysis Results:")
+                st.json(basic_analysis_result)
 
-        if detailed_analysis:
-            with st.spinner("Performing detailed marketing analysis..."):
-                uploaded_file.seek(0)
-                detailed_result = detailed_marketing_analysis(uploaded_file)
-                if detailed_result:
-                    st.write("## Detailed Marketing Analysis Results:")
-                    st.markdown(detailed_result)
-        if detailed_analysis_V1:
-            with st.spinner("Performing detailed marketing analysis_V1..."):
-                uploaded_file.seek(0)
-                detailed_result_V1 = detailed_marketing_analysis_v1(uploaded_file)
-                if detailed_result_V1:
-                    st.write("## Detailed Marketing Analysis_V1 Results:")
-                    st.markdown(detailed_result_V1)
-        if detailed_analysis_V2:
-            with st.spinner("Performing detailed marketing analysis_V2..."):
-                uploaded_file.seek(0)
-                detailed_result_V2 = detailed_marketing_analysis_v2(uploaded_file)
-                if detailed_result_V2:
-                    st.write("## Detailed Marketing Analysis_V2 Results:")
-                    st.markdown(detailed_result_V2)
-        if combined_analysis_V5:
-            with st.spinner("Performing combined marketing analysis_V5..."):
-                uploaded_file.seek(0)
-                detailed_result_V5 = combined_marketing_analysis_V5(uploaded_file)
-                if detailed_result_V5:
-                    st.write("## Combined Marketing Analysis_V5 Results:")
-                    st.markdown(detailed_result_V5)
-        if combined_analysis_V6:
-            with st.spinner("Performing combined marketing analysis_V6..."):
-                uploaded_file.seek(0)
-                detailed_result_V6 = combined_marketing_analysis_V6(uploaded_file)
-                if detailed_result_V6:
-                    st.write("## Combined Marketing Analysis_V6 Results:")
-                    st.markdown(detailed_result_V6)
-                    
-        if text_analysis_button:
-            with st.spinner("Performing text analysis..."):
-                uploaded_file.seek(0)
-                text_result = text_analysis(uploaded_file)
-                if text_result:
-                    st.write("## Text Analysis Results:")
-                    st.markdown(text_result)
-        if detailed_analysis_V3:
-            with st.spinner("Performing detailed marketing analysis_V3..."):
-                uploaded_file.seek(0)
-                detailed_result_V3 = detailed_marketing_analysis_v3(uploaded_file)
-                if detailed_result_V3:
-                    st.write("## Combined Marketing Analysis_V3 Results:")
-                    st.markdown(detailed_result_V3)                    
-        if marketing_success:
-            with st.spinner("Performing marketing effectiveness and success analysis..."):
-                uploaded_file.seek(0)
-                marketing_success_result = marketing_effectiveness(uploaded_file)
-                if marketing_success_result:
-                    st.write("## Marketing Effectiveness Analysis Results:")
-                    st.markdown(marketing_success_result)
+    if detailed_analysis:
+        with st.spinner("Performing detailed marketing analysis..."):
+            uploaded_file.seek(0)
+            detailed_result = detailed_marketing_analysis(uploaded_file)
+            if detailed_result:
+                st.write("## Detailed Marketing Analysis Results:")
+                st.markdown(detailed_result)
+    if detailed_analysis_V1:
+        with st.spinner("Performing detailed marketing analysis_V1..."):
+            uploaded_file.seek(0)
+            detailed_result_V1 = detailed_marketing_analysis_v1(uploaded_file)
+            if detailed_result_V1:
+                st.write("## Detailed Marketing Analysis_V1 Results:")
+                st.markdown(detailed_result_V1)
+    if detailed_analysis_V2:
+        with st.spinner("Performing detailed marketing analysis_V2..."):
+            uploaded_file.seek(0)
+            detailed_result_V2 = detailed_marketing_analysis_v2(uploaded_file)
+            if detailed_result_V2:
+                st.write("## Detailed Marketing Analysis_V2 Results:")
+                st.markdown(detailed_result_V2)
+    if combined_analysis_V5:
+        with st.spinner("Performing combined marketing analysis_V5..."):
+            uploaded_file.seek(0)
+            detailed_result_V5 = combined_marketing_analysis_V5(uploaded_file)
+            if detailed_result_V5:
+                st.write("## Combined Marketing Analysis_V5 Results:")
+                st.markdown(detailed_result_V5)
+    if combined_analysis_V6:
+        with st.spinner("Performing combined marketing analysis_V6..."):
+            uploaded_file.seek(0)
+            detailed_result_V6 = combined_marketing_analysis_V6(uploaded_file)
+            if detailed_result_V6:
+                st.write("## Combined Marketing Analysis_V6 Results:")
+                st.markdown(detailed_result_V6)
+                
+    if text_analysis_button:
+        with st.spinner("Performing text analysis..."):
+            uploaded_file.seek(0)
+            text_result = text_analysis(uploaded_file)
+            if text_result:
+                st.write("## Text Analysis Results:")
+                st.markdown(text_result)
+    if detailed_analysis_V3:
+        with st.spinner("Performing detailed marketing analysis_V3..."):
+            uploaded_file.seek(0)
+            detailed_result_V3 = detailed_marketing_analysis_v3(uploaded_file)
+            if detailed_result_V3:
+                st.write("## Combined Marketing Analysis_V3 Results:")
+                st.markdown(detailed_result_V3)                    
+    if marketing_success:
+        with st.spinner("Performing marketing effectiveness and success analysis..."):
+            uploaded_file.seek(0)
+            marketing_success_result = marketing_effectiveness(uploaded_file)
+            if marketing_success_result:
+                st.write("## Marketing Effectiveness Analysis Results:")
+                st.markdown(marketing_success_result)
 
-        if headline_analysis_button:
-            with st.spinner("Performing headline analysis..."):
-                uploaded_file.seek(0)
-                headline_result = headline_analysis(uploaded_file)
-                if headline_result:
-                    st.write("## Headline Analysis Results:")
-                    st.markdown(headline_result)
+    if headline_analysis_button:
+        with st.spinner("Performing headline analysis..."):
+            uploaded_file.seek(0)
+            headline_result = headline_analysis(uploaded_file)
+            if headline_result:
+                st.write("## Headline Analysis Results:")
+                st.markdown(headline_result)
 
-        if detailed_headline_analysis_button:
-            with st.spinner("Performing Headline Optimization Report analysis..."):
-                uploaded_file.seek(0)
-                detailed_headline_result = headline_detailed_analysis(uploaded_file)
-                if detailed_headline_result:
-                    st.write("## Headline Optimization Report Results:")
-                    st.markdown(detailed_headline_result)
-                    
-        if asset_type:
-            with st.spinner("Performing Asset Analysis..."):
-                uploaded_file.seek(0)
-                asset_type_result = asset_analysis(uploaded_file)
-                if asset_type_result:
-                    st.write("## Asset Type Report Results:")
-                    st.markdown(asset_type_result)
-        if asset_purpose:
-            with st.spinner("Performing Asset Analysis..."):
-                uploaded_file.seek(0)
-                asset_purpose_result = asset_analysis(uploaded_file)
-                if asset_purpose_result:
-                    st.write("## Asset Purpose Report Results:")
-                    st.markdown(asset_purpose_result)
-        if target_audience:
-            with st.spinner("Performing Asset Analysis..."):
-                uploaded_file.seek(0)
-                target_audience_result = asset_analysis(uploaded_file)
-                if target_audience_result:
-                    st.write("## Target Audience Report Results:")
-                    st.markdown(target_audience_result)
+    if detailed_headline_analysis_button:
+        with st.spinner("Performing Headline Optimization Report analysis..."):
+            uploaded_file.seek(0)
+            detailed_headline_result = headline_detailed_analysis(uploaded_file)
+            if detailed_headline_result:
+                st.write("## Headline Optimization Report Results:")
+                st.markdown(detailed_headline_result)
+                
+    if asset_type:
+        with st.spinner("Performing Asset Analysis..."):
+            uploaded_file.seek(0)
+            asset_type_result = asset_analysis(uploaded_file)
+            if asset_type_result:
+                st.write("## Asset Type Report Results:")
+                st.markdown(asset_type_result)
+    if asset_purpose:
+        with st.spinner("Performing Asset Analysis..."):
+            uploaded_file.seek(0)
+            asset_purpose_result = asset_analysis(uploaded_file)
+            if asset_purpose_result:
+                st.write("## Asset Purpose Report Results:")
+                st.markdown(asset_purpose_result)
+    if target_audience:
+        with st.spinner("Performing Asset Analysis..."):
+            uploaded_file.seek(0)
+            target_audience_result = asset_analysis(uploaded_file)
+            if target_audience_result:
+                st.write("## Target Audience Report Results:")
+                st.markdown(target_audience_result)
 
-        if flash_analysis_button:
-            with st.spinner("Performing Flash analysis..."):
-                uploaded_file.seek(0)
-                flash_result = flash_analysis(uploaded_file)
-                if flash_result:
-                    st.write("## Flash Analysis Results:")
-                    st.markdown(flash_result)
+    if flash_analysis_button:
+        with st.spinner("Performing Flash analysis..."):
+            uploaded_file.seek(0)
+            flash_result = flash_analysis(uploaded_file)
+            if flash_result:
+                st.write("## Flash Analysis Results:")
+                st.markdown(flash_result)
 
-        if ux_marketing_analysis_button:
-            with st.spinner("Performing UX and Marketing Analysis..."):
-                uploaded_file.seek(0)
-                ux_result = ux_marketing_analysis(uploaded_file)
-                if ux_result:
-                    st.write("## UX Design Analysis Results:")
-                    st.markdown(ux_result)
-                    
-        if custom_prompt_button:
-            with st.spinner("Performing custom prompt analysis..."):
-                uploaded_file.seek(0)
-                custom_prompt = st.session_state.custom_prompt
-                custom_prompt_result = custom_prompt_analysis(uploaded_file, custom_prompt, model)
-                if custom_prompt_result:
-                    st.write("## Custom Prompt Analysis Results:")
-                    st.markdown(custom_prompt_result)
+    if ux_marketing_analysis_button:
+        with st.spinner("Performing UX and Marketing Analysis..."):
+            uploaded_file.seek(0)
+            ux_result = ux_marketing_analysis(uploaded_file)
+            if ux_result:
+                st.write("## UX Design Analysis Results:")
+                st.markdown(ux_result)
+                
+    if custom_prompt_button_asset:
+        with st.spinner("Performing custom prompt analysis..."):
+            uploaded_file.seek(0)
+            custom_prompt_asset = st.session_state.custom_prompt_asset
+            custom_prompt_asset_result = custom_prompt_analysis_asset(uploaded_file, custom_prompt_asset, model)
+            if custom_prompt_asset_result:
+                st.write("## Custom Prompt Analysis Results:")
+                st.markdown(custom_prompt_asset_result)
+                
+    if custom_prompt_button_asset_purpose:
+        with st.spinner("Performing custom prompt analysis..."):
+            uploaded_file.seek(0)
+            custom_prompt_purpose = st.session_state.custom_prompt_purpose
+            custom_prompt_purpose_result = custom_prompt_analysis_purpose(uploaded_file, custom_prompt_purpose, model)
+            if custom_prompt_purpose_result:
+                st.write("## Custom Prompt Analysis Results:")
+                st.markdown(custom_prompt_purpose_result)
+                
+    if custom_prompt_button_target_audience:
+        with st.spinner("Performing custom prompt analysis..."):
+            uploaded_file.seek(0)
+            custom_prompt_audience = st.session_state.custom_prompt_audience
+            custom_prompt_audience_result = custom_prompt_analysis_audience(uploaded_file, custom_prompt_audience, model)
+            if custom_prompt_audience_result:
+                st.write("## Custom Prompt Analysis Results:")
+                st.markdown(custom_prompt_audience_result)
