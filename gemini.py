@@ -66,7 +66,7 @@ else:
         prompt = (
             "Imagine you are a UX design and marketing analysis consultant reviewing an image for a client. Analyze the provided image for marketing effectiveness. First, provide detailed responses for the following:\n"
             "\n"
-            "1. Asset Type: Clearly identify and describe the type of marketing asset. Examples include email, social media posts, advertisements, flyer, brochures, landing pages, etc.\n"
+            "1. Asset Type: Clearly identify and describe the type of marketing asset. Examples include email, social media posts, advertisements, flyers, brochures, landing pages, etc.\n"
             "2. Purpose: Clearly state the specific purpose of this marketing asset. Provide a detailed explanation of how it aims to achieve this purpose. Examples include selling a product, getting more signups, driving traffic to a webpage, increasing brand awareness, engaging with customers, etc.\n"
             "3. Asset Audience: Identify the target audience for this marketing asset. Describe the demographics, interests, and needs of this audience. Examples include age group, gender, location, income level, education, interests, behaviors, etc.\n"
             "\n"
@@ -83,7 +83,7 @@ else:
             "8. Headline Review: Evaluate the headline for clarity, conciseness, customer centricity, SEO keyword integration, emotional appeal, uniqueness, urgency, benefit to the reader, audience targeting, length, use of numbers/lists, brand consistency, and power words.\n"
             "9. Headline SEO keywords and emotional appeal: Does the headline incorporate SEO keywords and evoke an emotional response?\n"
             "10. Visual Cues and Color Usage: Does the image use visual cues and colors to draw attention to key elements? Analyze how color choices, contrast, and elements like arrows or frames guide the viewer's attention.\n"
-            "11. Labeling and Button Clarity: Are any labels or buttons present clearly labeled and easy to understand? Evaluate the use of text size, font choice, and placement for optimal readability.\n"
+            "11. Labeling and Button Clarity: Are any labels or buttons present that are clearly labeled and easy to understand? Evaluate the use of text size, font choice, and placement for optimal readability.\n"
             "12. Engagement: Assess the engagement level of the user experience. Is the UX design captivating and satisfying to interact with?\n"
             "13. Trust: Assess the trustworthiness of the content based on visual and textual elements. Is the content brand or customer-centric (customer-centric content has a higher trustworthiness)? Assess the credibility, reliability, and intimacy conveyed by the content.\n"
             "14. Motivation: Assess the design's ability to motivate users. Does it align with user motivators and demonstrate authority or provide social proof?\n"
@@ -292,14 +292,6 @@ else:
                     st.session_state.submitted = False
                 else:
                     st.error("Please provide all the required details for the analysis.")
-
-        if basic_analysis:
-            with st.spinner("Performing basic analysis..."):
-                uploaded_file.seek(0)
-                basic_analysis_result = analyze_image(uploaded_file)
-                if basic_analysis_result:
-                    st.write("## Basic Analysis Results:")
-                    st.json(basic_analysis_result)
 
         if combined_analysis_V6:
             with st.spinner("Performing combined marketing analysis_V6..."):
