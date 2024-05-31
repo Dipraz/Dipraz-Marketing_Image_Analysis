@@ -61,13 +61,12 @@ else:
         else:
             st.error("Unexpected response structure from the model.")
             return None
-
-    
+        
     def combined_marketing_analysis_V6(uploaded_file):
         prompt = (
             "Imagine you are a UX design and marketing analysis consultant reviewing an image for a client. Analyze the provided image for marketing effectiveness. First, provide detailed responses for the following:\n"
             "\n"
-            "1. Asset Type: Clearly identify and describe the type of marketing asset. Examples include email, social media posts, advertisements, flyers, brochures, landing pages, etc.\n"
+            "1. Asset Type: Clearly identify and describe the type of marketing asset. Examples include email, social media posts, advertisements, flyer, brochures, landing pages, etc.\n"
             "2. Purpose: Clearly state the specific purpose of this marketing asset. Provide a detailed explanation of how it aims to achieve this purpose. Examples include selling a product, getting more signups, driving traffic to a webpage, increasing brand awareness, engaging with customers, etc.\n"
             "3. Asset Audience: Identify the target audience for this marketing asset. Describe the demographics, interests, and needs of this audience. Examples include age group, gender, location, income level, education, interests, behaviors, etc.\n"
             "\n"
@@ -103,6 +102,57 @@ else:
         else:
             st.error("Unexpected response structure from the model.")
         return None
+    def combined_marketing_analysis_V7(uploaded_file, asset_type, asset_purpose, asset_audience):
+        prompt = (
+            f"Imagine you are a UX design and marketing analysis consultant reviewing an image for a client. Analyze the provided image for marketing effectiveness. "
+            f"First, provide detailed responses for the following:\n\n"
+            f"1. Asset Type: {asset_type}\n"
+            f"2. Purpose: {asset_purpose}\n"
+            f"3. Asset Audience: {asset_audience}\n\n"
+            f"Then, for each aspect listed below, provide a score from 1 to 5 (1 being low, 5 being high) and a concise explanation for each aspect, along with suggestions for improvement. "
+            f"The results should be presented in a table format with the columns: Aspect, Score, Explanation, and Improvement. After the table, provide the total sum of the scores and a concise explanation with overall improvement suggestions. "
+            f"Ensure that this analysis process yields consistent scoring results, regardless of how many times or when it is run. Here are the aspects to consider:\n\n"
+            f"1. Creative Score: Assess the creativity of the design considering the asset type '{asset_type}', its purpose '{asset_purpose}', and the target audience '{asset_audience}'. Does it stand out and capture attention through innovative elements?\n"
+            f"2. Attention: Evaluate the order of content consumption in the uploaded image. Start by identifying and analyzing the headline for its prominence and position, considering the asset type '{asset_type}', its purpose '{asset_purpose}', and the target audience '{asset_audience}'. Next, evaluate any additional text for visibility and reader engagement sequence. Assess the positioning of images in relation to the text, followed by an examination of interactive elements such as buttons. Discuss the order in which the content is consumed (e.g., headline first, then text, or image then text then button, etc.). Determine if the content prioritizes important information, and draws and holds attention effectively.\n"
+            f"3. Distinction: Does the content contain pictures that grab user attention? Does it appeal to the primal brain with and without text? Consider the asset type '{asset_type}', its purpose '{asset_purpose}', and the target audience '{asset_audience}' when evaluating this aspect.\n"
+            f"4. Purpose and Value: Is the purpose and value clear within 3 seconds? Is the content product or customer-centric? Evaluate this considering the asset type '{asset_type}', its purpose '{asset_purpose}', and the target audience '{asset_audience}'.\n"
+            f"5. Clarity: Evaluate the clarity of the design elements. Are the visuals and text easy to understand? Consider the asset type '{asset_type}', its purpose '{asset_purpose}', and the target audience '{asset_audience}'.\n"
+            f"6. First Impressions: Analyze the initial impact of the design. Does it create a strong positive first impression? Take into account the asset type '{asset_type}', its purpose '{asset_purpose}', and the target audience '{asset_audience}'.\n"
+            f"7. Cognitive Demand: Evaluate the cognitive load required to understand and navigate the design. Is it intuitive and easy to use? Consider the asset type '{asset_type}', its purpose '{asset_purpose}', and the target audience '{asset_audience}'.\n"
+            f"8. Headline Review: Evaluate the headline for clarity, conciseness, customer centricity, SEO keyword integration, emotional appeal, uniqueness, urgency, benefit to the reader, audience targeting, length, use of numbers/lists, brand consistency, and power words, considering the asset type '{asset_type}', its purpose '{asset_purpose}', and the target audience '{asset_audience}'.\n"
+            f"9. Headline SEO keywords and emotional appeal: Does the headline incorporate SEO keywords and evoke an emotional response? Consider the asset type '{asset_type}', its purpose '{asset_purpose}', and the target audience '{asset_audience}'.\n"
+            f"10. Visual Cues and Color Usage: Does the image use visual cues and colors to draw attention to key elements? Analyze how color choices, contrast, and elements like arrows or frames guide the viewer's attention. Consider the asset type '{asset_type}', its purpose '{asset_purpose}', and the target audience '{asset_audience}'.\n"
+            f"11. Labeling and Button Clarity: Are any labels or buttons present clearly labeled and easy to understand? Evaluate the use of text size, font choice, and placement for optimal readability, considering the asset type '{asset_type}', its purpose '{asset_purpose}', and the target audience '{asset_audience}'.\n"
+            f"12. Engagement: Assess the engagement level of the user experience. Is the UX design captivating and satisfying to interact with? Consider the asset type '{asset_type}', its purpose '{asset_purpose}', and the target audience '{asset_audience}'.\n"
+            f"13. Trust: Assess the trustworthiness of the content based on visual and textual elements. Is the content brand or customer-centric (customer-centric content has a higher trustworthiness)? Assess the credibility, reliability, and intimacy conveyed by the content, considering the asset type '{asset_type}', its purpose '{asset_purpose}', and the target audience '{asset_audience}'.\n"
+            f"14. Motivation: Assess the design's ability to motivate users. Does it align with user motivators and demonstrate authority or provide social proof? Consider the asset type '{asset_type}', its purpose '{asset_purpose}', and the target audience '{asset_audience}'.\n"
+            f"15. Influence: Analyze the influence of the design. Does it effectively persuade users and drive desired behaviors? Consider the asset type '{asset_type}', its purpose '{asset_purpose}', and the target audience '{asset_audience}'.\n"
+            f"16. Calls to Action: Analyze the presence, prominence, benefits, and language of CTAs, considering the asset type '{asset_type}', its purpose '{asset_purpose}', and the target audience '{asset_audience}'.\n"
+            f"17. Experience: Assess the overall user experience. How well does the design facilitate a smooth and enjoyable interaction? Consider the asset type '{asset_type}', its purpose '{asset_purpose}', and the target audience '{asset_audience}'.\n"
+            f"18. Memorability: Evaluate how memorable the design is. Does it leave a lasting impression? Consider the asset type '{asset_type}', its purpose '{asset_purpose}', and the target audience '{asset_audience}'.\n"
+            f"19. Effort: Evaluate the clarity and conciseness of the text. Does it convey the message effectively without being overly wordy? Consider the asset type '{asset_type}', its purpose '{asset_purpose}', and the target audience '{asset_audience}'.\n"
+        )
+
+        image = Image.open(uploaded_file)
+        response = model.generate_content([prompt, image])
+        if response.candidates:
+            raw_response = response.candidates[0].content.parts[0].text.strip()
+            st.write("Combined Marketing Analysis Results_V7:")
+            st.markdown(raw_response, unsafe_allow_html=True)  # Assuming the response is in HTML table format
+        else:
+            st.error("Unexpected response structure from the model.")
+        return None
+
+    # Initialize session state for inputs
+    if 'asset_type' not in st.session_state:
+        st.session_state.asset_type = ''
+    if 'asset_purpose' not in st.session_state:
+        st.session_state.asset_purpose = ''
+    if 'asset_audience' not in st.session_state:
+        st.session_state.asset_audience = ''
+    if 'submitted' not in st.session_state:
+        st.session_state.submitted = False
+
     def text_analysis(uploaded_file):
         prompt = (
             "Imagine you are a UX design and marketing analysis consultant reviewing the text on a marketing asset (excluding the headline) for a client. Analyze the provided text using the following criteria. For each aspect, provide a score from 1 to 5 (1 being low, 5 being high) along with a concise explanation and suggestions for improvement. Present the results in a table format with the columns: Aspect, Score, Explanation, and Improvements. After the table, provide the total sum of the scores and a concise explanation with overall improvement suggestions.Ensure your scoring remains consistent for each aspect, regardless of how many times you analyze the image. Here are the aspects to consider:\n"
@@ -137,7 +187,7 @@ else:
 
     def headline_analysis(uploaded_file):
         prompt = (
-            "Imagine you are a marketing consultant reviewing an image and its headline for a client. Analyze the provided image content alongside the headline text to assess the headline's effectiveness. Rate each criterion on a scale from 1 to 5 (1 being poor, 5 being excellent), and provide a concise explanation for each score based on the synergy between the image and headline. Present your results in a table format with columns labeled: Criterion, Score, Explanation. Below the table, calculate and display the total sum of all scores. Ensure that this analysis process yields consistent scoring results, regardless of how many times or when it is run. Conclude with three possible improved headlines that better align with the image content. The improved headlines should avoid using colons (':') and should be well-structured and varied in format.\n"
+            "Imagine you are a marketing consultant reviewing an image and its headline for a client. Analyze the provided image content alongside the headline text to assess the headline's effectiveness. Rate each criterion on a scale from 1 to 5 (1 being poor, 5 being excellent), and provide a concise explanation for each score based on the synergy between the image and headline. Present your results in a table format with columns labeled: Criterion, Score, Explanation. Below the table, calculate and display the total sum of all scores. Ensure that this analysis process yields consistent scoring results, regardless of how many times or when it is run. Conclude with three possible improved headlines that better align with the image content. The improved headlines should not contain colons (':') and should vary in structure and style.\n"
             "The criteria to assess are:\n"
             "1. Clarity & Conciseness: How clearly does the headline convey the main point?\n"
             "2. Customer Focus: Does the headline emphasize a customer-centric approach?\n"
@@ -149,7 +199,6 @@ else:
             "8. Benefit-Driven: Does the headline convey a clear benefit or value proposition, aligned with the image content?\n"
             "9. Target Audience: Is the headline tailored to resonate with the specific target audience, considering the image's visual cues?\n"
             "10. Length & Format: Does the headline fall within an ideal length of 6-12 words?\n"
-            "When suggesting improved headlines, prioritize aspects like clarity, relevance, emotional appeal, and target audience over a specific format. Provide a few alternative headlines with varying structures to demonstrate potential improvements."
         )
         image = Image.open(uploaded_file)
         response = model.generate_content([prompt, image])
@@ -206,6 +255,7 @@ else:
         st.header("Options")
         basic_analysis = st.button('Basic Analysis')
         combined_analysis_V6 = st.button('Combined Detailed Marketing Analysis V6')
+        combined_analysis_V7 = st.button('Combined Detailed Marketing Analysis V7', on_click=lambda: st.session_state.update({"submitted": True}))
         text_analysis_button = st.button('Text Analysis')
         headline_analysis_button = st.button('Headline Analysis')
         detailed_headline_analysis_button = st.button('Headline Optimization Report') 
@@ -218,6 +268,30 @@ else:
         image = Image.open(uploaded_file)
         image = resize_image(image)
         col2.image(image, caption="Uploaded Image", use_column_width=True)
+
+        if st.session_state.submitted:
+            st.write("Please provide additional details for analysis:")
+            st.session_state.asset_type = st.text_input("Asset Type (e.g., email, social media post):", value=st.session_state.asset_type)
+            st.session_state.asset_purpose = st.text_input("Asset Purpose (e.g., selling a product, increasing brand awareness):", value=st.session_state.asset_purpose)
+            st.session_state.asset_audience = st.text_input("Target Audience (e.g., age group, gender, location):", value=st.session_state.asset_audience)
+
+            if st.button("Submit Analysis"):
+                if st.session_state.asset_type and st.session_state.asset_purpose and st.session_state.asset_audience:
+                    with st.spinner("Performing detailed marketing analysis..."):
+                        uploaded_file.seek(0)
+                        combined_result = combined_marketing_analysis_V7(
+                            uploaded_file, 
+                            st.session_state.asset_type, 
+                            st.session_state.asset_purpose, 
+                            st.session_state.asset_audience
+                        )
+                        if combined_result:
+                            st.write("## Detailed Marketing Analysis Results:")
+                            st.markdown(combined_result)
+                    # Reset submitted state after processing
+                    st.session_state.submitted = False
+                else:
+                    st.error("Please provide all the required details for the analysis.")
 
         if basic_analysis:
             with st.spinner("Performing basic analysis..."):
