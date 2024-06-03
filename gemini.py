@@ -187,37 +187,29 @@ else:
 
     def headline_analysis(uploaded_file):
         prompt = (
-            "Imagine you are a marketing consultant reviewing an image and its associated headline for a client. "
-            "Your first task is to accurately identify the headline from the text provided. Then, analyze the image content "
-            "alongside the extracted headline to assess its effectiveness. Rate each criterion on a scale from 1 to 5 (1 being poor, 5 being excellent), "
-            "and provide a concise explanation for each score based on the synergy between the image and headline. Additionally, suggest specific improvements for each criterion. "
-            "Present your results in a table format with columns labeled: Criterion, Score, Explanation, Improvements. Below the table, calculate and display the total sum of all scores. "
-            "Ensure that this analysis process yields consistent scoring results, regardless of how many times or when it is run.\n\n"
+            "Imagine you are a marketing consultant reviewing an image and its headline for a client. Analyze the provided image content alongside the headline text to assess the headline's effectiveness. Rate each criterion on a scale from 1 to 5 (1 being poor, 5 being excellent), and provide a concise explanation for each score. Also, suggest improvements for each criterion. Present your results in a table format with columns labeled: Criterion, Score, Explanation, Improvements. Below the table, calculate and display the total sum of all scores. Ensure that this analysis process yields consistent scoring results, regardless of how often or when it is run. Conclude with three possible improved headlines that better align with the image content. The improved headlines should not contain colons (':') and should vary in structure and style.\n"
             "The criteria to assess are:\n"
-            "1. Headline Extraction Accuracy: Did you accurately extract the headline from the text? (Only rate this criterion as 5 if the headline is correctly identified, "
-            "otherwise rate it as 1 and provide the correct headline in the explanation and suggest how the extraction could be improved.)\n"
-            "2. Clarity & Conciseness: How clearly does the headline convey the main point? Suggest how to enhance clarity or conciseness.\n"
-            "3. Customer Focus: Does the headline emphasize a customer-centric approach? Provide suggestions to better align the headline with customer interests.\n"
-            "4. Relevance: How accurately does the headline reflect the content of the image? Offer improvements to increase relevance.\n"
-            "5. Keywords: Are relevant SEO keywords included naturally? Suggest keywords or phrases to integrate.\n"
-            "6. Emotional Appeal: Does the headline evoke curiosity or an emotional response, considering the image content? Recommend ways to strengthen emotional engagement.\n"
-            "7. Uniqueness: How original and creative is the headline? Propose ideas to boost originality.\n"
-            "8. Urgency & Curiosity: Does the headline create a sense of urgency or pique curiosity, considering the image? Discuss methods to enhance urgency.\n"
-            "9. Benefit-Driven: Does the headline convey a clear benefit or value proposition, aligned with the image content? Advise on how to better highlight benefits.\n"
-            "10. Target Audience: Is the headline tailored to resonate with the specific target audience, considering the image's visual cues? Provide tips to refine audience targeting.\n"
-            "11. Length & Format: Does the headline fall within an ideal length of 6-12 words? Assess the format and suggest adjustments for optimal impact.\n\n"
-            "Conclude with three possible improved headlines that better align with the image content. The improved headlines should not contain colons (':') "
-            "and should vary in structure and style, including a question, a statement, and a call-to-action, ensuring they remain concise and targeted towards the identified audience."
+            "1. Clarity & Conciseness: How clearly does the headline convey the main point?\n"
+            "2. Customer Focus: Does the headline emphasize a customer-centric approach?\n"
+            "3. Relevance: How accurately does the headline reflect the content of the image?\n"
+            "4. Keywords: Are relevant SEO keywords included naturally?\n"
+            "5. Emotional Appeal: Does the headline evoke curiosity or an emotional response, considering the image content?\n"
+            "6. Uniqueness: How original and creative is the headline?\n"
+            "7. Urgency & Curiosity: Does the headline create a sense of urgency or pique curiosity, considering the image?\n"
+            "8. Benefit-Driven: Does the headline convey a clear benefit or value proposition, aligned with the image content?\n"
+            "9. Target Audience: Is the headline tailored to resonate with the specific target audience, considering the image's visual cues?\n"
+            "10. Length & Format: Does the headline fall within an ideal length of 6-12 words?\n"
         )
         image = Image.open(uploaded_file)
         response = model.generate_content([prompt, image])
-
+    
         if response.candidates:
             raw_response = response.candidates[0].content.parts[0].text.strip()
             st.write("Headline Analysis Results:")
             st.markdown(raw_response, unsafe_allow_html=True)  # Assuming the response is in HTML table format
         else:
             st.error("Unexpected response structure from the model.")
+    
         return None
 
     def headline_detailed_analysis(uploaded_file):
