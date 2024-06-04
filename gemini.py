@@ -189,7 +189,7 @@ else:
         prompt = (
             "Imagine you are a marketing consultant reviewing an image and its headline for a client. Analyze the provided image content alongside the headline text to assess the headline's effectiveness. Rate each criterion on a scale from 1 to 5 (1 being poor, 5 being excellent), and provide a concise explanation for each score. Also, suggest improvements for each criterion. Present your results in a table format with columns labeled: Criterion, Score, Explanation, Improvements. Below the table, calculate and display the total sum of all scores. Ensure that this analysis process yields consistent scoring results, regardless of how often or when it is run. Conclude with three possible improved headlines that better align with the image content. The improved headlines should not contain colons (':') and should vary in structure and style.\n"
             "The criteria to assess are:\n"
-            "1. Clarity & Conciseness: How clearly does the headline convey the main point?\n"
+            "1. Clarity: How clearly does the headline convey the main point?\n"
             "2. Customer Focus: Does the headline emphasize a customer-centric approach?\n"
             "3. Relevance: How accurately does the headline reflect the content of the image?\n"
             "4. Keywords: Are relevant SEO keywords included naturally?\n"
