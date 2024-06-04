@@ -39,6 +39,18 @@ else:
     def resize_image(image, max_size=(500, 500)):
         image.thumbnail(max_size)
         return image
+    # Function to analyze a single image
+    def analyze_image(uploaded_file):
+        # Read image file
+        try:
+            image_data = uploaded_file.read()  # Read file as bytes
+            image = Image.open(io.BytesIO(image_data))  # Open image
+            image = resize_image(image)  # Optional: resize image if required for display or processing
+            # Insert your image analysis code here
+            return image
+        except Exception as e:
+            st.error(f"Failed to read or process the image: {e}")
+            return None
 
     def analyze_image(uploaded_file):
         prompt = (
