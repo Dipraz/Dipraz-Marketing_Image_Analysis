@@ -192,13 +192,12 @@ else:
             "1. Clarity: How clearly does the headline convey the main point?\n"
             "2. Customer Focus: Does the headline emphasize a customer-centric approach?\n"
             "3. Relevance: How accurately does the headline reflect the content of the image?\n"
-            "4. Keywords: Are relevant SEO keywords included naturally?\n"
-            "5. Emotional Appeal: Does the headline evoke curiosity or an emotional response, considering the image content?\n"
-            "6. Uniqueness: How original and creative is the headline?\n"
-            "7. Urgency & Curiosity: Does the headline create a sense of urgency or pique curiosity, considering the image?\n"
-            "8. Benefit-Driven: Does the headline convey a clear benefit or value proposition, aligned with the image content?\n"
-            "9. Target Audience: Is the headline tailored to resonate with the specific target audience, considering the image's visual cues?\n"
-            "10. Length & Format: Does the headline fall within an ideal length of 6-12 words?\n"
+            "4. Emotional Appeal: Does the headline evoke curiosity or an emotional response, considering the image content?\n"
+            "5. Uniqueness: How original and creative is the headline?\n"
+            "6. Urgency & Curiosity: Does the headline create a sense of urgency or pique curiosity, considering the image?\n"
+            "7. Benefit-Driven: Does the headline convey a clear benefit or value proposition, aligned with the image content?\n"
+            "8. Target Audience: Is the headline tailored to resonate with the specific target audience, considering the image's visual cues?\n"
+            "9. Length & Format: Does the headline fall within an ideal length of 6-12 words?\n"
         )
         image = Image.open(uploaded_file)
         response = model.generate_content([prompt, image])
