@@ -262,7 +262,7 @@ else:
         flash_analysis_button = st.button('Flash Analysis')
 
     col1, col2 = st.columns(2)
-    uploaded_file = col1.file_uploader("Upload your marketing image here:")
+    uploaded_file = col1.file_uploader("Upload your marketing image here:", accept_multiple_files=True, type=['png', 'jpg', 'jpeg'])
 
     if uploaded_file is not None:
         image = Image.open(uploaded_file)
