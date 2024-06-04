@@ -39,19 +39,7 @@ else:
     def resize_image(image, max_size=(500, 500)):
         image.thumbnail(max_size)
         return image
-    # Function to analyze a single image
-    def analyze_image(uploaded_file):
-        # Read image file
-        try:
-            image_data = uploaded_file.read()  # Read file as bytes
-            image = Image.open(io.BytesIO(image_data))  # Open image
-            image = resize_image(image)  # Optional: resize image if required for display or processing
-            # Insert your image analysis code here
-            return image
-        except Exception as e:
-            st.error(f"Failed to read or process the image: {e}")
-            return None
-
+        
     def analyze_image(uploaded_file):
         prompt = (
             "Imagine you are a marketing consultant reviewing an image for a client. Analyze the provided image for various marketing aspects and Ensure your results remains consistent for each aspect, regardless of how many times you analyze the image. Respond in single words or short phrases separated by commas for each attribute: "
@@ -274,7 +262,7 @@ else:
         flash_analysis_button = st.button('Flash Analysis')
 
     col1, col2 = st.columns(2)
-    uploaded_file = col1.file_uploader("Upload your marketing image here:", accept_multiple_files=True, type=['png', 'jpg', 'jpeg'])
+    uploaded_file = col1.file_uploader("Upload your marketing image here:")
 
     if uploaded_file is not None:
         image = Image.open(uploaded_file)
