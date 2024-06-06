@@ -1,3 +1,28 @@
+## Marketing Image Analysis
+
+
+
+
+openai
+streamlit
+python-dotenv
+Pillow
+google-auth
+google-auth-oauthlib
+google-auth-httplib2
+google-generativeai  # Replace with the correct version if different
+numpy
+xlsxwriter
+fpdf
+
+streamlit
+simple-salesforce
+langchain
+langchain-openai
+pandas
+
+
+
 import streamlit as st
 from dotenv import load_dotenv
 import os
