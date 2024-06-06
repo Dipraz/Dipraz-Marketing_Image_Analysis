@@ -279,6 +279,16 @@ else:
     col1, col2 = st.columns(2)
     uploaded_files = col1.file_uploader("Upload your marketing image here:", accept_multiple_files=True, type=['png', 'jpg', 'jpeg'])
 
+    # Ensure session state is initialized
+    if 'submitted' not in st.session_state:
+        st.session_state.submitted = False
+    if 'asset_type' not in st.session_state:
+        st.session_state.asset_type = ""
+    if 'asset_purpose' not in st.session_state:
+        st.session_state.asset_purpose = ""
+    if 'asset_audience' not in st.session_state:
+        st.session_state.asset_audience = ""
+
     if uploaded_files is not None:
         for uploaded_file in uploaded_files:
             image = Image.open(uploaded_file)
