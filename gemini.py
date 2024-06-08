@@ -194,7 +194,7 @@ else:
 
     def headline_analysis(uploaded_file):
         prompt = (
-            "Imagine you are a marketing consultant reviewing an image and its headline for a client. Analyze the provided image content alongside the headline text to assess the headline's effectiveness. Rate each criterion on a scale from 1 to 5 (1 being poor, 5 being excellent), and provide a concise explanation for each score. Also, suggest improvements for each criterion. Present your results in a table format with columns labeled: Criterion, Score, Explanation, Improvements. Below the table, calculate and display the total sum of all scores. Ensure that this analysis process yields consistent scoring results, regardless of how often or when it is run. Conclude with three possible improved headlines that better align with the image content. The improved headlines should not contain colons (':') and should vary in structure and style.\n"
+            "Imagine you are a marketing consultant reviewing an image and its headline for a client. Identify all possible headlines present in the image and analyze each one. For each headline, assess its effectiveness by rating each criterion on a scale from 1 to 5 (1 being poor, 5 being excellent), and provide a concise explanation for each score. Also, suggest improvements for each criterion. Present your results in a table format with columns labeled: Criterion, Score, Explanation, Improvements. Below the table, calculate and display the total sum of all scores for each headline. Ensure that this analysis process yields consistent scoring results, regardless of how often or when it is run. Conclude with three possible improved headlines for each original headline that better align with the image content. The improved headlines should not contain colons (':') and should vary in structure and style.\n"
             "The criteria to assess are:\n"
             "1. Clarity: How clearly does the headline convey the main point?\n"
             "2. Customer Focus: Does the headline emphasize a customer-centric approach?\n"
@@ -206,6 +206,7 @@ else:
             "8. Target Audience: Is the headline tailored to resonate with the specific target audience, considering the image's visual cues?\n"
             "9. Length & Format: Does the headline fall within an ideal length of 6-12 words?\n"
         )
+
         try:
             image = Image.open(io.BytesIO(uploaded_file.read()))
             response = model.generate_content([prompt, image])
