@@ -111,6 +111,7 @@ else:
             st.error(f"Failed to read or process the image: {e}")
             return None
 
+
     def text_analysis(uploaded_file):
         prompt = (
             "Imagine you are a UX design and marketing analysis consultant reviewing the text on a marketing asset (excluding the headline) for a client. Analyze the provided text using the following criteria. For each aspect, provide a score from 1 to 5 (1 being low, 5 being high) along with a concise explanation and suggestions for improvement. Present the results in a table format with the columns: Aspect, Score, Explanation, and Improvements. After the table, provide the total sum of the scores and a concise explanation with overall improvement suggestions. Ensure your scoring remains consistent for each aspect, regardless of how many times you analyze the image. Here are the aspects to consider:\n"
@@ -130,7 +131,7 @@ else:
             "14. Benefit-Driven: Does the text convey clear benefits or value propositions?\n"
             "15. Target Audience: Is the text tailored to resonate with the specific target audience?\n"
             "16. Cognitive Demand: Evaluate the cognitive load required to read, understand, and navigate the text. Is it intuitive and easy to use?\n"
-            "17. Reading Age: Assess the reading age level required to understand the text.\n"
+            "17. Reading Age: Assess the reading grade level required to understand the text.\n"
             "Conclude with three alternative versions of the text that align better with the image content and effectively address the identified weaknesses." 
         )
         try:
@@ -219,6 +220,21 @@ else:
             st.error(f"Failed to read or process the image: {e}")
             return None
 
+    def custom_prompt_analysis(uploaded_file, custom_prompt):
+        try:
+            image = Image.open(io.BytesIO(uploaded_file.read()))
+            response = model.generate_content([custom_prompt, image])
+            if response.candidates:
+                raw_response = response.candidates[0].content.parts[0].text.strip()
+                st.write("Custom Prompt Analysis Results:")
+                st.markdown(raw_response, unsafe_allow_html=True)  # Assuming the response is in HTML table format
+            else:
+                st.error("Unexpected response structure from the model.")
+            return None
+        except Exception as e:
+            st.error(f"Failed to read or process the image: {e}")
+            return None
+
     # Streamlit app setup
     st.title('Marketing Image Analysis AI Assistant')
     with st.sidebar:
@@ -227,8 +243,9 @@ else:
         combined_analysis_V6 = st.button('Combined Detailed Marketing Analysis V6')
         text_analysis_button = st.button('Text Analysis')
         headline_analysis_button = st.button('Headline Analysis')
-        detailed_headline_analysis_button = st.button('Headline Optimization Report') 
+        detailed_headline_analysis_button = st.button('Headline Optimization Report')
         flash_analysis_button = st.button('Flash Analysis')
+        custom_prompt_button = st.button('Custom Prompt Analysis')
 
     col1, col2 = st.columns(2)
     uploaded_files = col1.file_uploader("Upload your marketing image here:", accept_multiple_files=True, type=['png', 'jpg', 'jpeg'])
@@ -286,3 +303,13 @@ else:
                     if flash_result:
                         st.write("## Flash Analysis Results:")
                         st.markdown(flash_result)
+
+            if custom_prompt_button:
+                custom_prompt = st.text_area("Enter your custom prompt here:")
+                if custom_prompt:
+                    with st.spinner("Performing custom prompt analysis..."):
+                        uploaded_file.seek(0)
+                        custom_prompt_result = custom_prompt_analysis(uploaded_file, custom_prompt)
+                        if custom_prompt_result:
+                            st.write("## Custom Prompt Analysis Results:")
+                            st.markdown(custom_prompt_result)
