@@ -226,7 +226,6 @@ else:
         st.header("Options")
         basic_analysis = st.button('Basic Analysis')
         combined_analysis_V6 = st.button('Combined Detailed Marketing Analysis V6')
-        combined_analysis_V7 = st.button('Combined Detailed Marketing Analysis V7', on_click=lambda: st.session_state.update({"submitted": True}))
         text_analysis_button = st.button('Text Analysis')
         headline_analysis_button = st.button('Headline Analysis')
         detailed_headline_analysis_button = st.button('Headline Optimization Report') 
