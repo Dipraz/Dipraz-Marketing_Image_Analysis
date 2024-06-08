@@ -149,17 +149,24 @@ else:
 
     def headline_analysis(uploaded_file):
         prompt = (
-            "Imagine you are a marketing consultant reviewing an image and its headline for a client. Identify all possible headlines present in the image and analyze each one. For each headline, assess its effectiveness by rating each criterion on a scale from 1 to 5 (1 being poor, 5 being excellent), and provide a concise explanation for each score. Also, suggest improvements for each criterion. Present your results in a table format with columns labeled: Criterion, Score, Explanation, Improvements. Below the table, calculate and display the total sum of all scores for each headline. Ensure that this analysis process yields consistent scoring results, regardless of how often or when it is run. Conclude with three possible improved headlines for each original headline that better align with the image content. The improved headlines should not contain colons (':') and should vary in structure and style.\n"
-            "The criteria to assess are:\n"
-            "1. Clarity: How clearly does the headline convey the main point?\n"
-            "2. Customer Focus: Does the headline emphasize a customer-centric approach?\n"
-            "3. Relevance: How accurately does the headline reflect the content of the image?\n"
-            "4. Emotional Appeal: Does the headline evoke curiosity or an emotional response, considering the image content?\n"
-            "5. Uniqueness: How original and creative is the headline?\n"
-            "6. Urgency & Curiosity: Does the headline create a sense of urgency or pique curiosity, considering the image?\n"
-            "7. Benefit-Driven: Does the headline convey a clear benefit or value proposition, aligned with the image content?\n"
-            "8. Target Audience: Is the headline tailored to resonate with the specific target audience, considering the image's visual cues?\n"
-            "9. Length & Format: Does the headline fall within an ideal length of 6-12 words?\n"
+            "Imagine you are a marketing consultant reviewing an image and its headline for a client. Your goal is to provide a comprehensive analysis of the headline's effectiveness across various key criteria.\n"
+            "\n"
+            "1. Analyze the Image: Thoroughly examine the image content, noting its key elements, colors, composition, style, and any underlying messages or themes it conveys.\n"
+            "2. Extract Potential Headlines: Identify all possible headlines present in the image. This includes the main headline and any secondary or supporting headlines.\n"
+            "3. Evaluate Each Headline: Analyze each headline against the following criteria, rating each on a scale from 1 to 5 (1 being poor, 5 being excellent), and providing a concise explanation for each score:\n"
+            "    - Clarity: How clearly does the headline convey the main point?\n"
+            "    - Customer Focus: Does the headline emphasize a customer-centric approach?\n"
+            "    - Relevance: How accurately does the headline reflect the content of the image?\n"
+            "    - Emotional Appeal: Does the headline evoke curiosity or an emotional response, considering the image content?\n"
+            "    - Uniqueness: How original and creative is the headline?\n"
+            "    - Urgency & Curiosity: Does the headline create a sense of urgency or pique curiosity, considering the image?\n"
+            "    - Benefit-Driven: Does the headline convey a clear benefit or value proposition, aligned with the image content?\n"
+            "    - Target Audience: Is the headline tailored to resonate with the specific target audience, considering the image's visual cues?\n"
+            "    - Length & Format: Does the headline fall within an ideal length of 6-12 words?\n"
+            "4. Present Results: Present your analysis for each headline in a table format with columns labeled: Criterion, Score, Explanation, Improvements.\n"
+            "5. Calculate Total Scores: Below the table, calculate and display the total sum of all scores for each headline.\n"
+            "6. Ensure Consistency: Verify that the analysis process yields consistent scoring results, regardless of how often or when it is run.\n"
+            "7. Conclude with Improved Headlines: Based on your analysis, provide three possible improved headlines that better align with the image content. Ensure the improved headlines do not contain colons (':'), vary in structure and style, and effectively address any weaknesses identified in the existing headlines."
         )
         try:
             image = Image.open(io.BytesIO(uploaded_file.read()))
