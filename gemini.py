@@ -111,7 +111,6 @@ else:
             st.error(f"Failed to read or process the image: {e}")
             return None
 
-
     def text_analysis(uploaded_file):
         prompt = (
             "Imagine you are a UX design and marketing analysis consultant reviewing the text on a marketing asset (excluding the headline) for a client. Analyze the provided text using the following criteria. For each aspect, provide a score from 1 to 5 (1 being low, 5 being high) along with a concise explanation and suggestions for improvement. Present the results in a table format with the columns: Aspect, Score, Explanation, and Improvements. After the table, provide the total sum of the scores and a concise explanation with overall improvement suggestions. Ensure your scoring remains consistent for each aspect, regardless of how many times you analyze the image. Here are the aspects to consider:\n"
@@ -234,6 +233,11 @@ else:
     col1, col2 = st.columns(2)
     uploaded_files = col1.file_uploader("Upload your marketing image here:", accept_multiple_files=True, type=['png', 'jpg', 'jpeg'])
 
+    if uploaded_files is not None:
+        for uploaded_file in uploaded_files:
+            image = Image.open(uploaded_file)
+            image = resize_image(image)
+            col2.image(image, caption="Uploaded Image", use_column_width=True)
 
             if basic_analysis:
                 with st.spinner("Performing basic analysis..."):
