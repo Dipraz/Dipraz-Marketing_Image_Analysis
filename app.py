@@ -65,11 +65,39 @@ else:
         cap.release()
         return frames
     def analyze_media(uploaded_file, is_image=True):
-        prompt = (
-            "Imagine you are a marketing consultant reviewing a visual asset (image or video) for a client. Analyze the provided asset for various marketing aspects and ensure your results remain consistent for each aspect, regardless of how many times you analyze the image. Respond in single words or short phrases separated by commas for each attribute: "
-            "text amount (High or Low), color usage (Effective or Not effective), visual cues (Present or Absent), emotion (Positive or Negative), focus (Central message or Scattered), "
-            "customer-centric (Yes or No), credibility (High or Low), user interaction (High, Moderate, or Low), CTA presence (Yes or No), CTA clarity (Clear or Unclear)."
-        )
+        prompt = """
+        Imagine you are a marketing consultant reviewing a visual asset (image or video) for a client. Analyze the asset for various marketing aspects and ensure your results remain consistent, regardless of the number of times you analyze the asset.
+        
+        For Images:
+        Respond with single words or short phrases separated by commas for each attribute:
+        - Text amount (High, Moderate, or Low)
+        - Color usage (Effective or Ineffective)
+        - Visual cues (Present or Absent)
+        - Emotion evoked (Positive, Negative, or Neutral)
+        - Focus (Clear message or Distracted/Unclear)
+        - Customer-centric (Yes or No)
+        - Credibility (High or Low)
+        - Potential user interaction (High, Moderate, or Low)
+        - Call-to-action (CTA) presence (Yes or No)
+        - CTA clarity (Clear or Unclear)
+        
+        For Videos:
+        Analyze the most representative frame and consider elements throughout the video. Respond with single words or short phrases separated by commas for each attribute:
+        - Text amount (High, Moderate, or Low)
+        - Color usage (Effective or Ineffective)
+        - Visual cues (Present or Absent)
+        - Emotion evoked (Positive, Negative, or Neutral)
+        - Focus (Clear message or Distracted/Unclear)
+        - Customer-centric (Yes or No)
+        - Credibility (High or Low)
+        - Potential user interaction (High, Moderate, or Low)
+        - Call-to-action (CTA) presence (Yes or No)
+        - CTA clarity (Clear or Unclear)
+        - Pacing and flow (Smooth and Engaging or Jarring/Confusing)
+        - Audio elements (Effective, Distracting, or Absent)
+        - Overall video length (Appropriate or Too long/short)
+        """
+
         try:
             if is_image:
                 image = Image.open(io.BytesIO(uploaded_file.read()))
@@ -192,30 +220,50 @@ else:
             return None
 
     def text_analysis(uploaded_file, is_image=True):
-        prompt = (
-            "Imagine you are a UX design and marketing analysis consultant reviewing the text content of a marketing asset (image or video, excluding the headline) for a client. "
-            "1. Text Extraction: If analyzing an image, extract all visible text. If analyzing a video, extract text from the most representative frame and note any significant textual changes in other frames.\n"
-            "2. Text Analysis: Analyze the extracted text using the following criteria. For each aspect, provide a score from 1 to 5 (1 being low, 5 being high) along with a concise explanation and actionable suggestions for improvement. Present the results in a table format with the columns: Aspect, Score, Explanation, and Improvements.\n"
-            "Aspects to Consider:\n"
-            "1. Clarity: Evaluate the clarity and conciseness of the text. Does it convey the message effectively without being overly wordy?\n"
-            "2. Customer Focus: Does the text emphasize a customer-centric approach?\n"
-            "3. Engagement: Discuss the text amount, readability, grouping, use of lists, and value to the customer.\n"
-            "4. Effort: Evaluate the effort required to read the text. Is it broken into manageable chunks? Does it use lists or bullet points? Is it relatively short and easy to read?\n"
-            "5. Purpose and Value: Assess the clarity of the text’s purpose and value proposition. Is the message clear within a few seconds of reading?\n"
-            "6. Motivation: Assess the text's ability to motivate users. Does it align with user motivators and demonstrate authority or provide social proof?\n"
-            "7. Influence: Analyze the influence of the text. Does it effectively persuade users and drive desired behaviors?\n"
-            "8. Depth: Does the text provide a range of depth of information (including links to further information) to address different interest levels of customers?\n"
-            "9. Trust: Assess the trustworthiness of the content based on the text. Evaluate the credibility, reliability, and intimacy conveyed. Is the content brand-centric or customer-centric?\n"
-            "10. Memorability: Evaluate how memorable the text is. Does it leave a lasting impression?\n"
-            "11. Emotional Appeal: Does the text evoke an emotional response?\n"
-            "12. Uniqueness: Is the text original and creative?\n"
-            "13. Urgency & Curiosity: Does the text create a sense of urgency or pique curiosity?\n"
-            "14. Benefit-Driven: Does the text convey clear benefits or value propositions?\n"
-            "15. Target Audience: Is the text tailored to resonate with the specific target audience?\n"
-            "16. Cognitive Demand: Evaluate the cognitive load required to read, understand, and navigate the text. Is it intuitive and easy to use?\n"
-            "17. Reading Age: Assess the reading grade level required to understand the text.\n"
-            "Conclusion and Recommendations: Summarize the overall strengths and weaknesses of the text. Calculate the total score across all aspects. Provide three alternative text versions that address the identified weaknesses, align with the visual content, and resonate better with the target audience."
-        )
+        prompt = """
+        Imagine you are a UX design and marketing analysis consultant reviewing the text content of a marketing asset (image or video, excluding the headline) for a client. Your goal is to provide a comprehensive analysis of the text's effectiveness and offer actionable recommendations for improvement.
+        
+        1. Text Extraction and Contextualization:
+           - **Image Analysis:** Carefully extract and analyze all visible text within the image. Consider the text's placement, font choices, and relationship to visual elements.
+           - **Video Analysis:**
+              * Identify the most representative frame(s) that showcase the primary text content.
+              * Extract and analyze the text from these frames.
+              * Pay attention to any significant textual changes or patterns across different parts of the video.
+              * Consider how the text interacts with the video's visuals and audio elements.
+        
+        2. Textual Assessment:
+           Evaluate the extracted text based on the following criteria. For each aspect, provide:
+              * A score from 1 to 5 (1 being low, 5 being high).
+              * A clear and concise explanation justifying your score, focusing on both strengths and weaknesses.
+              * Actionable suggestions for improvement, tailored to the specific text, the overall asset, and the target audience.
+        
+            Present your evaluation in a well-organized table with these columns: Aspect, Score, Explanation, and Improvement.
+        
+        Aspects to Evaluate:
+        
+           - Clarity and Conciseness: Is the text easy to understand? Does it avoid unnecessary jargon and get to the point quickly?
+           - Customer Focus: Does the text center the customer's needs, desires, and pain points? Is it written from their perspective?
+           - Engagement: Is the text compelling and attention-grabbing? Does it use storytelling, persuasive language, or humor to connect with the audience? Evaluate the text's length, readability, formatting (e.g., use of lists, bullet points), and overall value proposition.
+           - Reading Effort: Is the text easy to scan and digest? Is it broken into manageable chunks? Does it avoid overly complex sentence structures?
+           - Purpose and Value: Is the purpose of the text immediately clear? Does it effectively communicate the value proposition of the product or service?
+           - Motivation & Persuasion: Does the text inspire the target audience to take action? Does it effectively appeal to their emotions, needs, or desires? Does it utilize social proof, authority, or other persuasive techniques?
+           - Depth and Detail: Does the text provide enough information to satisfy different levels of audience interest? Are there opportunities to include additional details or links to further information?
+           - Trustworthiness: Does the text build trust and credibility? Does it use language that is honest, transparent, and relatable? Is it more customer-centric or brand-centric?
+           - Memorability: Are there any unique phrases, word choices, or storytelling elements that make the text stand out and memorable?
+           - Emotional Appeal: Does the text evoke positive emotions relevant to the product or service? Are these emotions likely to resonate with the target audience?
+           - Uniqueness & Differentiation: Does the text differentiate the brand or product from competitors? Does it have a distinct voice and style?
+           - Urgency and Curiosity: Does the text create a sense of urgency or FOMO (fear of missing out)? Does it pique the audience's curiosity and encourage them to learn more?
+           - Benefit Orientation: Does the text clearly articulate the benefits of the product or service to the customer? Are these benefits compelling and relevant to the target audience?
+           - Target Audience Relevance: Is the text's language, tone, and style appropriate for the intended audience? Does it speak to their specific interests, needs, and preferences?
+           - Cognitive Demand: How much mental effort is required to understand the text? Is the information presented in a way that is easy to digest and remember?
+           - Reading Level: What is the estimated reading level of the text? Is it appropriate for the target audience's comprehension abilities?
+        
+        3. Conclusion and Recommendations:
+        
+           - Provide a concise summary of your analysis, highlighting the text's strengths, weaknesses, and overall effectiveness.
+           - Calculate the total score based on the individual aspect scores.
+           - Offer three alternative text versions that address the identified weaknesses and enhance the overall impact of the marketing message. These revisions should be tailored to the specific asset type, its purpose, and the target audience.
+        """
 
         try:
             if is_image:
@@ -368,9 +416,46 @@ else:
             return None
 
     def flash_analysis(uploaded_file, is_image=True):
-        prompt = (
-            "Imagine you are a visual content analyst reviewing an image for a client. Analyze the provided image and generate a detailed description that captures the key elements and information relevant to marketing purposes. Focus on objective details like objects, people, colors, text, and their arrangement. Additionally, identify any potential cultural references or symbols that might be relevant to the target audience. Ensure the description is consistent across multiple runs, avoiding subjective interpretations or emotional responses."
-        )
+        prompt = """
+        Imagine you are a visual content analyst reviewing a marketing asset (image or video) for a client. Your goal is to provide a detailed, objective description that captures essential information relevant to marketing decisions.
+        
+        Instructions:
+        
+        1. Asset Identification:
+            - Clearly identify the type of asset (image or video).
+        
+        2. Detailed Description:
+            - For images:
+                - Describe the prominent visual elements (objects, people, animals, settings).
+                - Note the dominant colors and their overall effect.
+                - Mention any text, its content, font style, size, and placement.
+                - Describe the composition and layout of the elements.
+            - For videos:
+                - Describe the key scenes, actions, and characters.
+                - Note the visual style, color palette, and editing techniques.
+                - Mention any text overlays, captions, or speech, transcribing if possible.
+                - Identify the background music or sound effects, if present.
+        
+        3. Cultural References and Symbolism:
+            - Identify any cultural references, symbols, or visual metaphors that could be significant to the target audience.
+            - Explain how these elements might be interpreted or resonate with the audience.
+        
+        4. Marketing Implications:
+            - Briefly summarize the potential marketing implications based on the visual and textual elements.
+            - Consider how the asset might appeal to different demographics or interests.
+            - Mention any potential positive or negative associations it may evoke.
+        
+        5. Additional Notes:
+            - If analyzing a video, focus on the most representative frame(s) for the initial description.
+            - Mention any significant changes or variations in visuals or text throughout the video.
+        
+        Please ensure your description is:
+        
+        - Objective: Focus on factual details and avoid subjective interpretations or opinions.
+        - Detailed: Provide enough information for the client to understand the asset's visual and textual content.
+        - Marketing-Oriented: Highlight elements that are relevant to marketing strategy and decision-making.
+        - Consistent: Provide similar descriptions for the same asset, regardless of how many times you analyze it.
+"""
 
         try:
             if is_image:
