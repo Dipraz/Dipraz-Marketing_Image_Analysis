@@ -65,89 +65,43 @@ else:
         cap.release()
         return frames
     def analyze_media(uploaded_file, is_image=True):
-        prompt = """
-        Imagine you are a marketing consultant reviewing a visual asset (image or video) for a client. Analyze the asset for various marketing aspects and ensure your results remain consistent, regardless of the number of times you analyze the asset.
-        
-        For Images:
-        Respond with single words or short phrases separated by commas for each attribute:
-        - Text amount (High, Moderate, or Low)
-        - Color usage (Effective or Ineffective)
-        - Visual cues (Present or Absent)
-        - Emotion evoked (Positive, Negative, or Neutral)
-        - Focus (Clear message or Distracted/Unclear)
-        - Customer-centric (Yes or No)
-        - Credibility (High or Low)
-        - Potential user interaction (High, Moderate, or Low)
-        - Call-to-action (CTA) presence (Yes or No)
-        - CTA clarity (Clear or Unclear)       
-        For Videos:
-        Analyze the most representative frame and consider elements throughout the video. Respond with single words or short phrases separated by commas for each attribute:
-        - Text amount (High, Moderate, or Low)
-        - Color usage (Effective or Ineffective)
-        - Visual cues (Present or Absent)
-        - Emotion evoked (Positive, Negative, or Neutral)
-        - Focus (Clear message or Distracted/Unclear)
-        - Customer-centric (Yes or No)
-        - Credibility (High or Low)
-        - Potential user interaction (High, Moderate, or Low)
-        - Call-to-action (CTA) presence (Yes or No)
-        - CTA clarity (Clear or Unclear)
-        - Pacing and flow (Smooth and Engaging or Jarring/Confusing)
-        - Audio elements (Effective, Distracting, or Absent)
-        - Overall video length (Appropriate or Too long/short)
-        """
-
+        prompt = (
+            "Imagine you are a marketing consultant reviewing an image for a client. Analyze the provided image for various marketing aspects and ensure your results remain consistent for each aspect, regardless of how many times you analyze the image. Respond in single words or short phrases separated by commas for each attribute: "
+            "text amount (High or Low), color usage (Effective or Not effective), visual cues (Present or Absent), emotion (Positive or Negative), focus (Central message or Scattered), "
+            "customer-centric (Yes or No), credibility (High or Low), user interaction (High, Moderate, or Low), CTA presence (Yes or No), CTA clarity (Clear or Unclear)."
+        )
         try:
             if is_image:
                 image = Image.open(io.BytesIO(uploaded_file.read()))
+                response = model.generate_content([prompt, image])
             else:
                 with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
                     tmp.write(uploaded_file.read())
                     tmp_path = tmp.name
+
                 frames = extract_frames(tmp_path)
-                if frames is None or not frames:
+                if frames is None or not frames:  # Check if frames were extracted successfully
                     st.error("No frames were extracted from the video. Please check the video format.")
                     return None
-                image = frames[0]  # Use the first extracted frame
-    
-            response = model.generate_content([prompt, image])
+
+                response = model.generate_content([prompt, frames[0]])  # Using the first frame
+
+            attributes = ["text_amount", "color_usage", "visual_cues", "emotion", "focus", "customer_centric", "credibility", "user_interaction", "cta_presence", "cta_clarity"]
             if response.candidates:
                 raw_response = response.candidates[0].content.parts[0].text.strip()
-                st.write("Raw Response:", raw_response)  # Display raw response to see what it actually looks like
-    
-                values = raw_response.split('\n')  # Split by new lines
-    
-                attribute_map = {
-                    "text_amount": 0,
-                    "color_usage": 1,
-                    "visual_cues": 2,
-                    "emotion": 3,
-                    "focus": 4,
-                    "customer_centric": 5,
-                    "credibility": 6,
-                    "user_interaction": 7,
-                    "cta_presence": 8,
-                    "cta_clarity": 9,
-                    "pacing_and_flow": 10,
-                    "audio_elements": 11,
-                    "video_length": 12,
-                }
-    
-                structured_response = {}
-                for attr, idx in attribute_map.items():
-                    if idx < len(values) and ': ' in values[idx]:
-                        structured_response[attr] = values[idx].split(': ')[-1].strip()
-                    else:
-                        structured_response[attr] = "N/A"
-    
-                return structured_response
+                values = raw_response.split(',')
+                if len(attributes) == len(values):
+                    structured_response = {attr: val.strip() for attr, val in zip(attributes, values)}
+                    return structured_response
+                else:
+                    st.error("Unexpected response structure from the model. Please check the prompt and model output format.")
+                    return None
             else:
-                st.error("No response candidates found.")
+                st.error("Unexpected response structure from the model.")
                 return None
         except Exception as e:
             st.error(f"Failed to read or process the media: {e}")
             return None
-
     def combined_marketing_analysis_V6(uploaded_file, is_image=True):
         prompt = """
         Imagine you are a UX design and marketing analysis consultant reviewing a visual asset (image or video) for a client.
