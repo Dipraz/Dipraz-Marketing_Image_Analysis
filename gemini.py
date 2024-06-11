@@ -65,27 +65,30 @@ else:
         cap.release()
         return frames
     def analyze_media(uploaded_file, is_image=True):
+        # General prompt for both images and videos
         prompt = (
-            "Imagine you are a marketing consultant reviewing an image for a client. Analyze the provided image for various marketing aspects and ensure your results remain consistent for each aspect, regardless of how many times you analyze the image. Respond in single words or short phrases separated by commas for each attribute: "
-            "text amount (High or Low), color usage (Effective or Not effective), visual cues (Present or Absent), emotion (Positive or Negative), focus (Central message or Scattered), "
-            "customer-centric (Yes or No), credibility (High or Low), user interaction (High, Moderate, or Low), CTA presence (Yes or No), CTA clarity (Clear or Unclear)."
+            "Analyze the media (image or video frame) for various marketing aspects, ensuring consistent results for each aspect. "
+            "Respond in single words or short phrases separated by commas for each attribute: text amount (High or Low), "
+            "color usage (Effective or Not effective), visual cues (Present or Absent), emotion (Positive or Negative), "
+            "focus (Central message or Scattered), customer-centric (Yes or No), credibility (High or Low), "
+            "user interaction (High, Moderate, or Low), CTA presence (Yes or No), CTA clarity (Clear or Unclear)."
         )
         try:
             if is_image:
                 image = Image.open(io.BytesIO(uploaded_file.read()))
-                response = model.generate_content([prompt, image])
+                response = model.generate_content([prompt, image])  # Assuming model.generate_content handles image input
             else:
                 with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
                     tmp.write(uploaded_file.read())
                     tmp_path = tmp.name
-
-                frames = extract_frames(tmp_path)
-                if frames is None or not frames:  # Check if frames were extracted successfully
+    
+                frames = extract_frames(tmp_path)  # Assuming extract_frames extracts frames from video
+                if frames is None or not frames:
                     st.error("No frames were extracted from the video. Please check the video format.")
                     return None
-
-                response = model.generate_content([prompt, frames[0]])  # Using the first frame
-
+    
+                response = model.generate_content([prompt, frames[0]])  # Analyzing the first frame
+    
             attributes = ["text_amount", "color_usage", "visual_cues", "emotion", "focus", "customer_centric", "credibility", "user_interaction", "cta_presence", "cta_clarity"]
             if response.candidates:
                 raw_response = response.candidates[0].content.parts[0].text.strip()
@@ -97,7 +100,7 @@ else:
                     st.error("Unexpected response structure from the model. Please check the prompt and model output format.")
                     return None
             else:
-                st.error("Unexpected response structure from the model.")
+                st.error("Model did not provide a response.")
                 return None
         except Exception as e:
             st.error(f"Failed to read or process the media: {e}")
