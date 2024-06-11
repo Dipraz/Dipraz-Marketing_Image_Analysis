@@ -101,32 +101,42 @@ else:
         try:
             if is_image:
                 image = Image.open(io.BytesIO(uploaded_file.read()))
-                response = model.generate_content([prompt, image])
             else:
                 with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
                     tmp.write(uploaded_file.read())
                     tmp_path = tmp.name
-
                 frames = extract_frames(tmp_path)
-                if frames is None or not frames:  # Check if frames were extracted successfully
+                if frames is None or not frames:
                     st.error("No frames were extracted from the video. Please check the video format.")
                     return None
-
-                response = model.generate_content([prompt, frames[0]])  # Using the first frame
-
-            attributes = ["text_amount", "color_usage", "visual_cues", "emotion", "focus", "customer_centric", "credibility", "user_interaction", "cta_presence", "cta_clarity"]
+                image = frames[0]  # Use the first extracted frame
+    
+            response = model.generate_content([prompt, image])
+    
             if response.candidates:
                 raw_response = response.candidates[0].content.parts[0].text.strip()
-                values = raw_response.split(',')
-                if len(attributes) == len(values):
-                    structured_response = {attr: val.strip() for attr, val in zip(attributes, values)}
-                    return structured_response
-                else:
-                    st.error("Unexpected response structure from the model. Please check the prompt and model output format.")
+    
+                # More robust handling of the response format
+                values = [value.strip() for value in raw_response.split(',')]
+    
+                # Adjust attributes based on media type
+                if is_image:
+                    attributes = ["text_amount", "color_usage", "visual_cues", "emotion", "focus", "customer_centric", "credibility", "user_interaction", "cta_presence", "cta_clarity"]
+                else:  # Video
+                    attributes = ["text_amount", "color_usage", "visual_cues", "emotion", "focus", "customer_centric", "credibility", "user_interaction", "cta_presence", "cta_clarity", "pacing_and_flow", "audio_elements", "video_length"]  
+    
+                # Check if the number of values matches the expected number of attributes
+                if len(attributes) != len(values):
+                    st.error(f"Unexpected number of values in the response. Expected {len(attributes)}, got {len(values)}. Raw response: '{raw_response}'")
                     return None
+    
+                structured_response = {attr: val for attr, val in zip(attributes, values)}
+                return structured_response
+    
             else:
-                st.error("Unexpected response structure from the model.")
+                st.error("No response candidates found.")
                 return None
+    
         except Exception as e:
             st.error(f"Failed to read or process the media: {e}")
             return None
