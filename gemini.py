@@ -113,7 +113,9 @@ else:
             response = model.generate_content([prompt, image])
             if response.candidates:
                 raw_response = response.candidates[0].content.parts[0].text.strip()
-                values = raw_response.split('\n')  # Split by new lines instead of commas
+                st.write("Raw Response:", raw_response)  # Display raw response to see what it actually looks like
+    
+                values = raw_response.split('\n')  # Split by new lines
     
                 attribute_map = {
                     "text_amount": 0,
@@ -133,8 +135,8 @@ else:
     
                 structured_response = {}
                 for attr, idx in attribute_map.items():
-                    if idx < len(values):
-                        structured_response[attr] = values[idx].split(': ')[-1].strip() if ': ' in values[idx] else "N/A"
+                    if idx < len(values) and ': ' in values[idx]:
+                        structured_response[attr] = values[idx].split(': ')[-1].strip()
                     else:
                         structured_response[attr] = "N/A"
     
