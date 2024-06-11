@@ -79,8 +79,7 @@ else:
         - Credibility (High or Low)
         - Potential user interaction (High, Moderate, or Low)
         - Call-to-action (CTA) presence (Yes or No)
-        - CTA clarity (Clear or Unclear)
-        
+        - CTA clarity (Clear or Unclear)       
         For Videos:
         Analyze the most representative frame and consider elements throughout the video. Respond with single words or short phrases separated by commas for each attribute:
         - Text amount (High, Moderate, or Low)
@@ -114,9 +113,8 @@ else:
             response = model.generate_content([prompt, image])
             if response.candidates:
                 raw_response = response.candidates[0].content.parts[0].text.strip()
-                values = [value.strip() for value in raw_response.split(',')]
+                values = raw_response.split('\n')  # Split by new lines instead of commas
     
-                # Create a mapping between expected attributes and their indices in the response
                 attribute_map = {
                     "text_amount": 0,
                     "color_usage": 1,
@@ -136,11 +134,11 @@ else:
                 structured_response = {}
                 for attr, idx in attribute_map.items():
                     if idx < len(values):
-                        structured_response[attr] = values[idx]
+                        structured_response[attr] = values[idx].split(': ')[-1].strip() if ': ' in values[idx] else "N/A"
                     else:
-                        structured_response[attr] = "N/A" if is_image else "Not applicable"
-                return structured_response
+                        structured_response[attr] = "N/A"
     
+                return structured_response
             else:
                 st.error("No response candidates found.")
                 return None
