@@ -113,32 +113,41 @@ else:
     
             response = model.generate_content([prompt, image])
     
-            if response.candidates:
-                raw_response = response.candidates[0].content.parts[0].text.strip()
-                values = [value.strip() for value in raw_response.split(',')]
-    
-                # Adjust attributes based on media type, and fill in missing values
-                if is_image:
-                    attributes = ["text_amount", "color_usage", "visual_cues", "emotion", "focus", "customer_centric", "credibility", "user_interaction", "cta_presence", "cta_clarity"]
-                    if len(values) < len(attributes):
-                        # Add "N/A" for missing values in image analysis
-                        values += ["N/A"] * (len(attributes) - len(values))
-                else:  # Video
-                    attributes = ["text_amount", "color_usage", "visual_cues", "emotion", "focus", "customer_centric", "credibility", "user_interaction", "cta_presence", "cta_clarity", "pacing_and_flow", "audio_elements", "video_length"]
-                    if len(values) < len(attributes):
-                        # Add "Not applicable" for missing values in video analysis
-                        values += ["Not applicable"] * (len(attributes) - len(values))
-    
-                structured_response = {attr: val for attr, val in zip(attributes, values)}
-                return structured_response
-    
-            else:
-                st.error("No response candidates found.")
+                if response.candidates:
+                    raw_response = response.candidates[0].content.parts[0].text.strip()
+                    values = [value.strip() for value in raw_response.split(',')]
+        
+                    # Create a mapping between expected attributes and their indices in the response
+                    attribute_map = {
+                        "text_amount": 0,
+                        "color_usage": 1,
+                        "visual_cues": 2,
+                        "emotion": 3,
+                        "focus": 4,
+                        "customer_centric": 5,
+                        "credibility": 6,
+                        "user_interaction": 7,
+                        "cta_presence": 8,
+                        "cta_clarity": 9,
+                        "pacing_and_flow": 10,
+                        "audio_elements": 11,
+                        "video_length": 12,
+                    }
+        
+                    structured_response = {}
+                    for attr, idx in attribute_map.items():
+                        if idx < len(values):
+                            structured_response[attr] = values[idx]
+                        else:
+                            structured_response[attr] = "N/A" if is_image else "Not applicable"
+                    return structured_response
+        
+                else:
+                    st.error("No response candidates found.")
+                    return None
+            except Exception as e:
+                st.error(f"Failed to read or process the media: {e}")
                 return None
-    
-        except Exception as e:
-            st.error(f"Failed to read or process the media: {e}")
-            return None
 
     def combined_marketing_analysis_V6(uploaded_file, is_image=True):
         prompt = """
