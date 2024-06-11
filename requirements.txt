@@ -1,10 +1,11 @@
 openai
 streamlit
-Pillow
 google-auth
 google-auth-oauthlib
 google-auth-httplib2
 numpy
-python-dotenv
 google-generativeai
 opencv-python
+python-dotenv
+opencv-python-headless
+pillow
