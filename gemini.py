@@ -115,20 +115,19 @@ else:
     
             if response.candidates:
                 raw_response = response.candidates[0].content.parts[0].text.strip()
-    
-                # More robust handling of the response format
                 values = [value.strip() for value in raw_response.split(',')]
     
-                # Adjust attributes based on media type
+                # Adjust attributes based on media type, and fill in missing values
                 if is_image:
                     attributes = ["text_amount", "color_usage", "visual_cues", "emotion", "focus", "customer_centric", "credibility", "user_interaction", "cta_presence", "cta_clarity"]
+                    if len(values) < len(attributes):
+                        # Add "N/A" for missing values in image analysis
+                        values += ["N/A"] * (len(attributes) - len(values))
                 else:  # Video
-                    attributes = ["text_amount", "color_usage", "visual_cues", "emotion", "focus", "customer_centric", "credibility", "user_interaction", "cta_presence", "cta_clarity", "pacing_and_flow", "audio_elements", "video_length"]  
-    
-                # Check if the number of values matches the expected number of attributes
-                if len(attributes) != len(values):
-                    st.error(f"Unexpected number of values in the response. Expected {len(attributes)}, got {len(values)}. Raw response: '{raw_response}'")
-                    return None
+                    attributes = ["text_amount", "color_usage", "visual_cues", "emotion", "focus", "customer_centric", "credibility", "user_interaction", "cta_presence", "cta_clarity", "pacing_and_flow", "audio_elements", "video_length"]
+                    if len(values) < len(attributes):
+                        # Add "Not applicable" for missing values in video analysis
+                        values += ["Not applicable"] * (len(attributes) - len(values))
     
                 structured_response = {attr: val for attr, val in zip(attributes, values)}
                 return structured_response
