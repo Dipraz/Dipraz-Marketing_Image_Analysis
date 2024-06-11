@@ -65,11 +65,39 @@ else:
         cap.release()
         return frames
     def analyze_media(uploaded_file, is_image=True):
-        prompt = (
-            "Imagine you are a marketing consultant reviewing an image for a client. Analyze the provided image for various marketing aspects and ensure your results remain consistent for each aspect, regardless of how many times you analyze the image. Respond in single words or short phrases separated by commas for each attribute: "
-            "text amount (High or Low), color usage (Effective or Not effective), visual cues (Present or Absent), emotion (Positive or Negative), focus (Central message or Scattered), "
-            "customer-centric (Yes or No), credibility (High or Low), user interaction (High, Moderate, or Low), CTA presence (Yes or No), CTA clarity (Clear or Unclear)."
-        )
+        prompt = """
+        Imagine you are a marketing consultant reviewing a visual asset (image or video) for a client. Analyze the asset for various marketing aspects and ensure your results remain consistent, regardless of the number of times you analyze the asset.
+        
+        For Images:
+        Respond with single words or short phrases separated by commas for each attribute:
+        - Text amount (High, Moderate, or Low)
+        - Color usage (Effective or Ineffective)
+        - Visual cues (Present or Absent)
+        - Emotion evoked (Positive, Negative, or Neutral)
+        - Focus (Clear message or Distracted/Unclear)
+        - Customer-centric (Yes or No)
+        - Credibility (High or Low)
+        - Potential user interaction (High, Moderate, or Low)
+        - Call-to-action (CTA) presence (Yes or No)
+        - CTA clarity (Clear or Unclear)
+        
+        For Videos:
+        Analyze the most representative frame and consider elements throughout the video. Respond with single words or short phrases separated by commas for each attribute:
+        - Text amount (High, Moderate, or Low)
+        - Color usage (Effective or Ineffective)
+        - Visual cues (Present or Absent)
+        - Emotion evoked (Positive, Negative, or Neutral)
+        - Focus (Clear message or Distracted/Unclear)
+        - Customer-centric (Yes or No)
+        - Credibility (High or Low)
+        - Potential user interaction (High, Moderate, or Low)
+        - Call-to-action (CTA) presence (Yes or No)
+        - CTA clarity (Clear or Unclear)
+        - Pacing and flow (Smooth and Engaging or Jarring/Confusing)
+        - Audio elements (Effective, Distracting, or Absent)
+        - Overall video length (Appropriate or Too long/short)
+        """
+
         try:
             if is_image:
                 image = Image.open(io.BytesIO(uploaded_file.read()))
@@ -104,35 +132,65 @@ else:
             return None
 
     def combined_marketing_analysis_V6(uploaded_file, is_image=True):
-        prompt = (
-            "Imagine you are a UX design and marketing analysis consultant reviewing an image for a client. Analyze the provided image for marketing effectiveness. First, provide detailed responses for the following:\n"
-            "\n"
-            "1. Asset Type: Clearly identify and describe the type of marketing asset. Examples include email, social media posts, advertisements, flyers, brochures, landing pages, etc.\n"
-            "2. Purpose: Clearly state the specific purpose of this marketing asset. Provide a detailed explanation of how it aims to achieve this purpose. Examples include selling a product, getting more signups, driving traffic to a webpage, increasing brand awareness, engaging with customers, etc.\n"
-            "3. Asset Audience: Identify the target audience for this marketing asset. Describe the demographics, interests, and needs of this audience. Examples include age group, gender, location, income level, education, interests, behaviors, etc.\n"
-            "\n"
-            "Then, for each aspect listed below, provide a score from 1 to 5 (1 being low, 5 being high) and a concise explanation for each aspect, along with suggestions for improvement. The results should be presented in a table format with the columns: Aspect, Score, Explanation, and Improvement. After the table, provide the total sum of the scores and a concise explanation with overall improvement suggestions. Ensure that this analysis process yields consistent scoring results, regardless of how many times or when it is run. Here are the aspects to consider:\n"
-            "\n"
-            "The aspects to consider are:\n"
-            "1. Creative Score: Assess the creativity of the design. Does it stand out and capture attention through innovative elements?\n"
-            "2. Attention: Evaluate the order of content consumption in the uploaded image. Start by identifying and analyzing the headline for its prominence and position. Next, evaluate any additional text for visibility and reader engagement sequence. Assess the positioning of images in relation to the text, followed by an examination of interactive elements such as buttons. Discuss the order in which the content is consumed (e.g., headline first, then text, or image then text then button, etc.). Determine if the content prioritizes important information, and draws and holds attention effectively.\n"
-            "3. Distinction: Does the content contain pictures that grab user attention? Does it appeal to the primal brain with and without text?\n"
-            "4. Purpose and Value: Is the purpose and value clear within 3 seconds? Is the content product or customer-centric?\n"
-            "5. Clarity: Evaluate the clarity of the design elements. Are the visuals and text easy to understand?\n"
-            "6. First Impressions: Analyze the initial impact of the design. Does it create a strong positive first impression?\n"
-            "7. Cognitive Demand: Evaluate the cognitive load required to understand and navigate the design. Is it intuitive and easy to use?\n"
-            "8. Headline Review: Evaluate the headline for clarity, conciseness, customer centricity, SEO keyword integration, emotional appeal, uniqueness, urgency, benefit to the reader, audience targeting, length, use of numbers/lists, brand consistency, and power words.\n"
-            "9. Visual Cues and Color Usage: Does the image use visual cues and colors to draw attention to key elements? Analyze how color choices, contrast, and elements like arrows or frames guide the viewer's attention.\n"
-            "10. Labeling and Button Clarity: Are any labels or buttons present that are clearly labeled and easy to understand? Evaluate the use of text size, font choice, and placement for optimal readability.\n"
-            "11. Engagement: Assess the engagement level of the user experience. Is the UX design captivating and satisfying to interact with?\n"
-            "12. Trust: Assess the trustworthiness of the content based on visual and textual elements. Is the content brand or customer-centric (customer-centric content has a higher trustworthiness)? Assess the credibility, reliability, and intimacy conveyed by the content.\n"
-            "13. Motivation: Assess the design's ability to motivate users. Does it align with user motivators and demonstrate authority or provide social proof?\n"
-            "14. Influence: Analyze the influence of the design. Does it effectively persuade users and drive desired behaviors?\n"
-            "15. Calls to Action: Analyze the presence, prominence, benefits, and language of CTAs.\n"
-            "16. Experience: Assess the overall user experience. How well does the design facilitate a smooth and enjoyable interaction?\n"
-            "17. Memorability: Evaluate how memorable the design is. Does it leave a lasting impression?\n"
-            "18. Effort: Evaluate the clarity and conciseness of the text. Does it convey the message effectively without being overly wordy? (1: Very Dense & Difficult, 5: Clear & Easy to Understand)\n"
-        )
+        prompt = """
+        Imagine you are a UX design and marketing analysis consultant reviewing a visual asset (image or video) for a client.
+        
+        1. Asset Identification:
+            - Clearly identify and describe the type of marketing asset (e.g., email, social media post, advertisement, flyer, brochure, landing page).
+        
+        2. Purpose Analysis:
+            - Clearly state the specific purpose of the asset (e.g., selling a product, increasing brand awareness, driving website traffic).
+            - Explain in detail how the asset aims to achieve its purpose, referencing specific elements or strategies used.
+        
+        3. Audience Identification:
+            - Identify the target audience for the asset.
+            - Describe the demographics, interests, needs, and pain points of this audience.
+        
+        4. Evaluation and Scoring:
+            For each aspect listed below, provide:
+                - A score from 1 to 5 (1 being low, 5 being high).
+                - A concise explanation justifying the score.
+                - Specific, actionable suggestions for improvement.
+            Present the results in a table with columns: Aspect, Score, Explanation, and Improvement.
+        
+        Aspects to Consider:
+        
+            - Creative Impact: Does the design stand out and capture attention with innovative elements?
+            - Attention & Hierarchy:
+                - Image: Is the order of content consumption clear and effective? (e.g., headline, body text, visuals, CTA)
+                - Video: Does the video's structure and editing guide the viewer's focus? Are key messages highlighted?
+            - Distinction: 
+                - Image: Do the visuals grab attention? Do they appeal to the viewer with and without text?
+                - Video: Does the video use compelling visuals and storytelling to differentiate itself?
+            - Purpose & Value: Is the asset's purpose and value proposition clear within 3 seconds? Is it customer-centric?
+            - Clarity: Are the visuals and text easy to understand? Is the message conveyed effectively?
+            - First Impression: Does the asset make a positive first impression? Is it visually appealing and inviting?
+            - Cognitive Load: Is the asset easy to process and understand? Does it avoid overwhelming the viewer with too much information or complexity?
+            - Headline Effectiveness:
+                - Image: Evaluate the headline for clarity, conciseness, customer focus, emotional appeal, uniqueness, urgency, benefit-driven messaging, target audience relevance, and length/format.
+                - Video: Evaluate the opening message/hook, and consider if on-screen text supports the video's narrative effectively.
+            - Visual Cues & Color Usage:
+                - Image: How effectively do visual cues and colors guide attention to key elements?
+                - Video: How do color choices and transitions contribute to the overall mood and message?
+            - Labeling & Button Clarity (if applicable): Are labels and buttons clear, easy to understand, and visually distinct?
+            - Engagement: 
+                - Image: Does the design encourage interaction or further exploration?
+                - Video: Does the video hold the viewer's attention throughout? Are there elements that drive engagement?
+            - Trustworthiness: Do the visual and textual elements create a sense of credibility, reliability, and intimacy? Is it brand or customer-centric?
+            - Motivation: Does the asset appeal to user motivators? Does it use authority, social proof, or other persuasive techniques effectively?
+            - Influence & Persuasion: Does the asset effectively persuade viewers and lead them towards a desired action?
+            - Call to Action (CTA): If present, is the CTA prominent, clear, and compelling? Does it communicate the benefits of taking action?
+            - Overall Experience (UX): How smooth and enjoyable is the user experience? Is it easy to navigate and understand the information presented?
+            - Memorability: Will the asset leave a lasting impression on the viewer? Does it have elements that are unique or surprising?
+            - Textual Effort: 
+                - Image: Is the text clear, concise, and easy to read?
+                - Video: Is the on-screen text minimal, readable, and well-timed? Does it complement the spoken message effectively?
+        
+        5. Overall Assessment:
+            - Summarize the key findings from your analysis.
+            - Calculate the total score across all aspects.
+            - Provide concrete recommendations for improving the asset's overall marketing effectiveness, taking into account its specific type, purpose, and target audience.
+        """
 
         try:
             if is_image:
@@ -162,27 +220,50 @@ else:
             return None
 
     def text_analysis(uploaded_file, is_image=True):
-        prompt = (
-            "Imagine you are a UX design and marketing analysis consultant reviewing the text on a marketing asset (excluding the headline) for a client. First, the LLM analyzes and presents all of the text that is being considered for analysis. Then Analyze the provided text using the following criteria. For each aspect, provide a score from 1 to 5 (1 being low, 5 being high) along with a concise explanation and suggestions for improvement. Present the results in a table format with the columns: Aspect, Score, Explanation, and Improvements. After the table, provide the total sum of the scores and a concise explanation with overall improvement suggestions. Ensure your scoring remains consistent for each aspect, regardless of how many times you analyze the image. Here are the aspects to consider:\n"
-            "1. Clarity: Evaluate the clarity and conciseness of the text. Does it convey the message effectively without being overly wordy?\n"
-            "2. Customer Focus: Does the text emphasize a customer-centric approach?\n"
-            "3. Engagement: Discuss the text amount, readability, grouping, use of lists, and value to the customer.\n"
-            "4. Effort: Evaluate the effort required to read the text. Is it broken into manageable chunks? Does it use lists or bullet points? Is it relatively short and easy to read?\n"
-            "5. Purpose and Value: Assess the clarity of the text’s purpose and value proposition. Is the message clear within a few seconds of reading?\n"
-            "6. Motivation: Assess the text's ability to motivate users. Does it align with user motivators and demonstrate authority or provide social proof?\n"
-            "7. Influence: Analyze the influence of the text. Does it effectively persuade users and drive desired behaviors?\n"
-            "8. Depth: Does the text provide a range of depth of information (including links to further information) to address different interest levels of customers?\n"
-            "9. Trust: Assess the trustworthiness of the content based on the text. Evaluate the credibility, reliability, and intimacy conveyed. Is the content brand-centric or customer-centric?\n"
-            "10. Memorability: Evaluate how memorable the text is. Does it leave a lasting impression?\n"
-            "11. Emotional Appeal: Does the text evoke an emotional response?\n"
-            "12. Uniqueness: Is the text original and creative?\n"
-            "13. Urgency & Curiosity: Does the text create a sense of urgency or pique curiosity?\n"
-            "14. Benefit-Driven: Does the text convey clear benefits or value propositions?\n"
-            "15. Target Audience: Is the text tailored to resonate with the specific target audience?\n"
-            "16. Cognitive Demand: Evaluate the cognitive load required to read, understand, and navigate the text. Is it intuitive and easy to use?\n"
-            "17. Reading Age: Assess the reading grade level required to understand the text.\n"
-            "Conclude with three alternative versions of the text that align better with the image content and effectively address the identified weaknesses." 
-        )
+        prompt = """
+        Imagine you are a UX design and marketing analysis consultant reviewing the text content of a marketing asset (image or video, excluding the headline) for a client. Your goal is to provide a comprehensive analysis of the text's effectiveness and offer actionable recommendations for improvement.
+        
+        1. Text Extraction and Contextualization:
+           - **Image Analysis:** Carefully extract and analyze all visible text within the image. Consider the text's placement, font choices, and relationship to visual elements.
+           - **Video Analysis:**
+              * Identify the most representative frame(s) that showcase the primary text content.
+              * Extract and analyze the text from these frames.
+              * Pay attention to any significant textual changes or patterns across different parts of the video.
+              * Consider how the text interacts with the video's visuals and audio elements.
+        
+        2. Textual Assessment:
+           Evaluate the extracted text based on the following criteria. For each aspect, provide:
+              * A score from 1 to 5 (1 being low, 5 being high).
+              * A clear and concise explanation justifying your score, focusing on both strengths and weaknesses.
+              * Actionable suggestions for improvement, tailored to the specific text, the overall asset, and the target audience.
+        
+            Present your evaluation in a well-organized table with these columns: Aspect, Score, Explanation, and Improvement.
+        
+        Aspects to Evaluate:
+        
+           - Clarity and Conciseness: Is the text easy to understand? Does it avoid unnecessary jargon and get to the point quickly?
+           - Customer Focus: Does the text center the customer's needs, desires, and pain points? Is it written from their perspective?
+           - Engagement: Is the text compelling and attention-grabbing? Does it use storytelling, persuasive language, or humor to connect with the audience? Evaluate the text's length, readability, formatting (e.g., use of lists, bullet points), and overall value proposition.
+           - Reading Effort: Is the text easy to scan and digest? Is it broken into manageable chunks? Does it avoid overly complex sentence structures?
+           - Purpose and Value: Is the purpose of the text immediately clear? Does it effectively communicate the value proposition of the product or service?
+           - Motivation & Persuasion: Does the text inspire the target audience to take action? Does it effectively appeal to their emotions, needs, or desires? Does it utilize social proof, authority, or other persuasive techniques?
+           - Depth and Detail: Does the text provide enough information to satisfy different levels of audience interest? Are there opportunities to include additional details or links to further information?
+           - Trustworthiness: Does the text build trust and credibility? Does it use language that is honest, transparent, and relatable? Is it more customer-centric or brand-centric?
+           - Memorability: Are there any unique phrases, word choices, or storytelling elements that make the text stand out and memorable?
+           - Emotional Appeal: Does the text evoke positive emotions relevant to the product or service? Are these emotions likely to resonate with the target audience?
+           - Uniqueness & Differentiation: Does the text differentiate the brand or product from competitors? Does it have a distinct voice and style?
+           - Urgency and Curiosity: Does the text create a sense of urgency or FOMO (fear of missing out)? Does it pique the audience's curiosity and encourage them to learn more?
+           - Benefit Orientation: Does the text clearly articulate the benefits of the product or service to the customer? Are these benefits compelling and relevant to the target audience?
+           - Target Audience Relevance: Is the text's language, tone, and style appropriate for the intended audience? Does it speak to their specific interests, needs, and preferences?
+           - Cognitive Demand: How much mental effort is required to understand the text? Is the information presented in a way that is easy to digest and remember?
+           - Reading Level: What is the estimated reading level of the text? Is it appropriate for the target audience's comprehension abilities?
+        
+        3. Conclusion and Recommendations:
+        
+           - Provide a concise summary of your analysis, highlighting the text's strengths, weaknesses, and overall effectiveness.
+           - Calculate the total score based on the individual aspect scores.
+           - Offer three alternative text versions that address the identified weaknesses and enhance the overall impact of the marketing message. These revisions should be tailored to the specific asset type, its purpose, and the target audience.
+        """
 
         try:
             if is_image:
@@ -212,20 +293,42 @@ else:
             return None
 
     def headline_analysis(uploaded_file, is_image=True):
-        prompt = (
-            "Imagine you are a marketing consultant reviewing an image and its headline for a client. Your goal is to provide a comprehensive analysis of the headline's effectiveness across various key criteria. Firstly, analyze the image content, noting its key elements, colors, composition, style, and any underlying messages or themes it conveys. Identify the main headline and any supporting headlines. Clearly differentiate the main headline from other text elements in the image. Evaluate the main headline against the following criteria, rating each on a scale from 1 to 5 (1 being poor, 5 being excellent), and providing a concise explanation for each score. Present the results for the main headline in a table format with columns labeled: Criterion, Score, Explanation, Improvements. If no improvements are needed, write 'No improvements needed' in the 'Improvements' column. Ensure that every cell in the table is filled and no cell is left blank. Do not need to repeat the evaluation for each supporting headline, if you think any of the supporting headlines need analysis, present it in a separate table. Calculate total scores: below each table, calculate and display the total sum of all scores for each headline. Ensure consistency: verify that the analysis process yields consistent scoring results, regardless of how often or when it is run. Lastly, conclude with improved headlines: based on your analysis, provide three possible improved headlines for the main headline and each supporting headline. Ensure the improved headlines do not contain colons (':'), vary in structure and style, and effectively address any weaknesses identified in the existing headlines."
-            "\n"
-            "The criteria to assess are:\n"
-            "1. Clarity: How clearly does the headline convey the main point?\n"
-            "2. Customer Focus: Does the headline emphasize a customer-centric approach?\n"
-            "3. Relevance: How accurately does the headline reflect the content of the image?\n"
-            "4. Emotional Appeal: Does the headline evoke curiosity or an emotional response, considering the image content?\n"
-            "5. Uniqueness: How original and creative is the headline?\n"
-            "6. Urgency & Curiosity: Does the headline create a sense of urgency or pique curiosity, considering the image?\n"
-            "7. Benefit-Driven: Does the headline convey a clear benefit or value proposition, aligned with the image content?\n"
-            "8. Target Audience: Is the headline tailored to resonate with the specific target audience, considering the image's visual cues?\n"
-            "9. Length & Format: Does the headline fall within an ideal length of 6-12 words?\n"
-        )
+        prompt = """
+        Imagine you are a marketing consultant reviewing a visual asset (image or video) and its headline(s) for a client. Your goal is to provide a comprehensive analysis of the headline's effectiveness across various key criteria.
+        1. Content Analysis:
+           - If analyzing an image, examine the visual elements such as key objects, colors, composition, and style, along with the underlying messages or themes conveyed.
+           - If analyzing a video, focus on the most representative frame and consider the overall visual and auditory elements that contribute to the message.
+        
+        2. Headline Identification:
+           - Clearly identify the main headline and any supporting headlines in the asset.
+           - Differentiate the main headline from other text elements.
+        
+        3. Headline Evaluation (Main Headline Only):
+           Evaluate the main headline against the following criteria, rating each on a scale from 1 to 5 (1 being poor, 5 being excellent), and provide a concise explanation for each score:
+           - Clarity: How easily and quickly does the headline convey the main point?
+           - Customer Focus: Does the headline emphasize a customer-centric approach, addressing their needs or interests?
+           - Relevance: How well does the headline reflect the visual content of the image or video?
+           - Emotional Appeal: Does the headline evoke curiosity, excitement, or other emotions that resonate with the target audience?
+           - Uniqueness: How original and memorable is the headline compared to typical marketing messages?
+           - Urgency & Curiosity: Does the headline create a sense of urgency or pique curiosity to learn more?
+           - Benefit-Driven: Does the headline clearly communicate a specific benefit or value proposition to the audience?
+           - Target Audience: Is the headline's language, tone, and style tailored to the specific target audience?
+           - Length & Format: Is the headline concise (ideally 6-12 words) and does it use formatting effectively?
+        
+        4. Present Results:
+           - Display the main headline's evaluation in a table format with columns: Criterion, Score, Explanation, and Improvements. Ensure every cell in the table is filled, and if no improvements are needed, note that.
+        
+        5. Supporting Headline Evaluation (Optional):
+           - If applicable, briefly assess any supporting headlines and note if they require further analysis. Consider creating a separate table if a more in-depth analysis is needed.
+        
+        6. Total Score:
+           - Calculate and display the total score for the main headline based on the evaluations.
+        
+        7. Improved Headlines:
+           - Provide three alternative headlines for the main headline that address any weaknesses identified. Ensure these headlines are free of colons, diverse in structure and style, and aligned with the visual content and the target audience.
+        
+        Note: If analyzing a video, mention any notable changes in headlines or messaging throughout the video.
+        """
 
         try:
             if is_image:
@@ -255,18 +358,35 @@ else:
             return None
 
     def headline_detailed_analysis(uploaded_file, is_image=True):
-        prompt = (
-            "Imagine you are a marketing consultant reviewing an image and its headline for a client. As an expert, you are assessing the headline's effectiveness. Analyze the headline text extracted from the image and present the results in a table format with the following columns: Criteria, Assessment, and Explanation. Ensure the analysis is consistent across multiple runs. The criteria to assess are:\n"
-            "1. Word Count: Provide the total number of words in the headline.\n"
-            "2. Letter Count: Provide the total number of letters in the headline, excluding spaces and special characters. Count only alphabetic characters.\n"
-            "3. Common Words: Count the number of frequently used words in the headline.\n"
-            "4. Uncommon Words: Count the number of less frequently used words in the headline.\n"
-            "5. Emotional Words: Count the number of words that convey emotions (positive, negative, etc.).\n"
-            "6. Power Words: Count the number of words used to grab attention or influence.\n"
-            "7. Sentiment: Assess the overall sentiment of the headline (positive, negative, neutral).\n"
-            "8. Reading Grade Level: Provide the reading grade level of the headline text.\n"
-            "After the table, provide an overall summary, including a concise explanation and some improvement suggestions."
-        )
+        prompt = """
+        Imagine you are a marketing consultant reviewing the headline text of a marketing asset (image or video) for a client. Your task is to assess the headline's effectiveness based on various linguistic and marketing criteria.
+        
+        1. Headline Extraction:
+           - If analyzing an image, extract the main headline from the image.
+           - If analyzing a video, extract the main headline from the most representative frame and note any significant textual changes in other frames.
+        
+        2. Headline Analysis:
+           Analyze the extracted headline text and present the results in a table format with the following columns: Criteria, Assessment, and Explanation. Ensure the analysis is consistent across multiple runs.
+        
+        Criteria to Assess:
+           - Word Count: Provide the total number of words in the headline.
+           - Letter Count: Provide the total number of letters in the headline, excluding spaces and special characters. Count only alphabetic characters.
+           - Common Words: Count the number of frequently used words in the headline.
+           - Uncommon Words: Count the number of less frequently used words in the headline.
+           - Emotional Words: Count the number of words that convey emotions (positive, negative, etc.).
+           - Power Words: Count the number of words known to grab attention or influence.
+           - Sentiment: Assess the overall sentiment of the headline (positive, negative, neutral).
+           - Reading Grade Level: Estimate the reading grade level required to understand the headline text.
+        
+        3. Overall Summary and Suggestions:
+           After the table, provide an overall assessment of the headline's effectiveness. Consider the following aspects:
+           - Clarity and Conciseness: Is the headline easy to understand at a glance? Does it convey the key message effectively?
+           - Impact and Engagement: Does the headline grab attention and make the reader curious? Does it evoke an emotional response?
+           - Relevance to the Target Audience: Is the headline's language and style appropriate for the intended audience? Does it speak to their interests or needs?
+           - Alignment with Visual Content: If applicable (for videos), does the headline align with the visual content and message of the video?
+        
+        Based on your analysis, provide three alternative headline suggestions that could improve the headline's overall effectiveness. Ensure the suggestions are clear, concise, attention-grabbing, relevant to the target audience, and aligned with the visual content (if applicable).
+        """
 
         try:
             if is_image:
@@ -296,9 +416,46 @@ else:
             return None
 
     def flash_analysis(uploaded_file, is_image=True):
-        prompt = (
-            "Imagine you are a visual content analyst reviewing an image for a client. Analyze the provided image and generate a detailed description that captures the key elements and information relevant to marketing purposes. Focus on objective details like objects, people, colors, text, and their arrangement. Additionally, identify any potential cultural references or symbols that might be relevant to the target audience. Ensure the description is consistent across multiple runs, avoiding subjective interpretations or emotional responses."
-        )
+        prompt = """
+        Imagine you are a visual content analyst reviewing a marketing asset (image or video) for a client. Your goal is to provide a detailed, objective description that captures essential information relevant to marketing decisions.
+        
+        Instructions:
+        
+        1. Asset Identification:
+            - Clearly identify the type of asset (image or video).
+        
+        2. Detailed Description:
+            - For images:
+                - Describe the prominent visual elements (objects, people, animals, settings).
+                - Note the dominant colors and their overall effect.
+                - Mention any text, its content, font style, size, and placement.
+                - Describe the composition and layout of the elements.
+            - For videos:
+                - Describe the key scenes, actions, and characters.
+                - Note the visual style, color palette, and editing techniques.
+                - Mention any text overlays, captions, or speech, transcribing if possible.
+                - Identify the background music or sound effects, if present.
+        
+        3. Cultural References and Symbolism:
+            - Identify any cultural references, symbols, or visual metaphors that could be significant to the target audience.
+            - Explain how these elements might be interpreted or resonate with the audience.
+        
+        4. Marketing Implications:
+            - Briefly summarize the potential marketing implications based on the visual and textual elements.
+            - Consider how the asset might appeal to different demographics or interests.
+            - Mention any potential positive or negative associations it may evoke.
+        
+        5. Additional Notes:
+            - If analyzing a video, focus on the most representative frame(s) for the initial description.
+            - Mention any significant changes or variations in visuals or text throughout the video.
+        
+        Please ensure your description is:
+        
+        - Objective: Focus on factual details and avoid subjective interpretations or opinions.
+        - Detailed: Provide enough information for the client to understand the asset's visual and textual content.
+        - Marketing-Oriented: Highlight elements that are relevant to marketing strategy and decision-making.
+        - Consistent: Provide similar descriptions for the same asset, regardless of how many times you analyze it.
+"""
 
         try:
             if is_image:
