@@ -1,14 +1,10 @@
 openai
 streamlit
-python-dotenv
 Pillow
 google-auth
 google-auth-oauthlib
 google-auth-httplib2
-google-generativeai  # Replace with the correct version if different
 numpy
-streamlit
 python-dotenv
-Pillow
 google-generativeai
 opencv-python
