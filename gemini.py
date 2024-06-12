@@ -39,7 +39,7 @@ else:
         generation_config=generation_config,
     )
 
-    def resize_image(image, max_size=(500, 500)):
+    def resize_image(image, max_size=(300, 250)):
         image.thumbnail(max_size)
         return image
 
@@ -274,7 +274,7 @@ else:
            - If analyzing a video, focus on the most representative frame and consider the overall visual and auditory elements that contribute to the message.
         
         2. Headline Identification:
-           - Clearly identify the main headline, Image Headline and any supporting headlines in the asset.
+           - Clearly identify the main headline, Image Headline, and any supporting headlines present in the asset.
            - Differentiate the main headline from other text elements.
         
         3. Headline Evaluation (Main Headline Only):
@@ -290,16 +290,16 @@ else:
            - Length & Format: Is the headline concise (ideally 6-12 words) and does it use formatting effectively?
         
         4. Present Results:
-           - Display the main headline's evaluation in a table format with columns: Criterion, Score, Explanation, and Improvements. Ensure every cell in the table is filled, and if no improvements are needed, note that.
+           - Display the main headline's evaluation in a table format with columns: Criterion, Score, Explanation, and Improvements. Ensure every cell in the table is filled, and mainly not any of the Improvements column should left empty or N\A, note that.
         
         5. Supporting Headline Evaluation (Optional):
-           - If applicable, briefly assess any supporting headlines and note if they require further analysis. Consider creating a separate table if a more in-depth analysis is needed.
+           - If applicable, briefly assess any image headline or supporting headlines and note if they require further analysis. Consider creating a separate table if a more in-depth analysis is needed.
         
         6. Total Score:
            - Calculate and display the total score for the main headline based on the evaluations.
         
         7. Improved Headlines:
-           - Provide three alternative headlines for the main headline that address any weaknesses identified. Ensure these headlines are free of colons, diverse in structure and style, and aligned with the visual content and the target audience.
+           - Provide three alternative headlines for the main headline and also the Image Headline that addresses any weaknesses identified. Ensure these headlines are free of colons, diverse in structure and style, and aligned with the visual content and the target audience.
         
         Note: If analyzing a video, mention any notable changes in headlines or messaging throughout the video.
         """
