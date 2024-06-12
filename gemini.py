@@ -274,11 +274,11 @@ else:
            - If analyzing a video, focus on the most representative frame and consider the overall visual and auditory elements that contribute to the message.
         
         2. Headline Identification:
-           - Clearly identify the main headline and any supporting headlines in the asset.
+           - Clearly identify the main headline, Image Headline and any supporting headlines in the asset.
            - Differentiate the main headline from other text elements.
         
         3. Headline Evaluation (Main Headline Only):
-           Evaluate the main headline against the following criteria, rating each on a scale from 1 to 5 (1 being poor, 5 being excellent), and provide a concise explanation for each score:
+           Evaluate the main headline against the following criteria, rating each on a scale from 0 to 10 (0 being poor, 10 being excellent), and provide a concise explanation for each score:
            - Clarity: How easily and quickly does the headline convey the main point?
            - Customer Focus: Does the headline emphasize a customer-centric approach, addressing their needs or interests?
            - Relevance: How well does the headline reflect the visual content of the image or video?
