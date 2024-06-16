@@ -347,12 +347,7 @@ Your task is to assess the headline's effectiveness based on various linguistic 
     1. **Headline Identification:**
         * **Main Headline:** Clearly state the main headline extracted from the image or video.
         * **Image Headline (if applicable):** If the image contains a distinct headline separate from the main headline, clearly state it here.
-    2. **Context:** 
-        * **Image:** Briefly describe the key visual elements and themes of the image that the headlines should relate to.
-        * **Video:** Summarize the main message or story of the video and any key visual elements that the headlines should complement. If there are significant changes in headlines throughout the video, note them here.
-
 **Part 2: Headline Analysis**
-
 Analyze the extracted headline(s) and present the results in a well-formatted table:
 
 | Criterion             | Main Headline Assessment                                    | Image Headline Assessment (if applicable)                                  | Explanation |
