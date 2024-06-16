@@ -339,35 +339,43 @@ Evaluate the extracted text based on the following criteria. For each aspect, pr
 
     def headline_detailed_analysis(uploaded_file, is_image=True):
         prompt = """
-        Imagine you are a marketing consultant reviewing the headline text of a marketing asset (image or video) for a client. Your task is to assess the headline's effectiveness based on various linguistic and marketing criteria.
-        
-        1. Headline Extraction:
-           - If analyzing an image, extract the main headline and image headline from the image.
-           - If analyzing a video, extract the main headline from the most representative frame and note any significant textual changes in other frames.
-        
-        2. Headline Analysis:
-           Analyze the extracted headline text and present the results in a table format with the following columns: Criteria, Assessment, and Explanation. Ensure the analysis is consistent across multiple runs.
-        
-        Criteria to Assess:
-           - Word Count: Provide the total number of words in the headline.
-           - Letter Count: Provide the total number of letters in the headline, excluding spaces and special characters. Count only alphabetic characters.
-           - Common Words: Count the number of frequently used words in the headline.
-           - Uncommon Words: Count the number of less frequently used words in the headline.
-           - Emotional Words: Count the number of words that convey emotions (positive, negative, etc.).
-           - Power Words: Count the number of words known to grab attention or influence.
-           - Sentiment: Assess the overall sentiment of the headline (positive, negative, neutral).
-           - Reading Grade Level: Estimate the reading grade level required to understand the headline text.
-        
-        3. Overall Summary and Suggestions:
-           After the table, provide an overall assessment of the headline's effectiveness. Consider the following aspects:
-           - Clarity and Conciseness: Is the headline easy to understand at a glance? Does it convey the key message effectively?
-           - Impact and Engagement: Does the headline grab attention and make the reader curious? Does it evoke an emotional response?
-           - Relevance to the Target Audience: Is the headline's language and style appropriate for the intended audience? Does it speak to their interests or needs?
-           - Alignment with Visual Content: If applicable (for videos), does the headline align with the visual content and message of the video?
-        
-        Based on your analysis, provide three alternative headline suggestions that could improve the headline's overall effectiveness. Ensure the suggestions are clear, concise, attention-grabbing, relevant to the target audience, and aligned with the visual content (if applicable).
-        """
+Imagine you are a marketing consultant reviewing the headline text of a marketing asset (image or video) for a client. 
+Your task is to assess the headline's effectiveness based on various linguistic and marketing criteria.
 
+**Part 1: Headline Extraction and Context**
+  **Image/Video:**
+    1. **Headline Identification:**
+        * **Main Headline:** Clearly state the main headline extracted from the image or video.
+        * **Image Headline (if applicable):** If the image contains a distinct headline separate from the main headline, clearly state it here.
+    2. **Context:** 
+        * **Image:** Briefly describe the key visual elements and themes of the image that the headlines should relate to.
+        * **Video:** Summarize the main message or story of the video and any key visual elements that the headlines should complement. If there are significant changes in headlines throughout the video, note them here.
+
+**Part 2: Headline Analysis**
+
+Analyze the extracted headline(s) and present the results in a well-formatted table:
+
+| Criterion             | Main Headline Assessment                                    | Image Headline Assessment (if applicable)                                  | Explanation |
+|-----------------------|-------------------------------------------------------------|----------------------------------------------------------------------------|-------------|
+| Word Count            | _[Number of words in the headline]_                         | _[Number of words in the headline]_                                        | _Example: The headline has X words, which is [concise/lengthy/appropriate] for a [type of asset]._ |
+| Keyword Relevance     | _[Assessment of how well the headline incorporates relevant keywords or phrases]_ | _[Assessment of how well the headline incorporates relevant keywords or phrases]_ | _Example: The headline includes [X number] of relevant keywords, such as "[keyword 1]", "[keyword 2]", etc. This may help with [SEO/search engine visibility/targeting a specific audience]._ |
+| Common Words          | _[Number of common words]_                                  | _[Number of common words]_                                                 | _Example: The headline uses X common words, which may [enhance readability/make it less memorable/be appropriate for the target audience]._ |
+| Uncommon Words        | _[Number of uncommon words]_                                | _[Number of uncommon words]_                                               | _Example: The headline includes X uncommon words, which can [make it more memorable/potentially confuse some readers/be appropriate for a niche audience]._ |
+| Emotional Words       | _[Number of words conveying emotion (positive, negative, neutral)]_ | _[Number of words conveying emotion (positive, negative, neutral)]_        | _Example: The headline contains X emotional words, indicating a [positive/negative/neutral] tone. This may [elicit a strong response/be appropriate for the context/be overly dramatic]._ |
+| Power Words           | _[Number of words with strong persuasive potential]_        | _[Number of words with strong persuasive potential]_                       | _Example: The headline includes X power words, which are designed to [grab attention/persuade/create urgency]. However, overuse can make the headline seem [pushy/manipulative/less authentic]._ |
+| Sentiment             | _[Overall sentiment: positive, negative, or neutral]_       | _[Overall sentiment: positive, negative, or neutral]_                      | _Example: The headline has a [positive/negative/neutral] sentiment, which [aligns well with the message/could be adjusted for better impact]._ |
+| Reading Grade Level   | _[Estimated grade level required to understand the headline]_ | _[Estimated grade level required to understand the headline]_              | _Example: The headline is written at a [grade level] reading level, making it [easy/challenging] for the target audience to comprehend. This is [appropriate/inappropriate] considering their [assumed education level/interests/background]._ |
+| Clarity & Conciseness | _[Assessment of how clear and easy to understand the headline is]_ | _[Assessment of how clear and easy to understand the headline is]_         | _Example: The headline is [clear and concise/somewhat vague/difficult to understand]. It [effectively/ineffectively] communicates the main message. The use of [specific words/phrases] contributes to its [clarity/lack of clarity]._ |
+| Impact & Engagement   | _[Assessment of how well the headline grabs attention and evokes emotion]_ | _[Assessment of how well the headline grabs attention and evokes emotion]_  | _Example: The headline is [attention-grabbing/forgettable/mildly interesting]. It [does/does not] effectively create a sense of urgency or curiosity. The use of [emotional language/power words/humor] [successfully/unsuccessfully] evokes a response in the reader._ |
+| Relevance             | _[Assessment of how well the headline aligns with the visual content and target audience]_ | _[Assessment of how well the headline aligns with the visual content and target audience]_ | _Example: The headline is [highly relevant/somewhat relevant/irrelevant] to the visual content and the target audience. It [successfully/partially/unsuccessfully] connects with their [interests/needs/pain points] by using [language/tone/style] that is [appropriate/inappropriate] for them._ |
+| Overall Effectiveness | _[Overall rating of the headline's effectiveness based on all criteria, 1 (poor) to 5 (excellent)]_ | _[Overall rating of the headline's effectiveness based on all criteria, 1 (poor) to 5 (excellent)]_ | _Example: Considering all factors, the headline receives an overall score of X out of 5. It is [highly effective/moderately effective/ineffective] due to its [strengths/weaknesses] in [specific criteria]._ |
+
+**Part 3: Improved Headline Suggestions**
+Provide three alternative headlines that improve upon the original while maintaining relevance to the visual content and the target audience:
+* **Option 1:**
+* **Option 2:**
+* **Option 3:**        
+    """
         try:
             if is_image:
                 image = Image.open(io.BytesIO(uploaded_file.read()))
