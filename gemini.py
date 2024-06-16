@@ -72,11 +72,11 @@ else:
     def analyze_media(uploaded_file, is_image=True):
         # General prompt for both images and videos
         prompt = (
-            "Analyze the media (image or video frame) for various marketing aspects, ensuring consistent results for each aspect. "
+            "Analyze the media (image or video frame) for various marketing aspects, ensuring consistent results for each aspects. "
             "Respond in single words or short phrases separated by commas for each attribute: text amount (High or Low), "
-            "color usage (Effective or Not effective), visual cues (Present or Absent), emotion (Positive or Negative), "
-            "focus (Central message or Scattered), customer-centric (Yes or No), credibility (High or Low), "
-            "user interaction (High, Moderate, or Low), CTA presence (Yes or No), CTA clarity (Clear or Unclear)."
+            "Color usage (Effective or Not effective), visual cues (Present or Absent), emotion (Positive or Negative), "
+            "Focus (Central message or Scattered), customer-centric (Yes or No), credibility (High or Low), "
+            "User interaction (High, Moderate, or Low), CTA presence (Yes or No), CTA clarity (Clear or Unclear)."
         )
         try:
             if is_image:
@@ -115,25 +115,20 @@ else:
         Imagine you are a UX design and marketing analysis consultant reviewing a visual asset (image or video) for a client.
         
         1. Asset Identification:
-            - Clearly identify and describe the type of marketing asset (e.g., email, social media post, advertisement, flyer, brochure, landing page).
-        
+            - Clearly identify and describe the type of marketing asset (e.g., email, social media post, advertisement, flyer, brochure, landing page).     
         2. Purpose Analysis:
             - Clearly state the specific purpose of the asset (e.g., selling a product, increasing brand awareness, driving website traffic).
-            - Explain in detail how the asset aims to achieve its purpose, referencing specific elements or strategies used.
-        
+            - Explain in detail how the asset aims to achieve its purpose, referencing specific elements or strategies used.      
         3. Audience Identification:
             - Identify the target audience for the asset.
-            - Describe the demographics, interests, needs, and pain points of this audience.
-        
+            - Describe the demographics, interests, needs, and pain points of this audience.    
         4. Evaluation and Scoring:
             For each aspect listed below, provide:
                 - A score from 1 to 5 (1 being low, 5 being high).
                 - A concise explanation justifying the score.
                 - Specific, actionable suggestions for improvement.
-            Present the results in a table with columns: Aspect, Score, Explanation, and Improvement.
-        
+            Present the results in a table with columns: Aspect, Score, Explanation, and Improvement.     
         Aspects to Consider:
-        
             - Creative Impact: Does the design stand out and capture attention with innovative elements?
             - Attention & Hierarchy:
                 - Image: Is the order of content consumption clear and effective? (e.g., headline, body text, visuals, CTA)
@@ -163,8 +158,7 @@ else:
             - Memorability: Will the asset leave a lasting impression on the viewer? Does it have elements that are unique or surprising?
             - Textual Effort: 
                 - Image: Is the text clear, concise, and easy to read?
-                - Video: Is the on-screen text minimal, readable, and well-timed? Does it complement the spoken message effectively?
-        
+                - Video: Is the on-screen text minimal, readable, and well-timed? Does it complement the spoken message effectively?  
         5. Overall Assessment:
             - Summarize the key findings from your analysis.
             - Calculate the total score across all aspects.
@@ -200,48 +194,47 @@ else:
 
     def text_analysis(uploaded_file, is_image=True):
         prompt = """
-        Imagine you are a UX design and marketing analysis consultant reviewing the text content of a marketing asset (image or video, excluding the headline) for a client. Your goal is to provide a comprehensive analysis of the text's effectiveness and offer actionable recommendations for improvement.
-        
-        1. Text Extraction and Contextualization:
-            **Image Analysis:** Carefully extract and analyze all visible text within the image. Consider the text's placement, font choices, and relationship to visual elements.
-            **Video Analysis:**
-              * Identify the most representative frame(s) that showcase the primary text content.
-              * Extract and analyze the text from these frames.
-              * Pay attention to any significant textual changes or patterns across different parts of the video.
-              * Consider how the text interacts with the video's visuals and audio elements.
-        
-        2. Textual Assessment:
-           Evaluate the extracted text based on the following criteria. For each aspect, provide:
-              * A score from 1 to 5 (1 being low, 5 being high).
-              * A clear and concise explanation justifying your score, focusing on both strengths and weaknesses.
-              * Actionable suggestions for improvement, tailored to the specific text, the overall asset, and the target audience.
-        
-            Present your evaluation in a well-organized table with these columns: Aspect, Score, Explanation, and Improvement.
-        
-        Aspects to Evaluate:
-        
-           - Clarity and Conciseness: Is the text easy to understand? Does it avoid unnecessary jargon and get to the point quickly?
-           - Customer Focus: Does the text center the customer's needs, desires, and pain points? Is it written from their perspective?
-           - Engagement: Is the text compelling and attention-grabbing? Does it use storytelling, persuasive language, or humor to connect with the audience? Evaluate the text's length, readability, formatting (e.g., use of lists, bullet points), and overall value proposition.
-           - Reading Effort: Is the text easy to scan and digest? Is it broken into manageable chunks? Does it avoid overly complex sentence structures?
-           - Purpose and Value: Is the purpose of the text immediately clear? Does it effectively communicate the value proposition of the product or service?
-           - Motivation & Persuasion: Does the text inspire the target audience to take action? Does it effectively appeal to their emotions, needs, or desires? Does it utilize social proof, authority, or other persuasive techniques?
-           - Depth and Detail: Does the text provide enough information to satisfy different levels of audience interest? Are there opportunities to include additional details or links to further information?
-           - Trustworthiness: Does the text build trust and credibility? Does it use language that is honest, transparent, and relatable? Is it more customer-centric or brand-centric?
-           - Memorability: Are there any unique phrases, word choices, or storytelling elements that make the text stand out and memorable?
-           - Emotional Appeal: Does the text evoke positive emotions relevant to the product or service? Are these emotions likely to resonate with the target audience?
-           - Uniqueness & Differentiation: Does the text differentiate the brand or product from competitors? Does it have a distinct voice and style?
-           - Urgency and Curiosity: Does the text create a sense of urgency or FOMO (fear of missing out)? Does it pique the audience's curiosity and encourage them to learn more?
-           - Benefit Orientation: Does the text clearly articulate the benefits of the product or service to the customer? Are these benefits compelling and relevant to the target audience?
-           - Target Audience Relevance: Is the text's language, tone, and style appropriate for the intended audience? Does it speak to their specific interests, needs, and preferences?
-           - Cognitive Demand: How much mental effort is required to understand the text? Is the information presented in a way that is easy to digest and remember?
-           - Reading Level: What is the estimated reading level of the text? Is it appropriate for the target audience's comprehension abilities?
-        
-        3. Conclusion and Recommendations:
-        
-           - Provide a concise summary of your analysis, highlighting the text's strengths, weaknesses, and overall effectiveness.
-           - Calculate the total score based on the individual aspect scores.
-           - Offer three alternative text versions that address the identified weaknesses and enhance the overall impact of the marketing message. These revisions should be tailored to the specific asset type, its purpose, and the target audience.
+Imagine you are a UX design and marketing analysis consultant reviewing the text content of a marketing asset (image or video, excluding the headline) for a client. Your goal is to provide a comprehensive analysis of the text's effectiveness and offer actionable recommendations for improvement.
+
+**Part 1: Text Extraction and Contextualization**
+
+*   **Image Analysis:** 
+    1.  **Text Extraction:** Thoroughly identify and extract ALL visible text within the image, including headlines, body copy, captions, calls to action, taglines, logos, and any other textual elements.
+    2.  **Presentation:** Present the extracted text in a clear, bulleted list format, maintaining the original order and structure to the extent possible.
+    3.  **Visual Analysis:**
+        *   **Placement:**  For each text element, specify its location within the image (e.g., top left, centered, bottom right). Note any instances of overlapping text or elements that might hinder readability.
+        *   **Font Choices:** Describe the font style (serif, sans-serif, script, etc.), weight (bold, regular, light), size, and color of each distinct text element.
+        *   **Visual Relationships:** Explain how the text interacts with other visual elements (images, graphics, colors) and how it contributes to the overall message and hierarchy of information.
+
+*   **Video Analysis:**
+    1.  **Key Frame Identification:** Select the most representative frame(s) that showcase the primary text content.
+    2.  **Text Extraction:** Extract and present the text from these key frames in a clear, bulleted list format.
+    3.  **Temporal Analysis:** Briefly describe any significant textual changes or patterns that occur throughout the video. 
+    4.  **Integration with Visuals and Audio:** Analyze how the text interacts with the video's visuals (scenes, characters, actions) and audio (dialogue, music, sound effects).
+
+
+**Part 2: Textual Assessment**
+Evaluate the extracted text based on the following criteria. For each aspect, provide:
+    *   **Score:** A rating from 1 (poor) to 5 (excellent)
+    *   **Explanation:** A concise justification of the score, highlighting strengths and weaknesses.
+    *   **Improvement:** Specific, actionable suggestions for enhancing the text's effectiveness.
+
+| Aspect                     | Score (1-5) | Explanation                                                                                                                                                                                                                                                                                                                                                                                                                      | Improvement                                                                                                                                                                                                                                                                                                                                                                                                          |
+| :-------------------------- | ----------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Clarity and Conciseness     |             | Assess how easy it is to understand the text. Does it convey the message directly and without unnecessary jargon? Is it free of ambiguity or confusing language? Consider sentence structure, vocabulary, and overall flow.                                                                                                                                                                                          | Suggest ways to simplify or clarify the language, eliminate jargon, or shorten sentences.  Provide examples of how the text could be made more concise and direct.                                                                                                                                                                                                                                |
+| Customer Focus             |             | Evaluate if the text is written from the customer's perspective. Does it address their needs, desires, and pain points? Does it use language that resonates with them? Are the benefits of the product/service clearly articulated in a way that matters to the target audience?                                                                                                                                                      | Offer suggestions for incorporating the customer's voice or perspective into the text. Recommend ways to highlight benefits that are most relevant to the target audience.                                                                                                                                                                                                                              |
+| Engagement                 |             | Assess how compelling and interesting the text is. Does it grab attention and hold the reader's interest? Consider the use of storytelling techniques, persuasive language, humor, rhetorical questions, or other engaging elements. Evaluate the length of the text, readability, formatting (e.g., use of bullet points, lists, headings), and the overall value proposition presented. | Propose ways to make the text more captivating. This could involve incorporating storytelling elements, using stronger verbs, adding humor, or highlighting the unique value proposition in a more compelling way. Suggest ways to improve formatting for better readability and scannability.                                                                                                   |
+| Reading Effort             |             | Evaluate how easy it is to read and understand the text. Does it flow smoothly? Are the sentences well-structured? Is the vocabulary appropriate for the target audience?  Consider the use of technical terms, passive voice, or complex sentence structures.                                                                                                                                                                    | Suggest ways to improve readability by using simpler sentence structures, active voice, or more accessible vocabulary.                                                                                                                                                                                                                                                                              |
+| Purpose and Value          |             | Is the purpose of the text immediately clear to the reader? Does it effectively communicate the value proposition of the product or service? Does it answer the question "What's in it for me?" from the customer's point of view?                                                                                                                                                                                          | If the purpose or value is unclear, recommend ways to make it more explicit. This could involve restating the key message more directly or highlighting the most compelling benefit.                                                                                                                                                                                                        |
+| Motivation & Persuasion    |             | Assess the text's persuasive power. Does it create a sense of urgency or desire for the product/service? Does it use strong calls to action? Does it effectively leverage social proof, authority, or other persuasive techniques?                                                                                                                                                                                            | Suggest ways to strengthen the persuasive elements. This could involve adding a stronger call to action, incorporating testimonials or statistics, or using more persuasive language.                                                                                                                                                                                                                  |
+| Depth and Detail           |             | Determine if the text provides sufficient information to meet the needs of the target audience. Is there enough detail to satisfy those who want to learn more? Are there opportunities to provide additional context, links to further resources, or options for deeper engagement?                                                                                                                                          | If the text lacks depth, suggest areas where more detail could be added. If it's too detailed, recommend condensing or prioritizing information. Consider whether additional resources (like a link to a landing page) would enhance the message.                                                                                                                                  |
+| Trustworthiness             |             | Evaluate how trustworthy and credible the text appears. Does it use language that is honest, transparent, and relatable? Does it focus on building trust with the customer or primarily on promoting the brand? Are there opportunities to incorporate trust signals like testimonials, guarantees, or data?                                                                                                                 | Suggest ways to enhance the text's trustworthiness. This could involve softening the sales pitch, highlighting customer testimonials, or using language that emphasizes transparency and authenticity.                                                                                                                                                                                            |
+| Memorability                |             | Assess if there are any elements in the text that make it stand out and easy to remember. This could include catchy phrases, unique word choices, or interesting storytelling techniques.                                                                                                                                                                                                                               | If the text lacks memorability, recommend incorporating memorable phrases, wordplay, or anecdotes that tie into the product/service.                                                                                                                                                                                                                                                                 |
+| Emotional Appeal           |             | Determine if the text evokes emotions that align with the desired brand image and message. Are these emotions likely to resonate with the target audience? Are there missed opportunities to create a stronger emotional connection?                                                                                                                                                                                               | Suggest incorporating language that evokes specific emotions (joy, excitement, etc.). Consider the use of sensory words or vivid imagery to make the text more emotionally impactful.                                                                                                                                                                                                            |
+| Uniqueness & Differentiation |             | Analyze whether the text effectively differentiates the brand or product from competitors. Does it have a distinct voice and style? Is the message unique and memorable, or does it blend in with other marketing messages?                                                                                                                                                                                                       | If the text lacks differentiation, suggest ways to make it more unique. This could involve developing a stronger brand voice, using unexpected language or metaphors, or focusing on a specific aspect that sets the brand or product apart.                                                                                                                                                   |
+| Urgency and Curiosity       |             | Assess if the text creates a sense of urgency or FOMO (fear of missing out). Does it pique the audience's curiosity and entice them to learn more or take action? Are there any missed opportunities to create a stronger sense of urgency or intrigue?                                                                                                                                                               | Suggest ways to create urgency (e.g., limited-time offers) or spark curiosity (e.g., asking intriguing questions).                                                                                                                                                                                                                                                                                |
+| Benefit Orientation         |             | Evaluate whether the text clearly articulates the benefits of the product or service to the customer. Are these benefits specific, relevant, and compelling to the target audience? Does the text answer the question "What's in it for me?" from the customer's perspective?                                                                                                                                              | If the benefits are unclear or not well-articulated, recommend making them more explicit and customer-centric. Focus on outcomes or solutions that the product/service provides, rather than just features.                                                                                                                                                                                 |
+| Target Audience Relevance  |             | Determine if the text's language, tone, and style are appropriate and appealing to the intended audience. Does it speak to their specific interests, needs, and preferences? Is it culturally relevant and sensitive to their values?                                                                                                                                                                                               | If the text
         """
 
         try:
@@ -349,7 +342,7 @@ else:
         Imagine you are a marketing consultant reviewing the headline text of a marketing asset (image or video) for a client. Your task is to assess the headline's effectiveness based on various linguistic and marketing criteria.
         
         1. Headline Extraction:
-           - If analyzing an image, extract the main headline from the image.
+           - If analyzing an image, extract the main headline and image headline from the image.
            - If analyzing a video, extract the main headline from the most representative frame and note any significant textual changes in other frames.
         
         2. Headline Analysis:
