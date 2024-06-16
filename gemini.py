@@ -6,6 +6,7 @@ import io
 import google.generativeai as genai
 import cv2
 import tempfile
+import re
 
 # Load environment variables from .env file
 load_dotenv()
@@ -61,9 +62,13 @@ else:
             pil_image = Image.open(io.BytesIO(buffer))
             
             frames.append(pil_image)
-
         cap.release()
         return frames
+    # Initialize session state variables for headlines and analysis results
+    if 'headlines' not in st.session_state:
+        st.session_state.headlines = {}
+    if 'headline_result' not in st.session_state:
+        st.session_state.headline_result = None    
     def analyze_media(uploaded_file, is_image=True):
         # General prompt for both images and videos
         prompt = (
@@ -198,8 +203,8 @@ else:
         Imagine you are a UX design and marketing analysis consultant reviewing the text content of a marketing asset (image or video, excluding the headline) for a client. Your goal is to provide a comprehensive analysis of the text's effectiveness and offer actionable recommendations for improvement.
         
         1. Text Extraction and Contextualization:
-           - **Image Analysis:** Carefully extract and analyze all visible text within the image. Consider the text's placement, font choices, and relationship to visual elements.
-           - **Video Analysis:**
+            **Image Analysis:** Carefully extract and analyze all visible text within the image. Consider the text's placement, font choices, and relationship to visual elements.
+            **Video Analysis:**
               * Identify the most representative frame(s) that showcase the primary text content.
               * Extract and analyze the text from these frames.
               * Pay attention to any significant textual changes or patterns across different parts of the video.
@@ -303,7 +308,6 @@ else:
         
         Note: If analyzing a video, mention any notable changes in headlines or messaging throughout the video.
         """
-
         try:
             if is_image:
                 image = Image.open(io.BytesIO(uploaded_file.read()))
@@ -312,21 +316,30 @@ else:
                 with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
                     tmp.write(uploaded_file.read())
                     tmp_path = tmp.name
-
                 frames = extract_frames(tmp_path)
-                if frames is None or not frames:  # Check if frames were extracted successfully
+                if not frames:
                     st.error("No frames were extracted from the video. Please check the video format.")
                     return None
-
-                response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
+                response = model.generate_content([prompt, frames[0]])
 
             if response.candidates:
                 raw_response = response.candidates[0].content.parts[0].text.strip()
+                st.session_state.headline_result = raw_response
                 st.write("Headline Analysis Results:")
-                st.markdown(raw_response, unsafe_allow_html=True)  # Assuming the response is in HTML table format
+                st.markdown(raw_response, unsafe_allow_html=True)
+
+                headline_matches = re.findall(r'(Main Headline|Image Headline):\s*(.*)', raw_response)
+                extracted_headlines = {headline_type: headline_text for headline_type, headline_text in headline_matches}
+
+                if "Image Headline" in extracted_headlines:
+                    st.session_state.headlines = extracted_headlines
+                else:
+                    st.warning("Image headline not found in the results. Further analysis cannot be performed.")
+                    st.session_state.headlines = None
+
             else:
                 st.error("Unexpected response structure from the model.")
-            return None
+                return None
         except Exception as e:
             st.error(f"Failed to read or process the media: {e}")
             return None
@@ -429,7 +442,7 @@ else:
         - Detailed: Provide enough information for the client to understand the asset's visual and textual content.
         - Marketing-Oriented: Highlight elements that are relevant to marketing strategy and decision-making.
         - Consistent: Provide similar descriptions for the same asset, regardless of how many times you analyze it.
-"""
+        """
 
         try:
             if is_image:
@@ -483,7 +496,7 @@ else:
             st.error(f"Failed to read or process the media: {e}")
             return None
 
-    # Streamlit app setup
+    # Streamlit UI setup
     st.title('Marketing Media Analysis AI Assistant')
     with st.sidebar:
         st.header("Options")
@@ -493,10 +506,8 @@ else:
         headline_analysis_button = st.button('Headline Analysis')
         detailed_headline_analysis_button = st.button('Headline Optimization Report')
         flash_analysis_button = st.button('Flash Analysis')
-
-        st.header("Custom Prompt")
         custom_prompt = st.text_area("Enter your custom prompt here:")
-        custom_prompt_button = st.button('Send')
+        custom_prompt_button = st.button('Send Custom Prompt')
 
     col1, col2 = st.columns(2)
     uploaded_files = col1.file_uploader("Upload your marketing media here:", accept_multiple_files=True, type=['png', 'jpg', 'jpeg', 'mp4', 'avi'])
@@ -511,6 +522,7 @@ else:
             else:
                 col2.video(uploaded_file, format="video/mp4")
 
+            # Basic analysis
             if basic_analysis:
                 with st.spinner("Performing basic analysis..."):
                     uploaded_file.seek(0)
@@ -519,12 +531,13 @@ else:
                         st.write("## Basic Analysis Results:")
                         st.json(basic_analysis_result)
 
+            # Combined marketing analysis V6
             if combined_analysis_V6:
-                with st.spinner("Performing combined marketing analysis_V6..."):
+                with st.spinner("Performing combined marketing analysis V6..."):
                     uploaded_file.seek(0)
                     detailed_result_V6 = combined_marketing_analysis_V6(uploaded_file, is_image)
                     if detailed_result_V6:
-                        st.write("## Combined Marketing Analysis_V6 Results:")
+                        st.write("## Combined Marketing Analysis V6 Results:")
                         st.markdown(detailed_result_V6)
 
             if text_analysis_button:
@@ -534,7 +547,8 @@ else:
                     if text_result:
                         st.write("## Text Analysis Results:")
                         st.markdown(text_result)
-
+                        
+            # Headline analysis
             if headline_analysis_button:
                 with st.spinner("Performing headline analysis..."):
                     uploaded_file.seek(0)
@@ -543,6 +557,47 @@ else:
                         st.write("## Headline Analysis Results:")
                         st.markdown(headline_result)
 
+            # Further Image Headline Analysis button, shows only if image headline is found
+            if 'headline_result' in st.session_state and 'Image Headline' in st.session_state.headlines:
+                if st.button('Further Headline Analysis (Image Headline)'):
+                    with st.spinner("Performing further headline analysis..."):
+                        image_headline = st.session_state.headlines['Image Headline']
+                        further_prompt = f"""Imagine you are a marketing consultant reviewing a visual asset (image or video) and its headline(s) for a client. Your goal is to provide a comprehensive analysis of the headline's effectiveness across various key criteria.
+                        1. Image Headline Evaluation (Image Headline Only: '{image_headline}'):
+                           - Evaluate the Image headline against the following criteria, rating each on a scale from 1 to 5 (1 being poor, 5 being excellent), and provide a concise explanation for each score:
+                           - Clarity: How easily and quickly does the headline convey the main point?
+                           - Customer Focus: Does the headline emphasize a customer-centric approach, addressing their needs or interests?
+                           - Relevance: How well does the headline reflect the visual content of the image or video?
+                           - Emotional Appeal: Does the headline evoke curiosity, excitement, or other emotions that resonate with the target audience?
+                           - Uniqueness: How original and memorable is the headline compared to typical marketing messages?
+                           - Urgency & Curiosity: Does the headline create a sense of urgency or pique curiosity to learn more?
+                           - Benefit-Driven: Does the headline clearly communicate a specific benefit or value proposition to the audience?
+                           - Target Audience: Is the headline's language, tone, and style tailored to the specific target audience?
+                           - Length & Format: Is the headline concise (ideally 6-12 words) and does it use formatting effectively?
+
+                        4. Present Results:
+                           - Display the '{image_headline}' Image headline's evaluation in a table format with columns: Criterion, Score, Explanation, and Improvements. Ensure every cell in the table is filled, and mainly not any of the Improvements column should left empty or N\\A, note that.
+
+                        5. Supporting Headline Evaluation (Optional):
+                           - If applicable, briefly assess any other image headline or supporting headlines and note if they require further analysis. Consider creating a separate table if a more in-depth analysis is needed.
+
+                        6. Total Score:
+                           - Calculate and display the total score for the image headline : '{image_headline}' based on the evaluations.
+
+                        7. Improved Headlines:
+                           - Provide three alternative headlines for the image headline : '{image_headline}' , that addresses any weaknesses identified. Ensure these headlines are free of colons, diverse in structure and style, and aligned with the visual content and the target audience.
+
+                        Note: If analyzing a video, mention any notable changes in headlines or messaging throughout the video.
+                        """                       
+                        further_response = model.generate_content([further_prompt, image])  # Assuming 'image' is correctly scoped
+                        if further_response.candidates:
+                            further_raw_response = further_response.candidates[0].content.parts[0].text.strip()
+                            st.write("Further Headline Analysis Results (Image Headline):")
+                            st.markdown(further_raw_response, unsafe_allow_html=True)
+                        else:
+                            st.error("Unexpected response structure from the model.")
+
+            # Headline optimization report
             if detailed_headline_analysis_button:
                 with st.spinner("Performing Headline Optimization Report analysis..."):
                     uploaded_file.seek(0)
@@ -551,6 +606,7 @@ else:
                         st.write("## Headline Optimization Report Results:")
                         st.markdown(detailed_headline_result)
 
+            # Flash analysis
             if flash_analysis_button:
                 with st.spinner("Performing Flash analysis..."):
                     uploaded_file.seek(0)
@@ -559,6 +615,7 @@ else:
                         st.write("## Flash Analysis Results:")
                         st.markdown(flash_result)
 
+            # Custom prompt analysis
             if custom_prompt_button:
                 with st.spinner("Performing custom prompt analysis..."):
                     uploaded_file.seek(0)
