@@ -502,40 +502,51 @@ Provide three alternative headlines that improve upon the original while maintai
         except Exception as e:
             st.error(f"Failed to read or process the media: {e}")
             return None
-
     def custom_prompt_analysis(uploaded_file, custom_prompt, is_image=True):
         try:
             if is_image:
+                # Handle images directly
                 image = Image.open(io.BytesIO(uploaded_file.read()))
                 response = model.generate_content([custom_prompt, image])
+                if response.candidates and len(response.candidates[0].content.parts) > 0:
+                    return response.candidates[0].content.parts[0].text.strip()
+                else:
+                    st.error("Model did not provide a valid response or the response structure was unexpected.")
+                    return None
             else:
+                # Handle videos by processing each extracted frame
                 with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
                     tmp.write(uploaded_file.read())
                     tmp_path = tmp.name
 
-                frames = extract_frames(tmp_path)
-                if frames is None or len(frames) == 0:
+                frames = extract_frames(tmp_path)  # Ensure frames are extracted correctly
+                if frames is None or not frames:
                     st.error("No frames were extracted from the video. Please check the video format.")
                     return None
 
                 responses = []
+                valid_responses = False  # Track if any valid responses were obtained
                 for frame in frames:
-                    response = model.generate_content([custom_prompt, frame])
+                    response = model.generate_content([custom_prompt, frame])  # Pass frame in the correct format
                     if response.candidates and len(response.candidates[0].content.parts) > 0:
                         responses.append(response.candidates[0].content.parts[0].text.strip())
+                        valid_responses = True
                     else:
                         responses.append("No valid response for this frame.")
 
-                return "\n".join(responses)  # Combine responses from all frames
+                # Clean up the temporary file
+                os.remove(tmp_path)
 
-            if response.candidates and len(response.candidates[0].content.parts) > 0:
-                return response.candidates[0].content.parts[0].text.strip()
-            else:
-                st.error("Model did not provide a valid response or the response structure was unexpected.")
-                return None
+                if not valid_responses:
+                    return "No valid responses were obtained from any of the frames."
+
+                # Combine valid responses from all frames
+                return "\n".join(responses)
+
         except Exception as e:
             st.error(f"Failed to read or process the media: {e}")
             return None
+
 
     # Streamlit UI setup
     st.title('Marketing Media Analysis AI Assistant')
