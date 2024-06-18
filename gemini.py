@@ -44,21 +44,54 @@ else:
         image.thumbnail(max_size)
         return image
     def extract_frames(video_file_path, num_frames=5):
-        """Extracts frames from a video file using imageio."""
+        """Extracts frames from a video file using OpenCV."""
+        cap = cv2.VideoCapture(video_file_path)
+        if not cap.isOpened():
+            st.error(f"Failed to open video file {video_file_path}. Check if the file is corrupt or format is unsupported.")
+            return None
+    
+        total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        frame_step = max(total_frames // num_frames, 1)
+        frames = []
+    
+        for i in range(0, total_frames, frame_step):
+            cap.set(cv2.CAP_PROP_POS_FRAMES, i)
+            ret, frame = cap.read()
+            if not ret:
+                break
+    
+            # Convert color space and create a PIL Image from bytes
+            frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            _, buffer = cv2.imencode('.jpg', frame_rgb)
+            pil_image = Image.open(io.BytesIO(buffer))
+            frames.append(pil_image)
+    
+        cap.release()
+        if len(frames) == 0:
+            st.error("No frames were extracted, possibly due to an error in reading the video.")
+            return None
+        return frames
+    
+    def analyze_video(uploaded_file):
+        """Analyzes video by extracting frames and performing model inference on the first frame."""
         try:
-            reader = imageio.get_reader(video_file_path)
-            total_frames = reader.get_length()
-            frame_step = max(total_frames // num_frames, 1)
-            frames = []
-            for i in range(0, total_frames, frame_step):
-                frame = reader.get_data(i)  # Get the frame directly as a numpy array
-                # Create a PIL Image from the numpy array (RGB format)
-                pil_image = Image.fromarray(frame)
-                frames.append(pil_image)
-            reader.close()
-            return frames
+            with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
+                tmp.write(uploaded_file.read())
+                tmp_path = tmp.name
+    
+            frames = extract_frames(tmp_path)
+            if frames is None or not frames:
+                st.error("No frames were extracted from the video. Please check the video format.")
+                return None
+    
+            response = model.generate_content([prompt, frames[0]])  # Analyzing the first frame
+            if response.candidates:
+                return response.candidates[0].content.parts[0].text.strip()
+            else:
+                st.error("Model did not provide a response.")
+                return None
         except Exception as e:
-            st.error(f"Error extracting frames: {e}")
+            st.error(f"Failed to read or process the media: {e}")
             return None
 
     # Initialize session state variables for headlines and analysis results
