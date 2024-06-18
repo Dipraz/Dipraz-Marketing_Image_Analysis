@@ -7,7 +7,6 @@ import google.generativeai as genai
 import cv2
 import tempfile
 import re
-import imageio
 
 # Load environment variables from .env file
 load_dotenv()
