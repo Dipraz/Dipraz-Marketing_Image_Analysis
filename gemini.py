@@ -7,6 +7,7 @@ import google.generativeai as genai
 import cv2
 import tempfile
 import re
+import imageio
 
 # Load environment variables from .env file
 load_dotenv()
@@ -43,6 +44,7 @@ else:
     def resize_image(image, max_size=(300, 250)):
         image.thumbnail(max_size)
         return image
+
     def extract_frames(video_file_path, num_frames=5):
         """Extracts frames from a video file using OpenCV."""
         cap = cv2.VideoCapture(video_file_path)
@@ -62,8 +64,7 @@ else:
     
             # Convert color space and create a PIL Image from bytes
             frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            _, buffer = cv2.imencode('.jpg', frame_rgb)
-            pil_image = Image.open(io.BytesIO(buffer))
+            pil_image = Image.fromarray(frame_rgb)
             frames.append(pil_image)
     
         cap.release()
@@ -84,6 +85,14 @@ else:
                 st.error("No frames were extracted from the video. Please check the video format.")
                 return None
     
+            prompt = (
+                "Analyze the media (image or video frame) for various marketing aspects, ensuring consistent results for each aspect. "
+                "Respond in single words or short phrases separated by commas for each attribute: text amount (High or Low), "
+                "Color usage (Effective or Not effective), visual cues (Present or Absent), emotion (Positive or Negative), "
+                "Focus (Central message or Scattered), customer-centric (Yes or No), credibility (High or Low), "
+                "User interaction (High, Moderate, or Low), CTA presence (Yes or No), CTA clarity (Clear or Unclear)."
+            )
+    
             response = model.generate_content([prompt, frames[0]])  # Analyzing the first frame
             if response.candidates:
                 return response.candidates[0].content.parts[0].text.strip()
@@ -99,10 +108,11 @@ else:
         st.session_state.headlines = {}
     if 'headline_result' not in st.session_state:
         st.session_state.headline_result = None    
+
     def analyze_media(uploaded_file, is_image=True):
         # General prompt for both images and videos
         prompt = (
-            "Analyze the media (image or video frame) for various marketing aspects, ensuring consistent results for each aspects. "
+            "Analyze the media (image or video frame) for various marketing aspects, ensuring consistent results for each aspect. "
             "Respond in single words or short phrases separated by commas for each attribute: text amount (High or Low), "
             "Color usage (Effective or Not effective), visual cues (Present or Absent), emotion (Positive or Negative), "
             "Focus (Central message or Scattered), customer-centric (Yes or No), credibility (High or Low), "
@@ -140,6 +150,7 @@ else:
         except Exception as e:
             st.error(f"Failed to read or process the media: {e}")
             return None
+
     def combined_marketing_analysis_V6(uploaded_file, is_image=True):
         prompt = """
         Imagine you are a UX design and marketing analysis consultant reviewing a visual asset (image or video) for a client.
@@ -293,39 +304,40 @@ Evaluate the extracted text based on the following criteria. For each aspect, pr
         except Exception as e:
             st.error(f"Failed to read or process the media: {e}")
             return None
+
     def headline_analysis(uploaded_file, is_image=True):
         prompt = """
-    Imagine you are a marketing consultant reviewing the headline text of a marketing asset (image or video) for a client. 
+    Imagine you are a marketing consultant reviewing the headline text of a marketing asset ({'image' if is_image else 'video'}) for a client. 
     Your task is to assess the headline's effectiveness based on various linguistic and marketing criteria.
-    
-    **Part 1: Headline Extraction and Context**
-      **Image/Video:**
-        1. **Headline Identification:**
-            * **Main Headline:** Clearly state the main headline extracted from the image or video.
-            * **Image Headline (if applicable):** If the image contains a distinct headline separate from the main headline, clearly state it here.
-            * **Supporting Headline (if applicable):** If there is a supporting headline present, clearly state it here.
-    
-    **Part 2: Headline Analysis**
-    Analyze the extracted headline(s) and present the results in a well-formatted table:
-    
-    | Criterion             | Main Headline Assessment | Image Headline Assessment (if applicable) | Supporting Headline Assessment (if applicable) | Explanation                                                                                     | Main Headline Assessment | Image Headline Assessment (if applicable) | Supporting Headline Assessment (if applicable) | Explanation                                                                                     |
-    |-----------------------|--------------------------|------------------------------------------|-----------------------------------------------|-------------------------------------------------------------------------------------------------|--------------------------|------------------------------------------|-----------------------------------------------|-------------------------------------------------------------------------------------------------|
-    | Clarity               | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _Example: How easily and quickly does the headline convey the main point?_                       |                          |                                          |                                               | _Example: To improve, consider simplifying the language for better clarity._                   |
-    | Customer Focus        | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _Example: Does the headline emphasize a customer-centric approach, addressing their needs or interests?_ |                          |                                          |                                               | _Example: To improve, consider addressing the customer's needs more directly._                 |
-    | Relevance             | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _Example: How well does the headline reflect the visual content of the image or video?_          |                          |                                          |                                               | _Example: To improve, consider aligning the headline more closely with the visual content._     |
-    | Emotional Appeal      | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _Example: Does the headline evoke curiosity, excitement, or other emotions that resonate with the target audience?_ |                          |                                          |                                               | _Example: To improve, consider using more emotionally evocative language._                      |
-    | Uniqueness            | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _Example: How original and memorable is the headline compared to typical marketing messages?_    |                          |                                          |                                               | _Example: To improve, consider making the headline more distinctive._                          |
-    | Urgency & Curiosity   | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _Example: Does the headline create a sense of urgency or pique curiosity to learn more?_         |                          |                                          |                                               | _Example: To improve, consider adding elements that create urgency or curiosity._              |
-    | Benefit-Driven        | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _Example: Does the headline clearly communicate a specific benefit or value proposition to the audience?_ |                          |                                          |                                               | _Example: To improve, consider highlighting specific benefits more clearly._                   |
-    | Target Audience       | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _Example: Is the headline's language, tone, and style tailored to the specific target audience?_ |                          |                                          |                                               | _Example: To improve, consider adjusting the tone and style to better suit the target audience._ |
-    | Length & Format       | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _Example: Is the headline concise (ideally 6-12 words) and does it use formatting effectively?_   |                          |                                          |                                               | _Example: To improve, consider optimizing the length and format of the headline._               |
-    | Overall Effectiveness | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _Example: Overall rating of the headline's effectiveness based on all criteria._                 |                          |                                          |                                               | _Example: To improve, consider addressing the identified weaknesses in specific criteria._      |
-    
-    **Part 3: Improved Headline Suggestions**
-    Provide three alternative headlines that improve upon the original while maintaining relevance to the visual content and the target audience:
-    * **Option 1:**
-    * **Option 2:**
-    * **Option 3:**
+
+**Part 1: Headline Extraction and Context**
+  **Image/Video:**
+    1. **Headline Identification:**
+        * **Main Headline:** Clearly state the main headline extracted from the image or video.
+        * **Image Headline (if applicable):** If the image contains a distinct headline separate from the main headline, clearly state it here.
+        * **Supporting Headline (if applicable):** If there is a supporting headline present, clearly state it here.
+
+**Part 2: Headline Analysis**
+Analyze the extracted headline(s) and present the results in a well-formatted table:
+
+| Criterion             | Main Headline Assessment | Image Headline Assessment (if applicable) | Supporting Headline Assessment (if applicable) | Explanation                                                                                     | Main Headline Improvement | Image Headline Improvement (if applicable) | Supporting Headline Improvement (if applicable) |
+|-----------------------|--------------------------|------------------------------------------|-----------------------------------------------|-------------------------------------------------------------------------------------------------|---------------------------|--------------------------------------------|------------------------------------------------|
+| Clarity               | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _Example: How easily and quickly does the headline convey the main point?_                       | _Example: To improve, consider simplifying the language for better clarity._ | _Example: To improve, consider simplifying the language for better clarity._ | _Example: To improve, consider simplifying the language for better clarity._ |
+| Customer Focus        | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _Example: Does the headline emphasize a customer-centric approach, addressing their needs or interests?_ | _Example: To improve, consider addressing the customer's needs more directly._ | _Example: To improve, consider addressing the customer's needs more directly._ | _Example: To improve, consider addressing the customer's needs more directly._ |
+| Relevance             | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _Example: How well does the headline reflect the visual content of the image or video?_          | _Example: To improve, consider aligning the headline more closely with the visual content._ | _Example: To improve, consider aligning the headline more closely with the visual content._ | _Example: To improve, consider aligning the headline more closely with the visual content._ |
+| Emotional Appeal      | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _Example: Does the headline evoke curiosity, excitement, or other emotions that resonate with the target audience?_ | _Example: To improve, consider using more emotionally evocative language._ | _Example: To improve, consider using more emotionally evocative language._ | _Example: To improve, consider using more emotionally evocative language._ |
+| Uniqueness            | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _Example: How original and memorable is the headline compared to typical marketing messages?_    | _Example: To improve, consider making the headline more distinctive._ | _Example: To improve, consider making the headline more distinctive._ | _Example: To improve, consider making the headline more distinctive._ |
+| Urgency & Curiosity   | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _Example: Does the headline create a sense of urgency or pique curiosity to learn more?_         | _Example: To improve, consider adding elements that create urgency or curiosity._ | _Example: To improve, consider adding elements that create urgency or curiosity._ | _Example: To improve, consider adding elements that create urgency or curiosity._ |
+| Benefit-Driven        | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _Example: Does the headline clearly communicate a specific benefit or value proposition to the audience?_ | _Example: To improve, consider highlighting specific benefits more clearly._ | _Example: To improve, consider highlighting specific benefits more clearly._ | _Example: To improve, consider highlighting specific benefits more clearly._ |
+| Target Audience       | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _Example: Is the headline's language, tone, and style tailored to the specific target audience?_ | _Example: To improve, consider adjusting the tone and style to better suit the target audience._ | _Example: To improve, consider adjusting the tone and style to better suit the target audience._ | _Example: To improve, consider adjusting the tone and style to better suit the target audience._ |
+| Length & Format       | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _Example: Is the headline concise (ideally 6-12 words) and does it use formatting effectively?_   | _Example: To improve, consider optimizing the length and format of the headline._ | _Example: To improve, consider optimizing the length and format of the headline._ | _Example: To improve, consider optimizing the length and format of the headline._ |
+| Overall Effectiveness | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _Example: Overall rating of the headline's effectiveness based on all criteria._                 | _Example: To improve, consider addressing the identified weaknesses in specific criteria._ | _Example: To improve, consider addressing the identified weaknesses in specific criteria._ | _Example: To improve, consider addressing the identified weaknesses in specific criteria._ |
+
+**Part 3: Improved Headline Suggestions**
+Provide three alternative headlines that improve upon the original while maintaining relevance to the visual content and the target audience:
+* **Option 1:**
+* **Option 2:**
+* **Option 3:**
         """
         try:
             if is_image:
@@ -335,11 +347,13 @@ Evaluate the extracted text based on the following criteria. For each aspect, pr
                 with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
                     tmp.write(uploaded_file.read())
                     tmp_path = tmp.name
+
                 frames = extract_frames(tmp_path)
-                if not frames:
+                if frames is None or not frames:  # Check if frames were extracted successfully
                     st.error("No frames were extracted from the video. Please check the video format.")
                     return None
-                response = model.generate_content([prompt, frames[0]])
+
+                response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
 
             if response.candidates:
                 raw_response = response.candidates[0].content.parts[0].text.strip()
@@ -365,7 +379,7 @@ Evaluate the extracted text based on the following criteria. For each aspect, pr
 
     def headline_detailed_analysis(uploaded_file, is_image=True):
         prompt = """
-        Imagine you are a marketing consultant reviewing the headline text of a marketing asset (image or video) for a client. 
+        Imagine you are a marketing consultant reviewing the headline text of a marketing asset ({'image' if is_image else 'video'}) for a client. 
         Your task is to assess the headline's effectiveness based on various linguistic and marketing criteria.
         
         **Part 1: Headline Extraction and Context**
@@ -373,6 +387,8 @@ Evaluate the extracted text based on the following criteria. For each aspect, pr
             1. **Headline Identification:**
                 * **Main Headline:** Clearly state the main headline extracted from the image or video.
                 * **Image Headline (if applicable):** If the image contains a distinct headline separate from the main headline, clearly state it here.
+                * **Supporting Headline (if applicable):** If there is a supporting headline present, clearly state it here.
+                
         **Part 2: Headline Analysis**
         Analyze the extracted headline(s) and present the results in a well-formatted table:
         
@@ -425,15 +441,12 @@ Evaluate the extracted text based on the following criteria. For each aspect, pr
             return None
 
     def flash_analysis(uploaded_file, is_image=True):
-        prompt = """
-        Imagine you are a visual content analyst reviewing a marketing asset (image or video) for a client. Your goal is to provide a detailed, objective description that captures essential information relevant to marketing decisions.
-        
+        prompt = f"""
+        Imagine you are a visual content analyst reviewing a marketing asset ({'image' if is_image else 'video'}) for a client. Your goal is to provide a detailed, objective description that captures essential information relevant to marketing decisions.
+
         Instructions:
-        
-        1. Asset Identification:
-            - Clearly identify the type of asset (image or video).
-        
-        2. Detailed Description:
+
+        1. Detailed Description:
             - For images:
                 - Describe the prominent visual elements (objects, people, animals, settings).
                 - Note the dominant colors and their overall effect.
@@ -444,28 +457,27 @@ Evaluate the extracted text based on the following criteria. For each aspect, pr
                 - Note the visual style, color palette, and editing techniques.
                 - Mention any text overlays, captions, or speech, transcribing if possible.
                 - Identify the background music or sound effects, if present.
-        
-        3. Cultural References and Symbolism:
+
+        2. Cultural References and Symbolism:
             - Identify any cultural references, symbols, or visual metaphors that could be significant to the target audience.
             - Explain how these elements might be interpreted or resonate with the audience.
-        
-        4. Marketing Implications:
+
+        3. Marketing Implications:
             - Briefly summarize the potential marketing implications based on the visual and textual elements.
             - Consider how the asset might appeal to different demographics or interests.
             - Mention any potential positive or negative associations it may evoke.
-        
-        5. Additional Notes:
+
+        4. Additional Notes:
             - If analyzing a video, focus on the most representative frame(s) for the initial description.
             - Mention any significant changes or variations in visuals or text throughout the video.
-        
+
         Please ensure your description is:
-        
+
         - Objective: Focus on factual details and avoid subjective interpretations or opinions.
         - Detailed: Provide enough information for the client to understand the asset's visual and textual content.
         - Marketing-Oriented: Highlight elements that are relevant to marketing strategy and decision-making.
         - Consistent: Provide similar descriptions for the same asset, regardless of how many times you analyze it.
-        """
-
+        """ 
         try:
             if is_image:
                 image = Image.open(io.BytesIO(uploaded_file.read()))
@@ -502,17 +514,24 @@ Evaluate the extracted text based on the following criteria. For each aspect, pr
                     tmp_path = tmp.name
 
                 frames = extract_frames(tmp_path)
-                if frames is None or not frames:  # Check if frames were extracted successfully
+                if frames is None or len(frames) == 0:
                     st.error("No frames were extracted from the video. Please check the video format.")
                     return None
 
-                response = model.generate_content([custom_prompt, frames[0]])  # Using the first frame for analysis
+                responses = []
+                for frame in frames:
+                    response = model.generate_content([custom_prompt, frame])
+                    if response.candidates and len(response.candidates[0].content.parts) > 0:
+                        responses.append(response.candidates[0].content.parts[0].text.strip())
+                    else:
+                        responses.append("No valid response for this frame.")
 
-            if response.candidates:
-                raw_response = response.candidates[0].content.parts[0].text.strip()
-                return raw_response
+                return "\n".join(responses)  # Combine responses from all frames
+
+            if response.candidates and len(response.candidates[0].content.parts) > 0:
+                return response.candidates[0].content.parts[0].text.strip()
             else:
-                st.error("Unexpected response structure from the model.")
+                st.error("Model did not provide a valid response or the response structure was unexpected.")
                 return None
         except Exception as e:
             st.error(f"Failed to read or process the media: {e}")
@@ -544,19 +563,18 @@ Evaluate the extracted text based on the following criteria. For each aspect, pr
             else:
                 col2.video(uploaded_file, format="video/mp4")
 
-            # Basic analysis
+            uploaded_file.seek(0)  # Reset file pointer for re-use
+
+            # Use the 'is_image' flag correctly in function calls
             if basic_analysis:
                 with st.spinner("Performing basic analysis..."):
-                    uploaded_file.seek(0)
                     basic_analysis_result = analyze_media(uploaded_file, is_image)
                     if basic_analysis_result:
                         st.write("## Basic Analysis Results:")
                         st.json(basic_analysis_result)
 
-            # Combined marketing analysis V6
             if combined_analysis_V6:
                 with st.spinner("Performing combined marketing analysis V6..."):
-                    uploaded_file.seek(0)
                     detailed_result_V6 = combined_marketing_analysis_V6(uploaded_file, is_image)
                     if detailed_result_V6:
                         st.write("## Combined Marketing Analysis V6 Results:")
@@ -564,83 +582,34 @@ Evaluate the extracted text based on the following criteria. For each aspect, pr
 
             if text_analysis_button:
                 with st.spinner("Performing text analysis..."):
-                    uploaded_file.seek(0)
                     text_result = text_analysis(uploaded_file, is_image)
                     if text_result:
                         st.write("## Text Analysis Results:")
                         st.markdown(text_result)
-                        
-            # Headline analysis
+
             if headline_analysis_button:
                 with st.spinner("Performing headline analysis..."):
-                    uploaded_file.seek(0)
                     headline_result = headline_analysis(uploaded_file, is_image)
                     if headline_result:
                         st.write("## Headline Analysis Results:")
                         st.markdown(headline_result)
 
-            # Further Image Headline Analysis button, shows only if image headline is found
-            if 'headline_result' in st.session_state and 'Image Headline' in st.session_state.headlines:
-                if st.button('Further Headline Analysis (Image Headline)'):
-                    with st.spinner("Performing further headline analysis..."):
-                        image_headline = st.session_state.headlines['Image Headline']
-                        further_prompt = f"""Imagine you are a marketing consultant reviewing a visual asset (image or video) and its headline(s) for a client. Your goal is to provide a comprehensive analysis of the headline's effectiveness across various key criteria.
-                        1. Image Headline Evaluation (Image Headline Only: '{image_headline}'):
-                           - Evaluate the Image headline against the following criteria, rating each on a scale from 1 to 5 (1 being poor, 5 being excellent), and provide a concise explanation for each score:
-                           - Clarity: How easily and quickly does the headline convey the main point?
-                           - Customer Focus: Does the headline emphasize a customer-centric approach, addressing their needs or interests?
-                           - Relevance: How well does the headline reflect the visual content of the image or video?
-                           - Emotional Appeal: Does the headline evoke curiosity, excitement, or other emotions that resonate with the target audience?
-                           - Uniqueness: How original and memorable is the headline compared to typical marketing messages?
-                           - Urgency & Curiosity: Does the headline create a sense of urgency or pique curiosity to learn more?
-                           - Benefit-Driven: Does the headline clearly communicate a specific benefit or value proposition to the audience?
-                           - Target Audience: Is the headline's language, tone, and style tailored to the specific target audience?
-                           - Length & Format: Is the headline concise (ideally 6-12 words) and does it use formatting effectively?
-
-                        4. Present Results:
-                           - Display the '{image_headline}' Image headline's evaluation in a table format with columns: Criterion, Score, Explanation, and Improvements. Ensure every cell in the table is filled, and mainly not any of the Improvements column should left empty or N\\A, note that.
-
-                        5. Supporting Headline Evaluation (Optional):
-                           - If applicable, briefly assess any other image headline or supporting headlines and note if they require further analysis. Consider creating a separate table if a more in-depth analysis is needed.
-
-                        6. Total Score:
-                           - Calculate and display the total score for the image headline : '{image_headline}' based on the evaluations.
-
-                        7. Improved Headlines:
-                           - Provide three alternative headlines for the image headline : '{image_headline}' , that addresses any weaknesses identified. Ensure these headlines are free of colons, diverse in structure and style, and aligned with the visual content and the target audience.
-
-                        Note: If analyzing a video, mention any notable changes in headlines or messaging throughout the video.
-                        """                       
-                        further_response = model.generate_content([further_prompt, image])  # Assuming 'image' is correctly scoped
-                        if further_response.candidates:
-                            further_raw_response = further_response.candidates[0].content.parts[0].text.strip()
-                            st.write("Further Headline Analysis Results (Image Headline):")
-                            st.markdown(further_raw_response, unsafe_allow_html=True)
-                        else:
-                            st.error("Unexpected response structure from the model.")
-
-            # Headline optimization report
             if detailed_headline_analysis_button:
                 with st.spinner("Performing Headline Optimization Report analysis..."):
-                    uploaded_file.seek(0)
                     detailed_headline_result = headline_detailed_analysis(uploaded_file, is_image)
                     if detailed_headline_result:
                         st.write("## Headline Optimization Report Results:")
                         st.markdown(detailed_headline_result)
 
-            # Flash analysis
             if flash_analysis_button:
                 with st.spinner("Performing Flash analysis..."):
-                    uploaded_file.seek(0)
                     flash_result = flash_analysis(uploaded_file, is_image)
                     if flash_result:
                         st.write("## Flash Analysis Results:")
                         st.markdown(flash_result)
 
-            # Custom prompt analysis
             if custom_prompt_button:
                 with st.spinner("Performing custom prompt analysis..."):
-                    uploaded_file.seek(0)
                     custom_result = custom_prompt_analysis(uploaded_file, custom_prompt, is_image)
                     if custom_result:
                         st.write("## Custom Prompt Analysis Results:")
