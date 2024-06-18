@@ -293,7 +293,6 @@ Evaluate the extracted text based on the following criteria. For each aspect, pr
         except Exception as e:
             st.error(f"Failed to read or process the media: {e}")
             return None
-
     def headline_analysis(uploaded_file, is_image=True):
         prompt = """
         Imagine you are a marketing consultant reviewing a visual asset (image or video) and its headline(s) for a client. Your goal is to provide a comprehensive analysis of the headline's effectiveness across various key criteria.
