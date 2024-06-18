@@ -295,41 +295,39 @@ Evaluate the extracted text based on the following criteria. For each aspect, pr
             return None
     def headline_analysis(uploaded_file, is_image=True):
         prompt = """
-        Imagine you are a marketing consultant reviewing a visual asset (image or video) and its headline(s) for a client. Your goal is to provide a comprehensive analysis of the headline's effectiveness across various key criteria.
-        1. Content Analysis:
-           - If analyzing an image, examine the visual elements such as key objects, colors, composition, and style, along with the underlying messages or themes conveyed.
-           - If analyzing a video, focus on the most representative frame and consider the overall visual and auditory elements that contribute to the message.
-        
-        2. Headline Identification:
-           - Clearly identify the main headline, Image Headline, and any supporting headlines present in the asset.
-           - Differentiate the main headline from other text elements.
-        
-        3. Headline Evaluation (Main Headline Only):
-           Evaluate the main headline against the following criteria, rating each on a scale from 1 to 5 (1 being poor, 5 being excellent), and provide a concise explanation for each score:
-           - Clarity: How easily and quickly does the headline convey the main point?
-           - Customer Focus: Does the headline emphasize a customer-centric approach, addressing their needs or interests?
-           - Relevance: How well does the headline reflect the visual content of the image or video?
-           - Emotional Appeal: Does the headline evoke curiosity, excitement, or other emotions that resonate with the target audience?
-           - Uniqueness: How original and memorable is the headline compared to typical marketing messages?
-           - Urgency & Curiosity: Does the headline create a sense of urgency or pique curiosity to learn more?
-           - Benefit-Driven: Does the headline clearly communicate a specific benefit or value proposition to the audience?
-           - Target Audience: Is the headline's language, tone, and style tailored to the specific target audience?
-           - Length & Format: Is the headline concise (ideally 6-12 words) and does it use formatting effectively?
-        
-        4. Present Results:
-           - Display the main headline's evaluation in a table format with columns: Criterion, Score, Explanation, and Improvements. Ensure every cell in the table is filled, and mainly not any of the Improvements column should left empty or N\A, note that.
-        
-        5. Supporting Headline Evaluation (Optional):
-           - If applicable, briefly assess any image headline or supporting headlines and note if they require further analysis. Consider creating a separate table if a more in-depth analysis is needed.
-        
-        6. Total Score:
-           - Calculate and display the total score for the main headline based on the evaluations.
-        
-        7. Improved Headlines:
-           - Provide three alternative headlines for the main headline and also the Image Headline that addresses any weaknesses identified. Ensure these headlines are free of colons, diverse in structure and style, and aligned with the visual content and the target audience.
-        
-        Note: If analyzing a video, mention any notable changes in headlines or messaging throughout the video.
+    Imagine you are a marketing consultant reviewing the headline text of a marketing asset (image or video) for a client. 
+    Your task is to assess the headline's effectiveness based on various linguistic and marketing criteria.
+    
+    **Part 1: Headline Extraction and Context**
+      **Image/Video:**
+        1. **Headline Identification:**
+            * **Main Headline:** Clearly state the main headline extracted from the image or video.
+            * **Image Headline (if applicable):** If the image contains a distinct headline separate from the main headline, clearly state it here.
+            * **Supporting Headline (if applicable):** If there is a supporting headline present, clearly state it here.
+    
+    **Part 2: Headline Analysis**
+    Analyze the extracted headline(s) and present the results in a well-formatted table:
+    
+    | Criterion             | Main Headline Assessment                                    | Image Headline Assessment (if applicable)                                  | Supporting Headline Assessment (if applicable)                                  | Explanation | Improvement |
+    |-----------------------|-------------------------------------------------------------|----------------------------------------------------------------------------|---------------------------------------------------------------------------------|-------------|-------------|
+    | Clarity               | _[Rate from 1 to 5]_                                        | _[Rate from 1 to 5]_                                                       | _[Rate from 1 to 5]_                                                            | _Example: How easily and quickly does the headline convey the main point?_ | _Example: To improve, consider simplifying the language for better clarity._ |
+    | Customer Focus        | _[Rate from 1 to 5]_                                        | _[Rate from 1 to 5]_                                                       | _[Rate from 1 to 5]_                                                            | _Example: Does the headline emphasize a customer-centric approach, addressing their needs or interests?_ | _Example: To improve, consider addressing the customer's needs more directly._ |
+    | Relevance             | _[Rate from 1 to 5]_                                        | _[Rate from 1 to 5]_                                                       | _[Rate from 1 to 5]_                                                            | _Example: How well does the headline reflect the visual content of the image or video?_ | _Example: To improve, consider aligning the headline more closely with the visual content._ |
+    | Emotional Appeal      | _[Rate from 1 to 5]_                                        | _[Rate from 1 to 5]_                                                       | _[Rate from 1 to 5]_                                                            | _Example: Does the headline evoke curiosity, excitement, or other emotions that resonate with the target audience?_ | _Example: To improve, consider using more emotionally evocative language._ |
+    | Uniqueness            | _[Rate from 1 to 5]_                                        | _[Rate from 1 to 5]_                                                       | _[Rate from 1 to 5]_                                                            | _Example: How original and memorable is the headline compared to typical marketing messages?_ | _Example: To improve, consider making the headline more distinctive._ |
+    | Urgency & Curiosity   | _[Rate from 1 to 5]_                                        | _[Rate from 1 to 5]_                                                       | _[Rate from 1 to 5]_                                                            | _Example: Does the headline create a sense of urgency or pique curiosity to learn more?_ | _Example: To improve, consider adding elements that create urgency or curiosity._ |
+    | Benefit-Driven        | _[Rate from 1 to 5]_                                        | _[Rate from 1 to 5]_                                                       | _[Rate from 1 to 5]_                                                            | _Example: Does the headline clearly communicate a specific benefit or value proposition to the audience?_ | _Example: To improve, consider highlighting specific benefits more clearly._ |
+    | Target Audience       | _[Rate from 1 to 5]_                                        | _[Rate from 1 to 5]_                                                       | _[Rate from 1 to 5]_                                                            | _Example: Is the headline's language, tone, and style tailored to the specific target audience?_ | _Example: To improve, consider adjusting the tone and style to better suit the target audience._ |
+    | Length & Format       | _[Rate from 1 to 5]_                                        | _[Rate from 1 to 5]_                                                       | _[Rate from 1 to 5]_                                                            | _Example: Is the headline concise (ideally 6-12 words) and does it use formatting effectively?_ | _Example: To improve, consider optimizing the length and format of the headline._ |
+    | Overall Effectiveness | _[Rate from 1 to 5]_                                        | _[Rate from 1 to 5]_                                                       | _[Rate from 1 to 5]_                                                            | _Example: Overall rating of the headline's effectiveness based on all criteria._ | _Example: To improve, consider addressing the identified weaknesses in specific criteria._ |
+    
+    **Part 3: Improved Headline Suggestions**
+    Provide three alternative headlines that improve upon the original while maintaining relevance to the visual content and the target audience:
+    * **Option 1:**
+    * **Option 2:**
+    * **Option 3:**
         """
+
         try:
             if is_image:
                 image = Image.open(io.BytesIO(uploaded_file.read()))
