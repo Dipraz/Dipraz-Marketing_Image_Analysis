@@ -2,11 +2,12 @@ openai
 streamlit
 google-auth
 google-auth-oauthlib
+google-cloud-aiplatform
 google-auth-httplib2
 numpy
+pandas
 google-generativeai
 opencv-python
 python-dotenv
-opencv-python-headless
 pillow
-
+imageio
