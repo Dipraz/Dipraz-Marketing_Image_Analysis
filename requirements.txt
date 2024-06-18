@@ -11,3 +11,4 @@ opencv-python
 python-dotenv
 pillow
 imageio
+opencv-python-headless
