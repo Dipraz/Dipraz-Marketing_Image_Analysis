@@ -43,27 +43,24 @@ else:
     def resize_image(image, max_size=(300, 250)):
         image.thumbnail(max_size)
         return image
-
     def extract_frames(video_file_path, num_frames=5):
-        """Extracts frames from a video file using OpenCV."""
-        cap = cv2.VideoCapture(video_file_path)
-        total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-        frame_step = max(total_frames // num_frames, 1) 
-        frames = []
-        for i in range(0, total_frames, frame_step):
-            cap.set(cv2.CAP_PROP_POS_FRAMES, i)
-            ret, frame = cap.read()
-            if not ret:
-                break
-            
-            # Explicitly convert color space and create a PIL Image from bytes
-            frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            _, buffer = cv2.imencode('.jpg', frame_rgb)
-            pil_image = Image.open(io.BytesIO(buffer))
-            
-            frames.append(pil_image)
-        cap.release()
-        return frames
+        """Extracts frames from a video file using imageio."""
+        try:
+            reader = imageio.get_reader(video_file_path)
+            total_frames = reader.get_length()
+            frame_step = max(total_frames // num_frames, 1)
+            frames = []
+            for i in range(0, total_frames, frame_step):
+                frame = reader.get_data(i)  # Get the frame directly as a numpy array
+                # Create a PIL Image from the numpy array (RGB format)
+                pil_image = Image.fromarray(frame)
+                frames.append(pil_image)
+            reader.close()
+            return frames
+        except Exception as e:
+            st.error(f"Error extracting frames: {e}")
+            return None
+
     # Initialize session state variables for headlines and analysis results
     if 'headlines' not in st.session_state:
         st.session_state.headlines = {}
