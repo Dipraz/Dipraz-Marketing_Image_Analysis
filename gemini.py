@@ -320,35 +320,34 @@ Evaluate the extracted text based on the following criteria. For each aspect, pr
 **Part 2: Headline Analysis**
 Analyze the extracted headline(s) and present the results in a well-formatted table:
 
-| Criterion             | Main Headline Assessment | Image Headline Assessment (if applicable) | Supporting Headline Assessment (if applicable) | Main Headline Explanation | Image Headline Explanation (if applicable) | Supporting Headline Explanation (if applicable) | Main Headline Improvement | Image Headline Improvement (if applicable) | Supporting Headline Improvement (if applicable) |
-|-----------------------|--------------------------|------------------------------------------|-----------------------------------------------|-----------------------------|---------------------------|--------------------------------------------|------------------------------------------------|
-| Clarity               | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _[Explanation for Main Headline Clarity]_ |  _[Suggest improvement if needed, or "N/A"]_ |  _[Suggest improvement if needed, or "N/A"]_ | _[Suggest improvement if needed, or "N/A"]_ |
-| Customer Focus        | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _[Explanation for Main Headline Customer Focus]_ |  _[Suggest improvement if needed, or "N/A"]_ |  _[Suggest improvement if needed, or "N/A"]_ | _[Suggest improvement if needed, or "N/A"]_ |
-| Relevance             | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _[Explanation for Main Headline Relevance]_ |  _[Suggest improvement if needed, or "N/A"]_ |  _[Suggest improvement if needed, or "N/A"]_ | _[Suggest improvement if needed, or "N/A"]_ |
-| Emotional Appeal      | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _[Explanation for Main Headline Emotional Appeal]_ |  _[Suggest improvement if needed, or "N/A"]_ |  _[Suggest improvement if needed, or "N/A"]_ | _[Suggest improvement if needed, or "N/A"]_ |
-| Uniqueness            | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _[Explanation for Main Headline Uniqueness]_ |  _[Suggest improvement if needed, or "N/A"]_ |  _[Suggest improvement if needed, or "N/A"]_ | _[Suggest improvement if needed, or "N/A"]_ |
-| Urgency & Curiosity   | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _[Explanation for Main Headline Urgency & Curiosity]_ |  _[Suggest improvement if needed, or "N/A"]_ |  _[Suggest improvement if needed, or "N/A"]_ | _[Suggest improvement if needed, or "N/A"]_ |
-| Benefit-Driven        | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _[Explanation for Main Headline Benefit-Driven]_ |  _[Suggest improvement if needed, or "N/A"]_ |  _[Suggest improvement if needed, or "N/A"]_ | _[Suggest improvement if needed, or "N/A"]_ |
-| Target Audience       | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _[Explanation for Main Headline Target Audience]_ |  _[Suggest improvement if needed, or "N/A"]_ |  _[Suggest improvement if needed, or "N/A"]_ | _[Suggest improvement if needed, or "N/A"]_ |
-| Length & Format       | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _[Explanation for Main Headline Length & Format]_ |  _[Suggest improvement if needed, or "N/A"]_ |  _[Suggest improvement if needed, or "N/A"]_ | _[Suggest improvement if needed, or "N/A"]_ |
-| Overall Effectiveness | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _[Explanation for Main Headline Overall Effectiveness]_ | _[Suggest improvement if needed, or "N/A"]_ |  _[Suggest improvement if needed, or "N/A"]_ | _[Suggest improvement if needed, or "N/A"]_ |
-
+| Criterion             | Main Headline Assessment | Image Headline Assessment (if applicable) | Supporting Headline Assessment (if applicable) | Main Headline Explanation | Image Headline Explanation (if applicable) | Supporting Headline Explanation (if applicable) |
+|-----------------------|--------------------------|------------------------------------------|-----------------------------------------------|-----------------------------|---------------------------|--------------------------------------------|
+| Clarity               | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _[Explanation for Main Headline Clarity]_ |  _[Explanation for Image Headline Clarity]_ | _[Explanation for Supporting Headline Clarity]_ |
+| Customer Focus        | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _[Explanation for Main Headline Customer Focus]_ |  _[Explanation for Image Headline Customer Focus]_ | _[Explanation for Supporting Headline Customer Focus]_ |
+| Relevance             | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _[Explanation for Main Headline Relevance]_ |  _[Explanation for Image Headline Relevance]_ | _[Explanation for Supporting Headline Relevance]_ |
+| Emotional Appeal      | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _[Explanation for Main Headline Emotional Appeal]_ |  _[Explanation for Image Headline Emotional Appeal]_ | _[Explanation for Supporting Headline Emotional Appeal]_ |
+| Uniqueness            | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _[Explanation for Main Headline Uniqueness]_ |  _[Explanation for Image Headline Uniqueness]_ | _[Explanation for Supporting Headline Uniqueness]_ |
+| Urgency & Curiosity   | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _[Explanation for Main Headline Urgency & Curiosity]_ |  _[Explanation for Image Headline Urgency & Curiosity]_ | _[Explanation for Supporting Headline Urgency & Curiosity]_ |
+| Benefit-Driven        | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _[Explanation for Main Headline Benefit-Driven]_ |  _[Explanation for Image Headline Benefit-Driven]_ | _[Explanation for Supporting Headline Benefit-Driven]_ |
+| Target Audience       | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _[Explanation for Main Headline Target Audience]_ |  _[Explanation for Image Headline Target Audience]_ | _[Explanation for Supporting Headline Target Audience]_ |
+| Length & Format       | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _[Explanation for Main Headline Length & Format]_ |  _[Explanation for Image Headline Length & Format]_ | _[Explanation for Supporting Headline Length & Format]_ |
+| Overall Effectiveness | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _[Explanation for Main Headline Overall Effectiveness]_ |  _[Explanation for Image Headline Overall Effectiveness]_ | _[Explanation for Supporting Headline Overall Effectiveness]_ |
 
 **Part 3: Improved Headline Suggestions**
-Provide **three alternative headlines for each of the following** (where applicable):
-* **Main Headline:**
-  * Option 1:
-  * Option 2:
-  * Option 3:
-* **Image Headline:**
-  * Option 1:
-  * Option 2:
-  * Option 3:
-* **Supporting Headline:**
-  * Option 1:
-  * Option 2:
-  * Option 3:
+Provide three alternative headlines for EACH of the following, along with a brief explanation for each option:
 
+* **Main Headline:**
+  * **Option 1:** [Headline] - [Explanation]
+  * **Option 2:** [Headline] - [Explanation]
+  * **Option 3:** [Headline] - [Explanation]
+* **Image Headline:**
+  * **Option 1:** [Headline] - [Explanation]
+  * **Option 2:** [Headline] - [Explanation]
+  * **Option 3:** [Headline] - [Explanation]
+* **Supporting Headline (if applicable):**
+  * **Option 1:** [Headline] - [Explanation]
+  * **Option 2:** [Headline] - [Explanation]
+  * **Option 3:** [Headline] - [Explanation]
     """
 
         try:
