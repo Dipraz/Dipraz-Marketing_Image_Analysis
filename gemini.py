@@ -306,7 +306,7 @@ Evaluate the extracted text based on the following criteria. For each aspect, pr
             return None
 
     def headline_analysis(uploaded_file, is_image=True):
-        prompt = """
+        prompt = f"""
     Imagine you are a marketing consultant reviewing the headline text of a marketing asset ({'image' if is_image else 'video'}) for a client. 
     Your task is to assess the headline's effectiveness based on various linguistic and marketing criteria.
 
@@ -320,25 +320,37 @@ Evaluate the extracted text based on the following criteria. For each aspect, pr
 **Part 2: Headline Analysis**
 Analyze the extracted headline(s) and present the results in a well-formatted table:
 
-| Criterion             | Main Headline Assessment | Image Headline Assessment (if applicable) | Supporting Headline Assessment (if applicable) | Explanation                                                                                     | Main Headline Improvement | Image Headline Improvement (if applicable) | Supporting Headline Improvement (if applicable) |
-|-----------------------|--------------------------|------------------------------------------|-----------------------------------------------|-------------------------------------------------------------------------------------------------|---------------------------|--------------------------------------------|------------------------------------------------|
-| Clarity               | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _Example: How easily and quickly does the headline convey the main point?_                       | _Example: To improve, consider simplifying the language for better clarity._ | _Example: To improve, consider simplifying the language for better clarity._ | _Example: To improve, consider simplifying the language for better clarity._ |
-| Customer Focus        | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _Example: Does the headline emphasize a customer-centric approach, addressing their needs or interests?_ | _Example: To improve, consider addressing the customer's needs more directly._ | _Example: To improve, consider addressing the customer's needs more directly._ | _Example: To improve, consider addressing the customer's needs more directly._ |
-| Relevance             | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _Example: How well does the headline reflect the visual content of the image or video?_          | _Example: To improve, consider aligning the headline more closely with the visual content._ | _Example: To improve, consider aligning the headline more closely with the visual content._ | _Example: To improve, consider aligning the headline more closely with the visual content._ |
-| Emotional Appeal      | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _Example: Does the headline evoke curiosity, excitement, or other emotions that resonate with the target audience?_ | _Example: To improve, consider using more emotionally evocative language._ | _Example: To improve, consider using more emotionally evocative language._ | _Example: To improve, consider using more emotionally evocative language._ |
-| Uniqueness            | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _Example: How original and memorable is the headline compared to typical marketing messages?_    | _Example: To improve, consider making the headline more distinctive._ | _Example: To improve, consider making the headline more distinctive._ | _Example: To improve, consider making the headline more distinctive._ |
-| Urgency & Curiosity   | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _Example: Does the headline create a sense of urgency or pique curiosity to learn more?_         | _Example: To improve, consider adding elements that create urgency or curiosity._ | _Example: To improve, consider adding elements that create urgency or curiosity._ | _Example: To improve, consider adding elements that create urgency or curiosity._ |
-| Benefit-Driven        | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _Example: Does the headline clearly communicate a specific benefit or value proposition to the audience?_ | _Example: To improve, consider highlighting specific benefits more clearly._ | _Example: To improve, consider highlighting specific benefits more clearly._ | _Example: To improve, consider highlighting specific benefits more clearly._ |
-| Target Audience       | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _Example: Is the headline's language, tone, and style tailored to the specific target audience?_ | _Example: To improve, consider adjusting the tone and style to better suit the target audience._ | _Example: To improve, consider adjusting the tone and style to better suit the target audience._ | _Example: To improve, consider adjusting the tone and style to better suit the target audience._ |
-| Length & Format       | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _Example: Is the headline concise (ideally 6-12 words) and does it use formatting effectively?_   | _Example: To improve, consider optimizing the length and format of the headline._ | _Example: To improve, consider optimizing the length and format of the headline._ | _Example: To improve, consider optimizing the length and format of the headline._ |
-| Overall Effectiveness | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _Example: Overall rating of the headline's effectiveness based on all criteria._                 | _Example: To improve, consider addressing the identified weaknesses in specific criteria._ | _Example: To improve, consider addressing the identified weaknesses in specific criteria._ | _Example: To improve, consider addressing the identified weaknesses in specific criteria._ |
+| Criterion             | Main Headline Assessment | Image Headline Assessment (if applicable) | Supporting Headline Assessment (if applicable) | Main Headline Explanation | Image Headline Explanation (if applicable) | Supporting Headline Explanation (if applicable) | Main Headline Improvement | Image Headline Improvement (if applicable) | Supporting Headline Improvement (if applicable) |
+|-----------------------|--------------------------|------------------------------------------|-----------------------------------------------|-----------------------------|---------------------------|--------------------------------------------|------------------------------------------------|
+| Clarity               | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _[Explanation for Main Headline Clarity]_ |  _[Suggest improvement if needed, or "N/A"]_ |  _[Suggest improvement if needed, or "N/A"]_ | _[Suggest improvement if needed, or "N/A"]_ |
+| Customer Focus        | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _[Explanation for Main Headline Customer Focus]_ |  _[Suggest improvement if needed, or "N/A"]_ |  _[Suggest improvement if needed, or "N/A"]_ | _[Suggest improvement if needed, or "N/A"]_ |
+| Relevance             | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _[Explanation for Main Headline Relevance]_ |  _[Suggest improvement if needed, or "N/A"]_ |  _[Suggest improvement if needed, or "N/A"]_ | _[Suggest improvement if needed, or "N/A"]_ |
+| Emotional Appeal      | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _[Explanation for Main Headline Emotional Appeal]_ |  _[Suggest improvement if needed, or "N/A"]_ |  _[Suggest improvement if needed, or "N/A"]_ | _[Suggest improvement if needed, or "N/A"]_ |
+| Uniqueness            | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _[Explanation for Main Headline Uniqueness]_ |  _[Suggest improvement if needed, or "N/A"]_ |  _[Suggest improvement if needed, or "N/A"]_ | _[Suggest improvement if needed, or "N/A"]_ |
+| Urgency & Curiosity   | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _[Explanation for Main Headline Urgency & Curiosity]_ |  _[Suggest improvement if needed, or "N/A"]_ |  _[Suggest improvement if needed, or "N/A"]_ | _[Suggest improvement if needed, or "N/A"]_ |
+| Benefit-Driven        | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _[Explanation for Main Headline Benefit-Driven]_ |  _[Suggest improvement if needed, or "N/A"]_ |  _[Suggest improvement if needed, or "N/A"]_ | _[Suggest improvement if needed, or "N/A"]_ |
+| Target Audience       | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _[Explanation for Main Headline Target Audience]_ |  _[Suggest improvement if needed, or "N/A"]_ |  _[Suggest improvement if needed, or "N/A"]_ | _[Suggest improvement if needed, or "N/A"]_ |
+| Length & Format       | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _[Explanation for Main Headline Length & Format]_ |  _[Suggest improvement if needed, or "N/A"]_ |  _[Suggest improvement if needed, or "N/A"]_ | _[Suggest improvement if needed, or "N/A"]_ |
+| Overall Effectiveness | _[Rate from 1 to 5]_     | _[Rate from 1 to 5]_                      | _[Rate from 1 to 5]_                           | _[Explanation for Main Headline Overall Effectiveness]_ | _[Suggest improvement if needed, or "N/A"]_ |  _[Suggest improvement if needed, or "N/A"]_ | _[Suggest improvement if needed, or "N/A"]_ |
+
 
 **Part 3: Improved Headline Suggestions**
-Provide three alternative headlines that improve upon the original while maintaining relevance to the visual content and the target audience:
-* **Option 1:**
-* **Option 2:**
-* **Option 3:**
-        """
+Provide **three alternative headlines for each of the following** (where applicable):
+* **Main Headline:**
+  * Option 1:
+  * Option 2:
+  * Option 3:
+* **Image Headline:**
+  * Option 1:
+  * Option 2:
+  * Option 3:
+* **Supporting Headline:**
+  * Option 1:
+  * Option 2:
+  * Option 3:
+
+    """
+
         try:
             if is_image:
                 image = Image.open(io.BytesIO(uploaded_file.read()))
