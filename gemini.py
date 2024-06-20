@@ -457,10 +457,13 @@ Your task is to assess the main headline's effectiveness based on various lingui
 
 **Part 1: Headline Extraction and Context**
 **Image/Video:**
-1. **Main Headline:** Clearly state the main headline extracted from the image or video.
+1. **Headline Identification:**
+    * **Main Headline:** Clearly state the main headline extracted from the image or video.
+    * **Image Headline (if applicable):** If the image contains a distinct headline separate from the main headline, clearly state it here.
+    * **Supporting Headline (if applicable):** If there is a supporting headline present, clearly state it here.
 
 **Part 2: Headline Analysis**
-Analyze the extracted main headline and present the results in a well-formatted table:
+Analyze the extracted Main Headline and present the results in a well-formatted table:
 
 | Criterion               | Score | Explanation                                       | Main Headline Improvement               |
 |-------------------------|-------|---------------------------------------------------|-----------------------------------------|
@@ -517,10 +520,13 @@ Your task is to assess the image headline's effectiveness based on various lingu
 
 **Part 1: Headline Extraction and Context**
 **Image/Video:**
-1. **Image Headline:** Clearly state the image headline extracted from the image or video.
+1. **Headline Identification:**
+    * **Main Headline:** Clearly state the main headline extracted from the image or video.
+    * **Image Headline (if applicable):** If the image contains a distinct headline separate from the main headline, clearly state it here.
+    * **Supporting Headline (if applicable):** If there is a supporting headline present, clearly state it here.
 
 **Part 2: Headline Analysis**
-Analyze the extracted image headline and present the results in a well-formatted table:
+Analyze the extracted Image Headline and present the results in a well-formatted table:
 
 | Criterion               | Score | Explanation                                       | Image Headline Improvement              |
 |-------------------------|-------|---------------------------------------------------|-----------------------------------------|
@@ -577,10 +583,14 @@ Your task is to assess the supporting headline's effectiveness based on various 
 
 **Part 1: Headline Extraction and Context**
 **Image/Video:**
-1. **Supporting Headline:** Clearly state the supporting headline extracted from the image or video.
+1. **Headline Identification:**
+    * **Main Headline:** Clearly state the main headline extracted from the image or video.
+    * **Image Headline (if applicable):** If the image contains a distinct headline separate from the main headline, clearly state it here.
+    * **Supporting Headline (if applicable):** If there is a supporting headline present, clearly state it here.
+
 
 **Part 2: Headline Analysis**
-Analyze the extracted supporting headline and present the results in a well-formatted table:
+Analyze the extracted Supporting Headline and present the results in a well-formatted table:
 
 | Criterion               | Score | Explanation                                       | Supporting Headline Improvement         |
 |-------------------------|-------|---------------------------------------------------|-----------------------------------------|
