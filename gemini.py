@@ -1,3 +1,4 @@
+
 import streamlit as st
 from dotenv import load_dotenv
 import os
@@ -449,6 +450,186 @@ Provide three alternative headlines for EACH of the following, along with a brie
         except Exception as e:
             st.error(f"Failed to read or process the media: {e}")
             return None
+    def main_headline_detailed_analysis(uploaded_file, is_image=True):
+        prompt = f"""
+Imagine you are a marketing consultant reviewing the main headline text of a marketing asset ({'image' if is_image else 'video'}) for a client.
+Your task is to assess the main headline's effectiveness based on various linguistic and marketing criteria.
+
+**Part 1: Headline Extraction and Context**
+**Image/Video:**
+1. **Main Headline:** Clearly state the main headline extracted from the image or video.
+
+**Part 2: Headline Analysis**
+Analyze the extracted main headline and present the results in a well-formatted table:
+
+| Criterion               | Score | Explanation                                       | Main Headline Improvement               |
+|-------------------------|-------|---------------------------------------------------|-----------------------------------------|
+| Clarity                 | _[1-5]_ | _[Explanation for clarity of the main headline]_   | _[Suggested improvement or reason it's effective]_ |
+| Customer Focus          | _[1-5]_ | _[Explanation for customer focus of the main headline]_ | _[Suggested improvement or reason it's effective]_ |
+| Relevance               | _[1-5]_ | _[Explanation for relevance of the main headline]_  | _[Suggested improvement or reason it's effective]_ |
+| Emotional Appeal        | _[1-5]_ | _[Explanation for emotional appeal of the main headline]_ | _[Suggested improvement or reason it's effective]_ |
+| Uniqueness              | _[1-5]_ | _[Explanation for uniqueness of the main headline]_ | _[Suggested improvement or reason it's effective]_ |
+| Urgency & Curiosity     | _[1-5]_ | _[Explanation for urgency & curiosity of the main headline]_ | _[Suggested improvement or reason it's effective]_ |
+| Benefit-Driven          | _[1-5]_ | _[Explanation for benefit-driven nature of the main headline]_ | _[Suggested improvement or reason it's effective]_ |
+| Target Audience         | _[1-5]_ | _[Explanation for target audience focus of the main headline]_ | _[Suggested improvement or reason it's effective]_ |
+| Length & Format         | _[1-5]_ | _[Explanation for length & format of the main headline]_ | _[Suggested improvement or reason it's effective]_ |
+| Overall Effectiveness   | _[1-5]_ | _[Explanation for overall effectiveness of the main headline]_ | _[Suggested improvement or reason it's effective]_ |
+
+Total Score: _[Sum of all scores]_
+
+**Part 3: Improved Headline Suggestions**
+Provide three alternative headlines for the main headline, along with a brief explanation for each option:
+
+* **Option 1:** [Headline] - [Explanation]
+* **Option 2:** [Headline] - [Explanation]
+* **Option 3:** [Headline] - [Explanation]
+    """
+        try:
+            if is_image:
+                image = Image.open(io.BytesIO(uploaded_file.read()))
+                response = model.generate_content([prompt, image])
+            else:
+                with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
+                    tmp.write(uploaded_file.read())
+                    tmp_path = tmp.name
+
+                frames = extract_frames(tmp_path)
+                if frames is None or not frames:  # Check if frames were extracted successfully
+                    st.error("No frames were extracted from the video. Please check the video format.")
+                    return None
+
+                response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
+
+            if response.candidates:
+                raw_response = response.candidates[0].content.parts[0].text.strip()
+                st.write("Headline Optimization Report Results:")
+                st.markdown(raw_response, unsafe_allow_html=True)  # Assuming the response is in HTML table format
+            else:
+                st.error("Unexpected response structure from the model.")
+            return None
+        except Exception as e:
+            st.error(f"Failed to read or process the media: {e}")
+            return None
+    def image_headline_detailed_analysis(uploaded_file, is_image=True):
+        prompt = f"""
+Imagine you are a marketing consultant reviewing the image headline text of a marketing asset ({'image' if is_image else 'video'}) for a client.
+Your task is to assess the image headline's effectiveness based on various linguistic and marketing criteria.
+
+**Part 1: Headline Extraction and Context**
+**Image/Video:**
+1. **Image Headline:** Clearly state the image headline extracted from the image or video.
+
+**Part 2: Headline Analysis**
+Analyze the extracted image headline and present the results in a well-formatted table:
+
+| Criterion               | Score | Explanation                                       | Image Headline Improvement              |
+|-------------------------|-------|---------------------------------------------------|-----------------------------------------|
+| Clarity                 | _[1-5]_ | _[Explanation for clarity of the image headline]_   | _[Suggested improvement or reason it's effective]_ |
+| Customer Focus          | _[1-5]_ | _[Explanation for customer focus of the image headline]_ | _[Suggested improvement or reason it's effective]_ |
+| Relevance               | _[1-5]_ | _[Explanation for relevance of the image headline]_  | _[Suggested improvement or reason it's effective]_ |
+| Emotional Appeal        | _[1-5]_ | _[Explanation for emotional appeal of the image headline]_ | _[Suggested improvement or reason it's effective]_ |
+| Uniqueness              | _[1-5]_ | _[Explanation for uniqueness of the image headline]_ | _[Suggested improvement or reason it's effective]_ |
+| Urgency & Curiosity     | _[1-5]_ | _[Explanation for urgency & curiosity of the image headline]_ | _[Suggested improvement or reason it's effective]_ |
+| Benefit-Driven          | _[1-5]_ | _[Explanation for benefit-driven nature of the image headline]_ | _[Suggested improvement or reason it's effective]_ |
+| Target Audience         | _[1-5]_ | _[Explanation for target audience focus of the image headline]_ | _[Suggested improvement or reason it's effective]_ |
+| Length & Format         | _[1-5]_ | _[Explanation for length & format of the image headline]_ | _[Suggested improvement or reason it's effective]_ |
+| Overall Effectiveness   | _[1-5]_ | _[Explanation for overall effectiveness of the image headline]_ | _[Suggested improvement or reason it's effective]_ |
+
+Total Score: _[Sum of all scores]_
+
+**Part 3: Improved Headline Suggestions**
+Provide three alternative headlines for the image headline, along with a brief explanation for each option:
+
+* **Option 1:** [Headline] - [Explanation]
+* **Option 2:** [Headline] - [Explanation]
+* **Option 3:** [Headline] - [Explanation]
+    """
+        try:
+            if is_image:
+                image = Image.open(io.BytesIO(uploaded_file.read()))
+                response = model.generate_content([prompt, image])
+            else:
+                with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
+                    tmp.write(uploaded_file.read())
+                    tmp_path = tmp.name
+
+                frames = extract_frames(tmp_path)
+                if frames is None or not frames:  # Check if frames were extracted successfully
+                    st.error("No frames were extracted from the video. Please check the video format.")
+                    return None
+
+                response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
+
+            if response.candidates:
+                raw_response = response.candidates[0].content.parts[0].text.strip()
+                st.write("Headline Optimization Report Results:")
+                st.markdown(raw_response, unsafe_allow_html=True)  # Assuming the response is in HTML table format
+            else:
+                st.error("Unexpected response structure from the model.")
+            return None
+        except Exception as e:
+            st.error(f"Failed to read or process the media: {e}")
+            return None
+    def supporting_headline_detailed_analysis(uploaded_file, is_image=True):
+        prompt = f"""
+Imagine you are a marketing consultant reviewing the supporting headline text of a marketing asset ({'image' if is_image else 'video'}) for a client.
+Your task is to assess the supporting headline's effectiveness based on various linguistic and marketing criteria.
+
+**Part 1: Headline Extraction and Context**
+**Image/Video:**
+1. **Supporting Headline:** Clearly state the supporting headline extracted from the image or video.
+
+**Part 2: Headline Analysis**
+Analyze the extracted supporting headline and present the results in a well-formatted table:
+
+| Criterion               | Score | Explanation                                       | Supporting Headline Improvement         |
+|-------------------------|-------|---------------------------------------------------|-----------------------------------------|
+| Clarity                 | _[1-5]_ | _[Explanation for clarity of the supporting headline]_   | _[Suggested improvement or reason it's effective]_ |
+| Customer Focus          | _[1-5]_ | _[Explanation for customer focus of the supporting headline]_ | _[Suggested improvement or reason it's effective]_ |
+| Relevance               | _[1-5]_ | _[Explanation for relevance of the supporting headline]_  | _[Suggested improvement or reason it's effective]_ |
+| Emotional Appeal        | _[1-5]_ | _[Explanation for emotional appeal of the supporting headline]_ | _[Suggested improvement or reason it's effective]_ |
+| Uniqueness              | _[1-5]_ | _[Explanation for uniqueness of the supporting headline]_ | _[Suggested improvement or reason it's effective]_ |
+| Urgency & Curiosity     | _[1-5]_ | _[Explanation for urgency & curiosity of the supporting headline]_ | _[Suggested improvement or reason it's effective]_ |
+| Benefit-Driven          | _[1-5]_ | _[Explanation for benefit-driven nature of the supporting headline]_ | _[Suggested improvement or reason it's effective]_ |
+| Target Audience         | _[1-5]_ | _[Explanation for target audience focus of the supporting headline]_ | _[Suggested improvement or reason it's effective]_ |
+| Length & Format         | _[1-5]_ | _[Explanation for length & format of the supporting headline]_ | _[Suggested improvement or reason it's effective]_ |
+| Overall Effectiveness   | _[1-5]_ | _[Explanation for overall effectiveness of the supporting headline]_ | _[Suggested improvement or reason it's effective]_ |
+
+Total Score: _[Sum of all scores]_
+
+**Part 3: Improved Headline Suggestions**
+Provide three alternative headlines for the supporting headline, along with a brief explanation for each option:
+
+* **Option 1:** [Headline] - [Explanation]
+* **Option 2:** [Headline] - [Explanation]
+* **Option 3:** [Headline] - [Explanation]
+    """
+        try:
+            if is_image:
+                image = Image.open(io.BytesIO(uploaded_file.read()))
+                response = model.generate_content([prompt, image])
+            else:
+                with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
+                    tmp.write(uploaded_file.read())
+                    tmp_path = tmp.name
+
+                frames = extract_frames(tmp_path)
+                if frames is None or not frames:  # Check if frames were extracted successfully
+                    st.error("No frames were extracted from the video. Please check the video format.")
+                    return None
+
+                response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
+
+            if response.candidates:
+                raw_response = response.candidates[0].content.parts[0].text.strip()
+                st.write("Headline Optimization Report Results:")
+                st.markdown(raw_response, unsafe_allow_html=True)  # Assuming the response is in HTML table format
+            else:
+                st.error("Unexpected response structure from the model.")
+            return None
+        except Exception as e:
+            st.error(f"Failed to read or process the media: {e}")
+            return None
 
     def flash_analysis(uploaded_file, is_image=True):
         prompt = f"""
@@ -566,6 +747,9 @@ Provide three alternative headlines for EACH of the following, along with a brie
         combined_analysis_V6 = st.button('Combined Detailed Marketing Analysis V6')
         text_analysis_button = st.button('Text Analysis')
         headline_analysis_button = st.button('Headline Analysis')
+        main_headline_analysis_button = st.button('Main Headline Analysis')
+        image_headline_analysis_button = st.button('Image Headline Analysis')
+        supporting_headline_analysis_button = st.button('Supporting Headline Analysis')
         detailed_headline_analysis_button = st.button('Headline Optimization Report')
         flash_analysis_button = st.button('Flash Analysis')
         custom_prompt = st.text_area("Enter your custom prompt here:")
@@ -615,6 +799,24 @@ Provide three alternative headlines for EACH of the following, along with a brie
                         st.write("## Headline Analysis Results:")
                         st.markdown(headline_result)
 
+            if main_headline_analysis_button:
+                with st.spinner("Performing Main Headline Analysis..."):
+                    main_headline_result = main_headline_detailed_analysis(uploaded_file, is_image)
+                    if main_headline_result:
+                        st.write("## Main Headline Analysis Results:")
+                        st.markdown(main_headline_result)
+            if image_headline_analysis_button:
+                with st.spinner("Performing Image Headline Analysis..."):
+                    image_detailed_headline_result = image_headline_detailed_analysis(uploaded_file, is_image)
+                    if image_detailed_headline_result:
+                        st.write("## Image Headline Analysis Results:")
+                        st.markdown(image_detailed_headline_result)
+            if supporting_headline_analysis_button:
+                with st.spinner("Performing Supporting Headline Analysis..."):
+                    supporting_detailed_headline_result = supporting_headline_detailed_analysis(uploaded_file, is_image)
+                    if supporting_detailed_headline_result:
+                        st.write("## Supporting Headline Analysis Report Results:")
+                        st.markdown(supporting_detailed_headline_result)
             if detailed_headline_analysis_button:
                 with st.spinner("Performing Headline Optimization Report analysis..."):
                     detailed_headline_result = headline_detailed_analysis(uploaded_file, is_image)
