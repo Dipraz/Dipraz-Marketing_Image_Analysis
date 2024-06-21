@@ -451,19 +451,21 @@ Provide three alternative headlines for EACH of the following, along with a brie
             st.error(f"Failed to read or process the media: {e}")
             return None
     def main_headline_detailed_analysis(uploaded_file, is_image=True):
-        prompt = f"""
+        prompt =  f"""
 Imagine you are a marketing consultant reviewing the main headline text of a marketing asset ({'image' if is_image else 'video'}) for a client.
 Your task is to assess the main headline's effectiveness based on various linguistic and marketing criteria.
 
 **Part 1: Headline Extraction and Context**
 **Image/Video:**
 1. **Headline Identification:**
-    * **Main Headline:** Clearly state the main headline extracted from the image or video.
-    * **Image Headline (if applicable):** If the image contains a distinct headline separate from the main headline, clearly state it here.
-    * **Supporting Headline (if applicable):** If there is a supporting headline present, clearly state it here.
+  * **Main Headline:** Clearly state the main headline extracted from the image or video.
+  * **Image Headline (if applicable):** If the image contains a distinct headline separate from the main headline, clearly state it here.
+  * **Supporting Headline (if applicable):** If there is a supporting headline present, clearly state it here.
 
 **Part 2: Headline Analysis**
 Analyze the extracted Main Headline and present the results in a well-formatted table:
+
+Headline being analyzed: [Main Headline]
 
 | Criterion               | Score | Explanation                                       | Main Headline Improvement               |
 |-------------------------|-------|---------------------------------------------------|-----------------------------------------|
@@ -521,12 +523,14 @@ Your task is to assess the image headline's effectiveness based on various lingu
 **Part 1: Headline Extraction and Context**
 **Image/Video:**
 1. **Headline Identification:**
-    * **Main Headline:** Clearly state the main headline extracted from the image or video.
-    * **Image Headline (if applicable):** If the image contains a distinct headline separate from the main headline, clearly state it here.
-    * **Supporting Headline (if applicable):** If there is a supporting headline present, clearly state it here.
+  * **Main Headline:** Clearly state the main headline extracted from the image or video.
+  * **Image Headline (if applicable):** If the image contains a distinct headline separate from the main headline, clearly state it here.
+  * **Supporting Headline (if applicable):** If there is a supporting headline present, clearly state it here.
 
 **Part 2: Headline Analysis**
 Analyze the extracted Image Headline and present the results in a well-formatted table:
+
+Headline being analyzed: [Image Headline]
 
 | Criterion               | Score | Explanation                                       | Image Headline Improvement              |
 |-------------------------|-------|---------------------------------------------------|-----------------------------------------|
@@ -584,13 +588,14 @@ Your task is to assess the supporting headline's effectiveness based on various 
 **Part 1: Headline Extraction and Context**
 **Image/Video:**
 1. **Headline Identification:**
-    * **Main Headline:** Clearly state the main headline extracted from the image or video.
-    * **Image Headline (if applicable):** If the image contains a distinct headline separate from the main headline, clearly state it here.
-    * **Supporting Headline (if applicable):** If there is a supporting headline present, clearly state it here.
-
+  * **Main Headline:** Clearly state the main headline extracted from the image or video.
+  * **Image Headline (if applicable):** If the image contains a distinct headline separate from the main headline, clearly state it here.
+  * **Supporting Headline (if applicable):** If there is a supporting headline present, clearly state it here.
 
 **Part 2: Headline Analysis**
 Analyze the extracted Supporting Headline and present the results in a well-formatted table:
+
+Headline being analyzed: [Supporting Headline]
 
 | Criterion               | Score | Explanation                                       | Supporting Headline Improvement         |
 |-------------------------|-------|---------------------------------------------------|-----------------------------------------|
