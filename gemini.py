@@ -1,4 +1,3 @@
-
 import streamlit as st
 from dotenv import load_dotenv
 import os
@@ -754,36 +753,61 @@ Provide three alternative headlines for the supporting headline, along with a br
             return None
 
 
-    # Streamlit UI setup
-    st.title('Marketing Media Analysis AI Assistant')
+    st.title("Marketing Media Analysis AI Assistant")
+
+    # --- Sidebar ---
     with st.sidebar:
-        st.header("Options")
-        basic_analysis = st.button('Basic Analysis')
-        combined_analysis_V6 = st.button('Combined Detailed Marketing Analysis V6')
-        text_analysis_button = st.button('Text Analysis')
-        headline_analysis_button = st.button('Headline Analysis')
-        main_headline_analysis_button = st.button('Main Headline Analysis')
-        image_headline_analysis_button = st.button('Image Headline Analysis')
-        supporting_headline_analysis_button = st.button('Supporting Headline Analysis')
-        detailed_headline_analysis_button = st.button('Headline Optimization Report')
-        flash_analysis_button = st.button('Flash Analysis')
-        custom_prompt = st.text_area("Enter your custom prompt here:")
-        custom_prompt_button = st.button('Send Custom Prompt')
+        st.header("Analysis Options")
 
-    col1, col2 = st.columns(2)
-    uploaded_files = col1.file_uploader("Upload your marketing media here:", accept_multiple_files=True, type=['png', 'jpg', 'jpeg', 'mp4', 'avi'])
+        # Tabs for better organization
+        tab1, tab2, tab3 = st.tabs(["Basic", "Detailed", "Headlines"])
 
-    if uploaded_files is not None:
-        for uploaded_file in uploaded_files:
-            is_image = uploaded_file.type in ['image/png', 'image/jpg', 'image/jpeg']
-            if is_image:
-                image = Image.open(uploaded_file)
-                image = resize_image(image)
-                col2.image(image, caption="Uploaded Image", use_column_width=True)
-            else:
-                col2.video(uploaded_file, format="video/mp4")
+        with tab1:
+            basic_analysis = st.button("Basic Analysis")
+            flash_analysis_button = st.button("Flash Analysis")
 
-            uploaded_file.seek(0)  # Reset file pointer for re-use
+        with tab2:
+            combined_analysis_V6 = st.button("Combined Marketing Analysis V6")
+            text_analysis_button = st.button("Text Analysis")
+
+        with tab3:
+            headline_analysis_button = st.button("Headline Analysis")
+            detailed_headline_analysis_button = st.button("Headline Optimization Report")
+            main_headline_analysis_button = st.button("Main Headline Analysis")
+            image_headline_analysis_button = st.button("Image Headline Analysis")
+            supporting_headline_analysis_button = st.button("Supporting Headline Analysis")
+
+        st.markdown("---")
+        custom_prompt = st.text_area("Custom Prompt (Optional):")
+        custom_prompt_button = st.button("Analyze with Custom Prompt")
+
+    # --- Main Content Area ---
+
+    # File Uploader with Enhanced UI
+    uploaded_files = st.file_uploader(
+        "Upload Marketing Media (Image or Video):", 
+        accept_multiple_files=True, 
+        type=["png", "jpg", "jpeg", "mp4", "avi"],
+        help="Supported formats: PNG, JPG, JPEG, MP4, AVI",
+    )
+
+    # Display Uploaded Media (Responsive Design)
+    for uploaded_file in uploaded_files:
+        is_image = uploaded_file.type in ["image/png", "image/jpg", "image/jpeg"]
+
+        with st.container():  # Use container for better layout
+            col1, col2 = st.columns([1, 2])  # Adjust column ratio as needed
+
+            with col1:
+                if is_image:
+                    image = Image.open(uploaded_file)
+                    image = resize_image(image)
+                    st.image(image, caption="Uploaded Image", use_column_width=True)
+                else:
+                    st.video(uploaded_file, format="video/mp4")
+
+            with col2:
+                uploaded_file.seek(0)
 
             # Use the 'is_image' flag correctly in function calls
             if basic_analysis:
