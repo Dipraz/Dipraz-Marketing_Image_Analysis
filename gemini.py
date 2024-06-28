@@ -650,7 +650,7 @@ Provide three alternative headlines for the supporting headline, along with a br
         
     def meta_profile(uploaded_file, is_image=True):
         prompt = f"""
-Analyze the uploaded image to develop detailed personas for Facebook advertising, focusing on the specific targeting options available on the platform. The analysis should reveal potential persona types that are likely to engage with the advertisement based on discernible visual elements and implied context within the image. The personas should be tailored to leverage Facebook's detailed targeting capabilities, including location, age, gender, interests, and more.
+Analyze the uploaded image to develop detailed personas for Meta advertising, focusing on the specific targeting options available on the platform. The analysis should reveal potential persona types that are most likely to engage with the advertisement, based on discernible visual elements and implied context within the image. These personas should be precisely tailored to utilize Meta's detailed targeting capabilities, including location, interests, behaviors, and more.
 
 **Persona Development Instructions:**
 
@@ -659,45 +659,49 @@ Analyze the uploaded image to develop detailed personas for Facebook advertising
    - Present these in a table format with columns for 'Persona Type' and 'Description'.
 
 2. **Detailed Persona Profiles:**
-   - For each identified persona type, create a comprehensive profile. Each profile should be presented in a table with the following columns:
+   - For each identified persona type, create a separate comprehensive profile. Present each profile in its own table with the following columns:
       - **Persona Type:** The general category of the persona.
       - **Description:** A brief overview based on the image analysis.
-      - **Analysis:** Detailed characteristics and expected reactions to the ad, tailored to Facebook’s targeting options like age, location, gender, interests, behaviors, device usage, and more.
+      - **Analysis:** Detailed characteristics and expected reactions to the ad, tailored to Meta’s targeting options such as age, location, gender, interests, device usage, and more.
 
 **Important Considerations:**
 
-* **Base on Visual Evidence:** Ensure that all persona deductions are supported by visible elements in the image.
-* **Utilize Facebook’s Targeting Options:** Include specifics such as:
+* **Base on Visual Evidence:** Ensure that all persona deductions are clearly supported by visible elements or scenarios within the image.
+* **Utilize Meta’s Targeting Options:** Detailed use of:
    - **Location:** Suggestions on countries, cities, or areas.
-   - **Age and Gender:** Appropriate age range and gender, if discernible.
-   - **Languages:** Potential languages spoken by the persona.
    - **Interests:** Deductions based on visible activities or preferences.
    - **Behaviors and Purchase Behavior:** Inferred from any visible consumer goods, technology, or lifestyle cues.
    - **Device Usage:** Likely devices used based on the context or settings in the image.
    - **Connections to Pages, Apps, or Events:** If there are implications of prior interactions with similar content.
    - **Life Events, Education Level, Fields of Study, Job Titles, and Industries:** Speculate based on attire, setting, or activities.
 
-**Example Persona Tables Based on an Image of People at a Tech Conference:**
+**Example for Each Persona Type Based on an Image of a Tech Conference:**
 
-**Persona Types Table:**
+**Tech Enthusiast:**
 
-| Persona Type     | Description                            |
-|------------------|----------------------------------------|
-| Tech Enthusiast  | Engaged with the latest technology and gadgets. |
-| Startup Founder  | Interested in entrepreneurship and startup culture. |
-| Software Developer | Likely works in software development, interested in coding and new tech. |
-| Business Professional | Engaged in corporate roles, interested in networking and professional development. |
+| Persona Type     | Description                            | Analysis                                                    |
+|------------------|----------------------------------------|-------------------------------------------------------------|
+| Tech Enthusiast  | Early adopters of technology, often attends tech events | Target with ads for new gadgets, tech conferences, online tech tutorials |
 
-**Detailed Persona Profiles Table:**
+**Startup Founder:**
 
-| Persona Type           | Description               | Analysis                                                    |
-|------------------------|---------------------------|-------------------------------------------------------------|
-| Tech Enthusiast        | Early adopters of technology, often attends tech events | Target with ads for new gadgets, tech conferences, online tech tutorials |
-| Startup Founder        | Young entrepreneurs, engaged in startup ecosystems | Focus on ads for business tools, networking events, investor connections |
-| Software Developer     | Professionals in software development, interested in coding and software updates | Advertise coding bootcamps, new software tools, tech job openings |
-| Business Professional  | Works in a corporate setting, interested in career advancement | Target with professional development courses, seminars, and corporate solutions |
+| Persona Type     | Description                            | Analysis                                                    |
+|------------------|----------------------------------------|-------------------------------------------------------------|
+| Startup Founder  | Young entrepreneurs, engaged in startup ecosystems | Focus on ads for business tools, networking events, investor connections |
 
-This structured approach should guide the generation of actionable persona insights that can be directly applied in Facebook advertising strategies.
+**Software Developer:**
+
+| Persona Type     | Description                            | Analysis                                                    |
+|------------------|----------------------------------------|-------------------------------------------------------------|
+| Software Developer | Professionals in software development, interested in coding and new tech | Advertise coding bootcamps, new software tools, tech job openings |
+
+**Business Professional:**
+
+| Persona Type     | Description                            | Analysis                                                    |
+|------------------|----------------------------------------|-------------------------------------------------------------|
+| Business Professional | Works in a corporate setting, interested in career advancement | Target with professional development courses, seminars, and corporate solutions |
+
+This structured approach ensures each persona is clearly defined and separately analyzed, facilitating the generation of actionable insights for targeted advertising strategies on Meta.
 """
         try:
             if is_image:
@@ -737,7 +741,7 @@ Analyze the uploaded image to develop detailed personas for LinkedIn advertising
    - Present these in a table format with columns for 'Persona Type' and 'Description'.
 
 2. **Detailed Persona Profiles:**
-   - For each identified persona type, create a comprehensive profile. Each profile should be presented in a table with the following columns:
+   - For each identified persona type, create a separate comprehensive profile. Each profile should be presented in its own table with the following columns:
       - **Persona Type:** The general category of the persona.
       - **Description:** A brief overview based on the image analysis.
       - **Analysis:** Detailed characteristics and expected reactions to the ad, tailored to LinkedIn’s targeting options like job seniority, skills, member groups, interests, and more.
@@ -755,24 +759,30 @@ Analyze the uploaded image to develop detailed personas for LinkedIn advertising
    - **Member Groups and Interests:** Connections to professional groups or interests based on the image context.
    - **Traits:** Any discernible behaviors that align with LinkedIn's trait targeting.
 
-**Example Persona Tables Based on an Image of a Corporate Event:**
+**Example for Each Persona Type Based on an Image of a Corporate Event:**
 
-**Persona Types Table:**
-
-| Persona Type         | Description                               |
-|----------------------|-------------------------------------------|
-| Corporate Executive  | High-level decision-makers in large corporations. |
-| Tech Innovator       | Professionals in cutting-edge technology sectors. |
-| HR Specialist        | Human resources professionals focused on talent management and recruitment. |
-| Marketing Guru       | Experts in digital marketing and brand strategy. |
-
-**Detailed Persona Profiles Table:**
+**Corporate Executive:**
 
 | Persona Type         | Description               | Analysis                                                                       |
 |----------------------|---------------------------|--------------------------------------------------------------------------------|
 | Corporate Executive  | Senior leaders at large firms | Target with content on leadership, enterprise solutions, and executive education. |
+
+**Tech Innovator:**
+
+| Persona Type         | Description               | Analysis                                                                       |
+|----------------------|---------------------------|--------------------------------------------------------------------------------|
 | Tech Innovator       | Professionals in tech industries | Focus ads on latest tech trends, innovations, and tech networking events. |
+
+**HR Specialist:**
+
+| Persona Type         | Description               | Analysis                                                                       |
+|----------------------|---------------------------|--------------------------------------------------------------------------------|
 | HR Specialist        | Engaged in recruitment and HR policies | Advertise tools for recruitment, HR software solutions, and professional HR events. |
+
+**Marketing Guru:**
+
+| Persona Type         | Description               | Analysis                                                                       |
+|----------------------|---------------------------|--------------------------------------------------------------------------------|
 | Marketing Guru       | Skilled in marketing strategies | Target with digital marketing tools, analytics software, and marketing seminars. |
 
 This structured approach should guide the generation of actionable persona insights that can be directly applied in LinkedIn advertising strategies.
@@ -814,9 +824,9 @@ Analyze the uploaded image to identify and describe potential advertising person
    - Summarize 2-3 potential customer categories in a table, derived from the image analysis.
    - Columns should include 'Persona Type' and 'Description'.
 
-2. **Detailed Persona Profiles Table:**
-   - Expand on each persona type with a detailed profile in table format.
-   - Columns should include:
+2. **Detailed Persona Profiles:**
+   - For each persona type identified, create a separate comprehensive profile presented in its own table.
+   - Each table should include the following columns:
       - **Name:** A hypothetical name representing the persona.
       - **Location:** General area (e.g., urban, suburban, rural) as suggested by the image.
       - **Gender:** If discernable from the image; otherwise, specify 'Any'.
@@ -842,11 +852,24 @@ Analyze the uploaded image to identify and describe potential advertising person
 | Tech Enthusiast  | Interested in the latest gadgets and tech.   |
 | Social Influencer| Engages frequently with followers on social media. |
 
-**Detailed Persona Profiles Table:**
+**Detailed Persona Profiles:**
+
+**Urban Explorer:**
 
 | Name        | Location    | Gender | Language | Interests        | Behaviors                          | Keywords            | Topics            | Analysis                                      |
 |-------------|-------------|--------|----------|------------------|------------------------------------|---------------------|-------------------|-----------------------------------------------|
 | Alex        | Urban       | Any    | English  | Photography, tech| Posts tech reviews, cityscapes     | #UrbanLife, #Tech   | Technology, Photography | Use ads for tech gadgets, photography courses. |
+
+**Tech Enthusiast:**
+
+| Name        | Location    | Gender | Language | Interests        | Behaviors                          | Keywords            | Topics            | Analysis                                      |
+|-------------|-------------|--------|----------|------------------|------------------------------------|---------------------|-------------------|-----------------------------------------------|
+| Casey       | Urban       | Any    | English  | Gadgets, emerging tech | Engages with tech blogs, reviews products | #TechTrends, #Gadgets | Technology, Gadgets | Promote cutting-edge tech and gadget launches. |
+
+**Social Influencer:**
+
+| Name        | Location    | Gender | Language | Interests        | Behaviors                          | Keywords            | Topics            | Analysis                                      |
+|-------------|-------------|--------|----------|------------------|------------------------------------|---------------------|-------------------|-----------------------------------------------|
 | Jamie       | Urban       | Female | English  | Social media, fashion | Influences fashion trends, engages actively | #Fashion, #SocialMedia | Fashion, Lifestyle | Target with fashion brand collaborations, social media tools. |
 """
         try:
