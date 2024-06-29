@@ -1220,7 +1220,4 @@ Analyze the uploaded image to identify and describe potential advertising person
                     if x_profile_result:
                         st.write("## Headline Optimization Report Results:")
                         st.markdown(x_profile_result)
-                        json_data = convert_to_json(x_profile_result)
-                        xml_data = convert_to_xml(x_profile_result)
-                        st.markdown(create_download_link(json_data, "json", "headline_optimization_report.json"), unsafe_allow_html=True)
-                        st.markdown(create_download_link(xml_data, "xml", "headline_optimization_report.xml"), unsafe_allow_html=True)
+
