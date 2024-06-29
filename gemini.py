@@ -1198,10 +1198,7 @@ Analyze the uploaded image to identify and describe potential advertising person
                     if meta_profile_result:
                         st.write("## Headline Optimization Report Results:")
                         st.markdown(meta_profile_result)
-                        json_data = convert_to_json(meta_profile_result)
-                        xml_data = convert_to_xml(meta_profile_result)
-                        st.markdown(create_download_link(json_data, "json", "headline_optimization_report.json"), unsafe_allow_html=True)
-                        st.markdown(create_download_link(xml_data, "xml", "headline_optimization_report.xml"), unsafe_allow_html=True)
+
                         
             if linkedin_profile_button:
                 with st.spinner("Performing Headline Optimization Report analysis..."):
@@ -1209,11 +1206,7 @@ Analyze the uploaded image to identify and describe potential advertising person
                     if linked_profile_result:
                         st.write("## Headline Optimization Report Results:")
                         st.markdown(linked_profile_result)
-                        json_data = convert_to_json(linked_profile_result)
-                        xml_data = convert_to_xml(linked_profile_result)
-                        st.markdown(create_download_link(json_data, "json", "headline_optimization_report.json"), unsafe_allow_html=True)
-                        st.markdown(create_download_link(xml_data, "xml", "headline_optimization_report.xml"), unsafe_allow_html=True)
-                    
+
             if x_profile_button:
                 with st.spinner("Performing Headline Optimization Report analysis..."):
                     x_profile_result = x_profile(uploaded_file, is_image)
