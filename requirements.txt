@@ -1,4 +1,3 @@
-opencv-python
 openai
 streamlit
 google-auth
@@ -11,3 +10,4 @@ google-generativeai
 pillow
 imageio
 opencv-python-headless
+python-dotenv
