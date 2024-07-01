@@ -8,7 +8,6 @@ google-auth-httplib2
 numpy
 pandas
 google-generativeai
-python-dotenv
 pillow
 imageio
-opencv-python-headless
+opencv-python-headless==4.10.0.84
