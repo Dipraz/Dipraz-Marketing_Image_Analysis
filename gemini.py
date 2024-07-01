@@ -648,6 +648,156 @@ Provide three alternative headlines for the supporting headline, along with a br
             st.error(f"Failed to read or process the media: {e}")
             return None
         
+    def main_headline_analysis(uploaded_file, is_image=True):
+        prompt = f"""
+Imagine you are a marketing consultant reviewing the main headline text of a marketing asset ({'image' if is_image else 'video'}) for a client.
+Your task is to assess the main headline's effectiveness based on various linguistic and marketing criteria.
+
+**Part 1: Main Headline Context**
+    **Image/Video:**
+        - **Main Headline Identification:** Extract and clearly state the main headline from the image or video.
+
+    **Part 2: Main Headline Analysis**
+    Present the results in a well-formatted table for the main headline:
+    | Criterion             | Assessment                   | Explanation                                                      | Recommendation                                       |
+    |-----------------------|------------------------------|------------------------------------------------------------------|------------------------------------------------------|
+    | Word Count            | [Automatic count] words      | The headline has [x] words, which is [appropriate/lengthy].     | Consider [reducing/increasing] the word count to [y].|
+    | Keyword Relevance     | [High/Moderate/Low]          | The headline [includes/misses] relevant keywords such as [x].   | Incorporate [more/specific] keywords like [y].       |
+    | Common Words          | [Number] common words        | Common words [enhance/reduce] readability and appeal.           | [Increase/reduce] the use of common words.           |
+    | Uncommon Words        | [Number] uncommon words      | Uncommon words make the headline [stand out/confusing].         | Balance [common/uncommon] words for clarity.         |
+    | Power Words           | [Number] power words         | Power words [create urgency/may overwhelm] the reader.          | Use power words [more sparingly/more effectively].   |
+    | Emotional Words       | [Number] emotional words     | Emotional tone is [effective/overdone/subtle].                  | Adjust the emotional tone by [modifying x].          |
+    | Sentiment             | [Positive/Negative/Neutral]  | The sentiment is [not aligning well/matching] with the image.   | Match the sentiment more closely with the image.     |
+    | Reading Grade Level   | [Grade level] required       | The headline is [too complex/simple] for the target audience.   | Adapt the reading level to [simplify/complexify].    |
+    **Part 3: Improved Headline Suggestions**
+    Provide suggestions for improving the main headline considering the overall analysis.
+    """
+        try:
+            if is_image:
+                image = Image.open(io.BytesIO(uploaded_file.read()))
+                response = model.generate_content([prompt, image])
+            else:
+                with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
+                    tmp.write(uploaded_file.read())
+                    tmp_path = tmp.name
+
+                frames = extract_frames(tmp_path)
+                if frames is None or not frames:  # Check if frames were extracted successfully
+                    st.error("No frames were extracted from the video. Please check the video format.")
+                    return None
+
+                response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
+
+            if response.candidates:
+                raw_response = response.candidates[0].content.parts[0].text.strip()
+                st.write("Headline Optimization Report Results:")
+                st.markdown(raw_response, unsafe_allow_html=True)  # Assuming the response is in HTML table format
+            else:
+                st.error("Unexpected response structure from the model.")
+            return None
+        except Exception as e:
+            st.error(f"Failed to read or process the media: {e}")
+            return None
+    def image_headline_analysis(uploaded_file, is_image=True):
+        prompt = f"""
+Imagine you are a marketing consultant reviewing the image headline text of a marketing asset ({'image' if is_image else 'video'}) for a client.
+Your task is to assess the image headline's effectiveness based on various linguistic and marketing criteria.
+
+**Part 1: Image Headline Context**
+    **Image/Video:**
+        - **Image Headline Identification:** Extract and clearly state the separate headline from the image or video.
+
+    **Part 2: Image Headline Analysis**
+    Analyze and format the results:
+    | Criterion             | Assessment                   | Explanation                                                      | Recommendation                                       |
+    |-----------------------|------------------------------|------------------------------------------------------------------|------------------------------------------------------|
+    | Word Count            | [Automatic count] words      | The headline length is [appropriate/lengthy] for visibility.     | Adjust the word count to [increase/decrease] clarity.|
+    | Keyword Relevance     | [High/Moderate/Low]          | Headline's keywords [align/do not align] with visual content.    | Enhance keyword alignment for better SEO.            |
+    | Common Words          | [Number] common words        | Common words [aid/hinder] immediate comprehension.               | Optimize common word usage for [audience/type].      |
+    | Uncommon Words        | [Number] uncommon words      | Uncommon words add [uniqueness/confusion].                       | Find a balance in word rarity for better engagement.  |
+    | Power Words           | [Number] power words         | Uses power words to [effectively/too aggressively] engage.       | Adjust power word usage for subtlety.                |
+    | Emotional Words       | [Number] emotional words     | Emotional words [evoke strong/a weak] response.                  | Modify emotional words to better suit the tone.      |
+    | Sentiment             | [Positive/Negative/Neutral]  | Sentiment [supports/contradicts] the visual theme.               | Align the sentiment more with the visual message.    |
+    | Reading Grade Level   | [Grade level] required       | Reading level is [ideal/not ideal] for the target demographic.   | Tailor the complexity to better fit the audience.     |
+    **Part 3: Recommendations**
+    Suggest three improved headlines based on the analysis.
+    """
+        try:
+            if is_image:
+                image = Image.open(io.BytesIO(uploaded_file.read()))
+                response = model.generate_content([prompt, image])
+            else:
+                with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
+                    tmp.write(uploaded_file.read())
+                    tmp_path = tmp.name
+
+                frames = extract_frames(tmp_path)
+                if frames is None or not frames:  # Check if frames were extracted successfully
+                    st.error("No frames were extracted from the video. Please check the video format.")
+                    return None
+
+                response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
+
+            if response.candidates:
+                raw_response = response.candidates[0].content.parts[0].text.strip()
+                st.write("Headline Optimization Report Results:")
+                st.markdown(raw_response, unsafe_allow_html=True)  # Assuming the response is in HTML table format
+            else:
+                st.error("Unexpected response structure from the model.")
+            return None
+        except Exception as e:
+            st.error(f"Failed to read or process the media: {e}")
+            return None
+    def supporting_headline_analysis(uploaded_file, is_image=True):
+        prompt = f"""
+    Review anyImagine you are a marketing consultant reviewing the supporting headline text of a marketing asset ({'image' if is_image else 'video'}) for a client.
+    Your task is to assess the supporting headline's effectiveness based on various linguistic and marketing criteria. supporting headlines in the provided image or video frame as a marketing consultant.
+    **Part 1: Supporting Headline Context**
+    **Image/Video:**
+        - **Supporting Headline Identification:** Identify and state any supporting headlines.
+
+    **Part 2: Supporting Headline Analysis**
+    Format the results as follows:
+    | Criterion             | Assessment                   | Explanation                                                      | Recommendation                                       |
+    |-----------------------|------------------------------|------------------------------------------------------------------|------------------------------------------------------|
+    | Word Count            | [Automatic count] words      | The supporting headline's length is [optimal/too long/short].    | Aim for a word count of [x] for better engagement.   |
+    | Keyword Relevance     | [High/Moderate/Low]          | Keywords used are [not sufficiently/sufficiently] relevant.      | Incorporate more relevant keywords like [y].         |
+    | Common Words          | [Number] common words        | Utilization of common words [enhances/detracts from] impact.     | Adjust common word usage to improve clarity.         |
+    | Uncommon Words        | [Number] uncommon words      | Uncommon words help [distinguish/muddle] the message.            | Use uncommon words to [highlight/clarify] message.   |
+    | Power Words           | [Number] power words         | Power words [effectively/ineffectively] persuade the audience.   | Refine the use of power words for better impact.     |
+    | Emotional Words       | [Number] emotional words     | Emotional expression is [strong/weak], affecting impact.         | Enhance/reduce emotional wording for desired effect. |
+    | Sentiment             | [Positive/Negative/Neutral]  | Sentiment of the headline [aligns/conflicts] with main content.  | Adjust sentiment to [complement/contrast] main tone. |
+    | Reading Grade Level   | [Grade level] required       | The complexity suits [or does not suit] the intended audience.   | Modify to [simplify/complexify] reading level.       |
+    **Part 3: Revised Headline Suggestions**
+    Offer alternative headlines that enhance effectiveness based on the detailed analysis.
+    """
+        try:
+            if is_image:
+                image = Image.open(io.BytesIO(uploaded_file.read()))
+                response = model.generate_content([prompt, image])
+            else:
+                with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
+                    tmp.write(uploaded_file.read())
+                    tmp_path = tmp.name
+
+                frames = extract_frames(tmp_path)
+                if frames is None or not frames:  # Check if frames were extracted successfully
+                    st.error("No frames were extracted from the video. Please check the video format.")
+                    return None
+
+                response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
+
+            if response.candidates:
+                raw_response = response.candidates[0].content.parts[0].text.strip()
+                st.write("Headline Optimization Report Results:")
+                st.markdown(raw_response, unsafe_allow_html=True)  # Assuming the response is in HTML table format
+            else:
+                st.error("Unexpected response structure from the model.")
+            return None
+        except Exception as e:
+            st.error(f"Failed to read or process the media: {e}")
+            return None
+
     def meta_profile(uploaded_file, is_image=True):
         prompt = f"""
 Analyze the uploaded image to develop detailed personas for Meta advertising, focusing on the specific targeting options available on the platform. The analysis should reveal potential persona types that are most likely to engage with the advertisement, based on discernible visual elements and implied context within the image. These personas should be precisely tailored to utilize Meta's detailed targeting capabilities, including location, interests, behaviors, and more.
@@ -1043,7 +1193,10 @@ Analyze the uploaded image to identify and describe potential advertising person
             main_headline_analysis_button = st.button("Main Headline Analysis")
             image_headline_analysis_button = st.button("Image Headline Analysis")
             supporting_headline_analysis_button = st.button("Supporting Headline Analysis")
-            
+            main_headline_text_analysis_button = st.button("Main Headline Text Analysis")
+            image_headline_text_analysis_button = st.button("Image Headline Text Analysis")
+            supporting_headline_text_analysis_button = st.button("Supporting Headline Text Analysis")
+
         with tab4:
             meta_profile_button = st.button("Facebook targeting")
             linkedin_profile_button = st.button("LinkedIn targeting")
@@ -1169,7 +1322,36 @@ Analyze the uploaded image to identify and describe potential advertising person
                         xml_data = convert_to_xml(detailed_headline_result)
                         st.markdown(create_download_link(json_data, "json", "headline_optimization_report.json"), unsafe_allow_html=True)
                         st.markdown(create_download_link(xml_data, "xml", "headline_optimization_report.xml"), unsafe_allow_html=True)
-
+            if main_headline_text_analysis_button:
+                with st.spinner("Performing Image Headline Analysis..."):
+                    main_headline_analysis_result = main_headline_analysis(uploaded_file, is_image)
+                    if main_headline_analysis_result:
+                        st.write("## Image Headline Analysis Results:")
+                        st.markdown(main_headline_analysis_result)
+                        json_data = convert_to_json(main_headline_analysis_result)
+                        xml_data = convert_to_xml(main_headline_analysis_result)
+                        st.markdown(create_download_link(json_data, "json", "image_headline_analysis.json"), unsafe_allow_html=True)
+                        st.markdown(create_download_link(xml_data, "xml", "image_headline_analysis.xml"), unsafe_allow_html=True)                      
+            if image_headline_text_analysis_button:
+                with st.spinner("Performing Image Headline Analysis..."):
+                    image_headline_analysis_result = image_headline_analysis(uploaded_file, is_image)
+                    if image_headline_analysis_result:
+                        st.write("## Image Headline Analysis Results:")
+                        st.markdown(image_headline_analysis_result)
+                        json_data = convert_to_json(image_headline_analysis_result)
+                        xml_data = convert_to_xml(image_headline_analysis_result)
+                        st.markdown(create_download_link(json_data, "json", "image_headline_analysis.json"), unsafe_allow_html=True)
+                        st.markdown(create_download_link(xml_data, "xml", "image_headline_analysis.xml"), unsafe_allow_html=True)
+            if supporting_headline_text_analysis_button:
+                with st.spinner("Performing Image Headline Analysis..."):
+                    supporting_headline_analysis_result = supporting_headline_analysis(uploaded_file, is_image)
+                    if supporting_headline_analysis_result:
+                        st.write("## Image Headline Analysis Results:")
+                        st.markdown(supporting_headline_analysis_result)
+                        json_data = convert_to_json(supporting_headline_analysis_result)
+                        xml_data = convert_to_xml(supporting_headline_analysis_result)
+                        st.markdown(create_download_link(json_data, "json", "image_headline_analysis.json"), unsafe_allow_html=True)
+                        st.markdown(create_download_link(xml_data, "xml", "image_headline_analysis.xml"), unsafe_allow_html=True)
             if flash_analysis_button:
                 with st.spinner("Performing Flash analysis..."):
                     flash_result = flash_analysis(uploaded_file, is_image)
@@ -1198,7 +1380,10 @@ Analyze the uploaded image to identify and describe potential advertising person
                     if meta_profile_result:
                         st.write("## Headline Optimization Report Results:")
                         st.markdown(meta_profile_result)
-
+                        json_data = convert_to_json(meta_profile_result)
+                        xml_data = convert_to_xml(meta_profile_result)
+                        st.markdown(create_download_link(json_data, "json", "headline_optimization_report.json"), unsafe_allow_html=True)
+                        st.markdown(create_download_link(xml_data, "xml", "headline_optimization_report.xml"), unsafe_allow_html=True)
                         
             if linkedin_profile_button:
                 with st.spinner("Performing Headline Optimization Report analysis..."):
@@ -1206,11 +1391,18 @@ Analyze the uploaded image to identify and describe potential advertising person
                     if linked_profile_result:
                         st.write("## Headline Optimization Report Results:")
                         st.markdown(linked_profile_result)
-
+                        json_data = convert_to_json(linked_profile_result)
+                        xml_data = convert_to_xml(linked_profile_result)
+                        st.markdown(create_download_link(json_data, "json", "headline_optimization_report.json"), unsafe_allow_html=True)
+                        st.markdown(create_download_link(xml_data, "xml", "headline_optimization_report.xml"), unsafe_allow_html=True)
+                    
             if x_profile_button:
                 with st.spinner("Performing Headline Optimization Report analysis..."):
                     x_profile_result = x_profile(uploaded_file, is_image)
                     if x_profile_result:
                         st.write("## Headline Optimization Report Results:")
                         st.markdown(x_profile_result)
-
+                        json_data = convert_to_json(x_profile_result)
+                        xml_data = convert_to_xml(x_profile_result)
+                        st.markdown(create_download_link(json_data, "json", "headline_optimization_report.json"), unsafe_allow_html=True)
+                        st.markdown(create_download_link(xml_data, "xml", "headline_optimization_report.xml"), unsafe_allow_html=True)
