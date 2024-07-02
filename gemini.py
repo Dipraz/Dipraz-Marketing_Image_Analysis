@@ -800,58 +800,35 @@ Your task is to assess the image headline's effectiveness based on various lingu
 
     def meta_profile(uploaded_file, is_image=True):
         prompt = f"""
-Analyze the uploaded image to develop detailed personas for Meta advertising, focusing on the specific targeting options available on the platform. The analysis should reveal potential persona types that are most likely to engage with the advertisement, based on discernible visual elements and implied context within the image. These personas should be precisely tailored to utilize Meta's detailed targeting capabilities, including location, interests, behaviors, and more.
+Based on the following targeting elements for Facebook, please describe 4 persona types
+that are most likely to respond to the add. Please present these in a table (Persona Type,
+Description). Once you have identified these, create 4 personas (including names) who
+would be likely to purchase this product, and describe how you would expect them to react
+to it detailing the characteristics. Present each persona with a table (Persona Type,
+Description, Analysis) of the characteristics and analysis. Please include each of the
+characteristic that can be selected in the Facebook targeting, and what you would select.
 
-**Persona Development Instructions:**
+Location: Target users based on countries, states, cities, or even specific addresses and zip
+codes.
+Age: Select the age range of the audience.
+Gender: Target ads specifically to men, women, or all genders.
+Languages: Target users based on the languages they speak.
+Interests: Based on user activities, liked pages, and closely related topics. This includes
+interests in entertainment, fitness, hobbies, and more.
 
-1. **Persona Types Identification:**
-   - Identify 4 distinct persona types that are most likely to respond to the advertisement, based on the image analysis.
-   - Present these in a table format with columns for 'Persona Type' and 'Description'.
-
-2. **Detailed Persona Profiles:**
-   - For each identified persona type, create a separate comprehensive profile. Present each profile in its own table with the following columns:
-      - **Persona Type:** The general category of the persona.
-      - **Description:** A brief overview based on the image analysis.
-      - **Analysis:** Detailed characteristics and expected reactions to the ad, tailored to Meta’s targeting options such as age, location, gender, interests, device usage, and more.
-
-**Important Considerations:**
-
-* **Base on Visual Evidence:** Ensure that all persona deductions are clearly supported by visible elements or scenarios within the image.
-* **Utilize Meta’s Targeting Options:** Detailed use of:
-   - **Location:** Suggestions on countries, cities, or areas.
-   - **Interests:** Deductions based on visible activities or preferences.
-   - **Behaviors and Purchase Behavior:** Inferred from any visible consumer goods, technology, or lifestyle cues.
-   - **Device Usage:** Likely devices used based on the context or settings in the image.
-   - **Connections to Pages, Apps, or Events:** If there are implications of prior interactions with similar content.
-   - **Life Events, Education Level, Fields of Study, Job Titles, and Industries:** Speculate based on attire, setting, or activities.
-
-**Example for Each Persona Type Based on an Image of a Tech Conference:**
-
-**Tech Enthusiast:**
-
-| Persona Type     | Description                            | Analysis                                                    |
-|------------------|----------------------------------------|-------------------------------------------------------------|
-| Tech Enthusiast  | Early adopters of technology, often attends tech events | Target with ads for new gadgets, tech conferences, online tech tutorials |
-
-**Startup Founder:**
-
-| Persona Type     | Description                            | Analysis                                                    |
-|------------------|----------------------------------------|-------------------------------------------------------------|
-| Startup Founder  | Young entrepreneurs, engaged in startup ecosystems | Focus on ads for business tools, networking events, investor connections |
-
-**Software Developer:**
-
-| Persona Type     | Description                            | Analysis                                                    |
-|------------------|----------------------------------------|-------------------------------------------------------------|
-| Software Developer | Professionals in software development, interested in coding and new tech | Advertise coding bootcamps, new software tools, tech job openings |
-
-**Business Professional:**
-
-| Persona Type     | Description                            | Analysis                                                    |
-|------------------|----------------------------------------|-------------------------------------------------------------|
-| Business Professional | Works in a corporate setting, interested in career advancement | Target with professional development courses, seminars, and corporate solutions |
-
-This structured approach ensures each persona is clearly defined and separately analyzed, facilitating the generation of actionable insights for targeted advertising strategies on Meta.
+Behaviors: Includes user behavior based on device usage, travel patterns, purchase
+behavior, and more.
+Purchase Behavior: Target users who have made purchases in specific categories.
+Device Usage: Target based on the devices used to access Facebook, like mobiles, tablets,
+or desktops.
+Connections to Your Pages, Apps, or Events: Target users who have already interacted with
+your business on Facebook or exclude them to find new audiences.
+Target users based on important life events like anniversaries, birthdays, recently moved,
+newly engaged, or having a baby.
+Education Level: Target users based on their educational background.
+Education Fields of Study: Target users based on their educational background.
+Job Title: Target professionals based on their job information.
+Job Title Industries: Target professionals based on their job information.
 """
         try:
             if is_image:
@@ -882,60 +859,34 @@ This structured approach ensures each persona is clearly defined and separately 
         
     def linkedin_profile(uploaded_file, is_image=True):
         prompt = f"""
-Analyze the uploaded image to develop detailed personas for LinkedIn advertising, focusing on the specific targeting options available on the platform. The analysis should reveal potential persona types that are most likely to engage with the advertisement based on discernible visual elements and implied context within the image. The personas should be tailored to leverage LinkedIn's detailed targeting capabilities, including company industry, job functions, and more.
+Based on the following targeting elements for Linkedin, please describe 4 persona types that
+are most likely to respond to the add. Please present these in a table (Persona Type,
+Description). Once you have identified these, create 4 personas (including names) who
+would be likely to purchase this product, and describe how you would expect them to react
+to it detailing the characteristics. Present each persona with a table (Persona Type,
+Description, Analysis) of the characteristics and analysis. Please include each of the
+characteristic that can be selected in the Linkedin targeting, and what you would select.
 
-**Persona Development Instructions:**
-
-1. **Persona Types Identification:**
-   - Identify 4 distinct persona types that are most likely to respond to the advertisement, based on the image analysis.
-   - Present these in a table format with columns for 'Persona Type' and 'Description'.
-
-2. **Detailed Persona Profiles:**
-   - For each identified persona type, create a separate comprehensive profile. Each profile should be presented in its own table with the following columns:
-      - **Persona Type:** The general category of the persona.
-      - **Description:** A brief overview based on the image analysis.
-      - **Analysis:** Detailed characteristics and expected reactions to the ad, tailored to LinkedIn’s targeting options like job seniority, skills, member groups, interests, and more.
-
-**Important Considerations:**
-
-* **Base on Visual Evidence:** Ensure that all persona deductions are supported by visible elements in the image.
-* **Utilize LinkedIn’s Targeting Options:** Include specifics such as:
-   - **Location:** Suggestions on countries, cities, or regions.
-   - **Company Industry and Size:** Likely industries and company sizes discernible from attire, accessories, or context.
-   - **Job Functions and Job Titles:** Deductions based on attire or activities in the image.
-   - **Job Seniority and Years of Experience:** Inferred from visual cues indicating professional maturity or youth.
-   - **Schools, Degrees, Fields of Study:** Speculate based on any educational material or context.
-   - **Skills:** Likely skills based on the activities or settings depicted.
-   - **Member Groups and Interests:** Connections to professional groups or interests based on the image context.
-   - **Traits:** Any discernible behaviors that align with LinkedIn's trait targeting.
-
-**Example for Each Persona Type Based on an Image of a Corporate Event:**
-
-**Corporate Executive:**
-
-| Persona Type         | Description               | Analysis                                                                       |
-|----------------------|---------------------------|--------------------------------------------------------------------------------|
-| Corporate Executive  | Senior leaders at large firms | Target with content on leadership, enterprise solutions, and executive education. |
-
-**Tech Innovator:**
-
-| Persona Type         | Description               | Analysis                                                                       |
-|----------------------|---------------------------|--------------------------------------------------------------------------------|
-| Tech Innovator       | Professionals in tech industries | Focus ads on latest tech trends, innovations, and tech networking events. |
-
-**HR Specialist:**
-
-| Persona Type         | Description               | Analysis                                                                       |
-|----------------------|---------------------------|--------------------------------------------------------------------------------|
-| HR Specialist        | Engaged in recruitment and HR policies | Advertise tools for recruitment, HR software solutions, and professional HR events. |
-
-**Marketing Guru:**
-
-| Persona Type         | Description               | Analysis                                                                       |
-|----------------------|---------------------------|--------------------------------------------------------------------------------|
-| Marketing Guru       | Skilled in marketing strategies | Target with digital marketing tools, analytics software, and marketing seminars. |
-
-This structured approach should guide the generation of actionable persona insights that can be directly applied in LinkedIn advertising strategies.
+Location: Country, city, or region.
+Age: Though LinkedIn does not directly allow age and gender targeting, these can be
+inferred through other demographic details.
+Gender: Though LinkedIn does not directly allow age and gender targeting, these can be
+inferred through other demographic details.
+Company Industry: Reach professionals in particular industries.
+Company Size: Target companies based on the number of employees.
+Job Functions: Target users with specific job functions within companies.
+Job Seniority: From entry-level to senior executives and managers.
+Job Titles: Specific job titles, reaching users with particular roles.
+Years of Experience: Reach users based on how long they’ve been in the professional
+workforce.
+Schools: Alumni of specific educational institutions.
+Degrees: Users who hold specific degrees.
+Fields of Study: Users who studied specific subjects.
+Skills: Users who have listed specific skills on their profiles.
+Member Groups: Target members of LinkedIn groups related to professional interests.
+Interests: Based on content users interact with or their listed interests.
+Traits: Includes aspects like member traits, which can reflect user activities and behaviors on
+LinkedIn.
 """
         try:
             if is_image:
@@ -966,61 +917,33 @@ This structured approach should guide the generation of actionable persona insig
         
     def x_profile(uploaded_file, is_image=True):
         prompt = f"""
-Analyze the uploaded image to identify and describe potential advertising personas for X (formerly Twitter), focusing specifically on discernible visual elements and contextual cues within the image. The analysis should provide insights into user characteristics, preferences, and behaviors, aiming to enhance advertising strategies on X by pinpointing key personas who are likely to engage with tailored content. Emphasize the translation of visual and contextual observations into actionable marketing insights, suitable for developing targeted advertising campaigns on X.
+Based on the following targeting elements for X, please describe 4 persona types that are
+most likely to respond to the add. Please present these in a table (Persona Type,
+Description). Once you have identified these, create 4 personas (including names) who
+would be likely to purchase this product, and describe how you would expect them to react
+to it detailing the characteristics. Present each persona with a table (Persona Type,
+Description, Analysis) of the characteristics and analysis. Please include each of the
+characteristic that can be selected in the X targeting, and what you would select.
 
-**Persona Development Instructions:**
+Location: Target users by country, region, or metro area. More granular targeting, such as
+city or postal code, is also available.
+Gender: You can select audiences based on gender.
+Language: Target users based on the language they speak.
+Interests: Target users based on their interests, which are inferred from their activities and
+the topics they engage with on X.
+Events: Target ads around specific events, both global and local, that generate significant
+engagement on the platform.
+Behaviors: Target based on user behaviors and actions, such as what they tweet or engage
+with.
+Keywords: Target users based on keywords in their tweets or tweets they engage with. This
+can be particularly useful for capturing intent and interest in real-time.
+Topics: Engage users who are part of conversations around predefined or custom topics.
+Device: Target users based on the devices or operating systems they use to access X.
 
-1. **Persona Types Table:**
-   - Summarize 2-3 potential customer categories in a table, derived from the image analysis.
-   - Columns should include 'Persona Type' and 'Description'.
-
-2. **Detailed Persona Profiles:**
-   - For each persona type identified, create a separate comprehensive profile presented in its own table.
-   - Each table should include the following columns:
-      - **Name:** A hypothetical name representing the persona.
-      - **Location:** General area (e.g., urban, suburban, rural) as suggested by the image.
-      - **Gender:** If discernable from the image; otherwise, specify 'Any'.
-      - **Language:** Likely primary language(s) inferred from the image.
-      - **Interests:** Interests deduced from elements within the image.
-      - **Behaviors:** Predicted X usage patterns (e.g., types of accounts followed, content interaction).
-      - **Keywords:** Related hashtags or search terms.
-      - **Topics:** Types of topics they might engage on X.
-      - **Analysis:** Strategies on how to effectively target this persona on X.
-
-**Important Considerations:**
-
-* **Base on Visual Evidence:** Ensure all deductions about personas are supported by visible elements or scenarios within the image.
-* **X-Specific Insights:** Emphasize insights that are specifically useful for targeting and engaging these personas on X.
-
-**Example Output (Based on an image of a person engaging in urban photography):**
-
-**Persona Types Table:**
-
-| Persona Type     | Description                                  |
-|------------------|----------------------------------------------|
-| Urban Explorer   | Enjoys city life and urban photography.      |
-| Tech Enthusiast  | Interested in the latest gadgets and tech.   |
-| Social Influencer| Engages frequently with followers on social media. |
-
-**Detailed Persona Profiles:**
-
-**Urban Explorer:**
-
-| Name        | Location    | Gender | Language | Interests        | Behaviors                          | Keywords            | Topics            | Analysis                                      |
-|-------------|-------------|--------|----------|------------------|------------------------------------|---------------------|-------------------|-----------------------------------------------|
-| Alex        | Urban       | Any    | English  | Photography, tech| Posts tech reviews, cityscapes     | #UrbanLife, #Tech   | Technology, Photography | Use ads for tech gadgets, photography courses. |
-
-**Tech Enthusiast:**
-
-| Name        | Location    | Gender | Language | Interests        | Behaviors                          | Keywords            | Topics            | Analysis                                      |
-|-------------|-------------|--------|----------|------------------|------------------------------------|---------------------|-------------------|-----------------------------------------------|
-| Casey       | Urban       | Any    | English  | Gadgets, emerging tech | Engages with tech blogs, reviews products | #TechTrends, #Gadgets | Technology, Gadgets | Promote cutting-edge tech and gadget launches. |
-
-**Social Influencer:**
-
-| Name        | Location    | Gender | Language | Interests        | Behaviors                          | Keywords            | Topics            | Analysis                                      |
-|-------------|-------------|--------|----------|------------------|------------------------------------|---------------------|-------------------|-----------------------------------------------|
-| Jamie       | Urban       | Female | English  | Social media, fashion | Influences fashion trends, engages actively | #Fashion, #SocialMedia | Fashion, Lifestyle | Target with fashion brand collaborations, social media tools. |
+Carrier: Target users based on their mobile carrier, which can be useful for mobile-specific
+campaigns.
+Geography: Targeting based on user location can be fine-tuned to match the cultural context
+and regional norms. 
 """
         try:
             if is_image:
