@@ -919,33 +919,20 @@ LinkedIn.
         
     def x_profile(uploaded_file, is_image=True):
         prompt = f"""
-Based on the following targeting elements for X, please describe 4 persona types that are
-most likely to respond to the add. Please present these in a table (Persona Type,
-Description). Once you have identified these, create 4 personas (including names) who
-would be likely to purchase this product, and describe how you would expect them to react
-to it detailing the characteristics. Present each persona with a table (Persona Type,
-Description, Analysis) of the characteristics and analysis. Please include each of the
-characteristic that can be selected in the X targeting, and what you would select.
+Based on the following targeting elements for platform X, please describe 4 persona types that are most likely to respond to the ad. Present these in a table format with the columns (Persona Type, Description). After identifying these personas, create detailed profiles for 4 individuals who are likely to purchase this product. Describe how you would expect each persona to react to the product, detailing their characteristics. Present each persona in a table with columns (Persona Type, Description, Analysis). Include each characteristic that can be selected in the X targeting and specify what you would select for each persona.
 
-Location: Target users by country, region, or metro area. More granular targeting, such as
-city or postal code, is also available.
-Gender: You can select audiences based on gender.
-Language: Target users based on the language they speak.
-Interests: Target users based on their interests, which are inferred from their activities and
-the topics they engage with on X.
-Events: Target ads around specific events, both global and local, that generate significant
-engagement on the platform.
-Behaviors: Target based on user behaviors and actions, such as what they tweet or engage
-with.
-Keywords: Target users based on keywords in their tweets or tweets they engage with. This
-can be particularly useful for capturing intent and interest in real-time.
-Topics: Engage users who are part of conversations around predefined or custom topics.
-Device: Target users based on the devices or operating systems they use to access X.
-
-Carrier: Target users based on their mobile carrier, which can be useful for mobile-specific
-campaigns.
-Geography: Targeting based on user location can be fine-tuned to match the cultural context
-and regional norms. 
+The targeting elements for ads on platform X include:
+- **Location:** Target users by country, region, metro area, city, or postal code.
+- **Gender:** Select audiences based on gender.
+- **Language:** Target users based on the language they speak.
+- **Interests:** Target users based on their interests, inferred from activities and topics they engage with on X.
+- **Events:** Target ads around specific events that generate significant engagement, both globally and locally.
+- **Behaviors:** Target based on user behaviors and actions, such as what they tweet or engage with.
+- **Keywords:** Target users based on keywords in their tweets or tweets they engage with, capturing intent and interest in real-time.
+- **Topics:** Engage users in conversations around predefined or custom topics.
+- **Device:** Target users based on the devices or operating systems they use to access X.
+- **Carrier:** Target users based on their mobile carrier, useful for mobile-specific campaigns.
+- **Geography:** Fine-tune targeting based on user location to match cultural context and regional norms.
 """
         try:
             if is_image:
@@ -1102,7 +1089,7 @@ and regional norms.
         st.header("Analysis Options")
 
         # Tabs for better organization
-        tab1, tab2, tab3, tab4 = st.tabs(["Basic", "Detailed", "Headlines", "Persona"])
+        tab1, tab2, tab3, tab4, tab5 = st.tabs(["Basic", "Detailed", "Headlines", "Persona","Others"])
 
         with tab1:
             basic_analysis = st.button("Basic Analysis")
@@ -1115,17 +1102,19 @@ and regional norms.
         with tab3:
             headline_analysis_button = st.button("Headline Analysis")
             detailed_headline_analysis_button = st.button("Headline Optimization Report")
+
+        with tab4:
+            meta_profile_button = st.button("Facebook targeting")
+            linkedin_profile_button = st.button("LinkedIn targeting")
+            x_profile_button = st.button("X (formerly Twitter) targeting")
+            
+        with tab5:
             main_headline_analysis_button = st.button("Main Headline Analysis")
             image_headline_analysis_button = st.button("Image Headline Analysis")
             supporting_headline_analysis_button = st.button("Supporting Headline Analysis")
             main_headline_text_analysis_button = st.button("Main Headline Text Analysis")
             image_headline_text_analysis_button = st.button("Image Headline Text Analysis")
             supporting_headline_text_analysis_button = st.button("Supporting Headline Text Analysis")
-
-        with tab4:
-            meta_profile_button = st.button("Facebook targeting")
-            linkedin_profile_button = st.button("LinkedIn targeting")
-            x_profile_button = st.button("X (formerly Twitter) targeting")
             
         st.markdown("---")
         custom_prompt = st.text_area("Custom Prompt (Optional):")
