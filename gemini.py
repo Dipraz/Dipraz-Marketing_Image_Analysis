@@ -1083,14 +1083,14 @@ and regional norms.
 
     def compare_images(image1, image2):
         prompt = """
-    Directly compare the visual elements, marketing messages, and overall effectiveness of two provided images. Focus on identifying and discussing their differences, comparative strengths and weaknesses, and provide actionable insights for improvement.
+    Provide a comprehensive analysis comparing two images, focusing on their visual elements, marketing messages, and overall effectiveness together. Discuss:
+    
+    - Similarities: Identify and explain the visual and thematic similarities between the images.
+    - Differences: Discuss the visual and thematic differences, emphasizing how these contribute to the distinctiveness of each image.
+    - Comparative Strengths and Weaknesses: Evaluate the strengths and weaknesses of each image in relation to each other.
+    - Actionable Insights for Improvement: Offer specific recommendations for enhancing the marketing effectiveness of each image based on the comparison.
 
-    Consider:
-    - Contrast in visual elements such as color schemes, composition, and typography.
-    - Differences in marketing messages, including how each image targets its audience, the clarity and tone of the messages, and their persuasiveness.
-    - Overall effectiveness, highlighting which image better aligns with the intended marketing goals and why.
-
-    Summarize the comparative advantages of each image and suggest specific improvements that could enhance their marketing impact.
+    Conclude with an overall assessment of which image might perform better in a marketing context and why.
     """
         try:
             response = model.generate_content([prompt, image1, image2])
