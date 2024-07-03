@@ -1090,7 +1090,14 @@ and regional norms.
     - Comparative Strengths and Weaknesses: Evaluate the strengths and weaknesses of each image in relation to each other.
     - Actionable Insights for Improvement: Offer specific recommendations for enhancing the marketing effectiveness of each image based on the comparison.
 
-    Conclude with an overall assessment of which image might perform better in a marketing context and why.
+    Conclude with an overall assessment of which image might perform better in a marketing context and why. 
+
+    Finally, summarize the key findings in a short table that lists the main comparative points, including suggested improvements for each image:
+    | Aspect            | Image 1        | Image 2        | Notes                             | Improvements                  |
+    |-------------------|----------------|----------------|-----------------------------------|-------------------------------|
+    | Visual Appeal     | [Detail]       | [Detail]       | [Insight]                         | [Suggestions for improvement] |
+    | Marketing Message | [Detail]       | [Detail]       | [Insight]                         | [Suggestions for improvement] |
+    | Overall Impact    | [Detail]       | [Detail]       | [Insight on better performance]   | [Suggestions for improvement] |
     """
         try:
             response = model.generate_content([prompt, image1, image2])
