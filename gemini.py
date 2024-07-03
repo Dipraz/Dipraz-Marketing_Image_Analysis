@@ -1296,10 +1296,7 @@ and regional norms.
                     if custom_result:
                         st.write("## Custom Prompt Analysis Results:")
                         st.markdown(custom_result)
-                        json_data = convert_to_json(custom_result)
-                        xml_data = convert_to_xml(custom_result)
-                        st.markdown(create_download_link(json_data, "json", "custom_prompt_analysis.json"), unsafe_allow_html=True)
-                        st.markdown(create_download_link(xml_data, "xml", "custom_prompt_analysis.xml"), unsafe_allow_html=True)
+
 
             if meta_profile_button:
                 with st.spinner("Performing Headline Optimization Report analysis..."):
