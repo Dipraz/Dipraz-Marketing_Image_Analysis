@@ -806,7 +806,7 @@ Based on the following targeting elements for Facebook, please describe 4 person
 that are most likely to respond to the add. Please present these in a table (Persona Type,
 Description). Once you have identified these, create 4 personas (including names) who
 would be likely to purchase this product, and describe how you would expect them to react
-to it detailing the characteristics. Present each persona with a table (Persona Type,
+to it detailing the characteristics. Present each persona with a 14 x 4 table (Persona Type,
 Description, Analysis) of the characteristics and analysis. Please include each of the
 characteristic that can be selected in the Facebook targeting, and what you would select.
 
@@ -865,7 +865,7 @@ Based on the following targeting elements for Linkedin, please describe 4 person
 are most likely to respond to the add. Please present these in a table (Persona Type,
 Description). Once you have identified these, create 4 personas (including names) who
 would be likely to purchase this product, and describe how you would expect them to react
-to it detailing the characteristics. Present each persona with a table (Persona Type,
+to it detailing the characteristics. Present each persona in a 16 x 4 table (Persona Type,
 Description, Analysis) of the characteristics and analysis. Please include each of the
 characteristic that can be selected in the Linkedin targeting, and what you would select.
 
@@ -923,7 +923,7 @@ Based on the following targeting elements for X, please describe 4 persona types
 most likely to respond to the add. Please present these in a table (Persona Type,
 Description). Once you have identified these, create 4 personas (including names) who
 would be likely to purchase this product, and describe how you would expect them to react
-to it detailing the characteristics. Present each persona with a table (Persona Type,
+to it detailing the characteristics. Present each persona with a 12 x 4 table (Persona Type,
 Description, Analysis) of the characteristics and analysis. Please include each of the
 characteristic that can be selected in the X targeting, and what you would select.
 
@@ -941,11 +941,10 @@ Keywords: Target users based on keywords in their tweets or tweets they engage w
 can be particularly useful for capturing intent and interest in real-time.
 Topics: Engage users who are part of conversations around predefined or custom topics.
 Device: Target users based on the devices or operating systems they use to access X.
-
 Carrier: Target users based on their mobile carrier, which can be useful for mobile-specific
 campaigns.
 Geography: Targeting based on user location can be fine-tuned to match the cultural context
-and regional norms. 
+and regional norms.
 """
         try:
             if is_image:
