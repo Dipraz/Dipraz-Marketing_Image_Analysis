@@ -1093,11 +1093,11 @@ and regional norms.
     Conclude with an overall assessment of which image might perform better in a marketing context and why. 
 
     Finally, summarize the key findings in a short table that lists the main comparative points, including suggested improvements for each image:
-    | Aspect            | Image 1        | Image 2        | Notes                             | Improvements                  |
-    |-------------------|----------------|----------------|-----------------------------------|-------------------------------|
-    | Visual Appeal     | [Detail]       | [Detail]       | [Insight]                         | [Suggestions for improvement] |
-    | Marketing Message | [Detail]       | [Detail]       | [Insight]                         | [Suggestions for improvement] |
-    | Overall Impact    | [Detail]       | [Detail]       | [Insight on better performance]   | [Suggestions for improvement] |
+    | Aspect            | Image 1 Details | Image 1 Improvements | Image 2 Details | Image 2 Improvements | Comparative Insight |
+    |-------------------|-----------------|----------------------|-----------------|----------------------|---------------------|
+    | Visual Appeal     | [Detail]        | [Improvement]        | [Detail]        | [Improvement]        | [Insight]           |
+    | Marketing Message | [Detail]        | [Improvement]        | [Detail]        | [Improvement]        | [Insight]           |
+    | Overall Impact    | [Detail]        | [Improvement]        | [Detail]        | [Improvement]        | [Insight on better performance] |
     """
         try:
             response = model.generate_content([prompt, image1, image2])
