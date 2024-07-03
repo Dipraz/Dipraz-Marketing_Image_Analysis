@@ -806,7 +806,7 @@ Based on the following targeting elements for Facebook, please describe 4 person
 that are most likely to respond to the add. Please present these in a table (Persona Type,
 Description). Once you have identified these, create 4 personas (including names) who
 would be likely to purchase this product, and describe how you would expect them to react
-to it detailing the characteristics. Present each persona with a 14 x 4 table (Persona Type,
+to it detailing the characteristics. Present each persona with a table (Persona Type,
 Description, Analysis) of the characteristics and analysis. Please include each of the
 characteristic that can be selected in the Facebook targeting, and what you would select.
 
@@ -865,7 +865,7 @@ Based on the following targeting elements for Linkedin, please describe 4 person
 are most likely to respond to the add. Please present these in a table (Persona Type,
 Description). Once you have identified these, create 4 personas (including names) who
 would be likely to purchase this product, and describe how you would expect them to react
-to it detailing the characteristics. Present each persona in a 16 x 4 table (Persona Type,
+to it detailing the characteristics. Present each persona with a table (Persona Type,
 Description, Analysis) of the characteristics and analysis. Please include each of the
 characteristic that can be selected in the Linkedin targeting, and what you would select.
 
@@ -923,7 +923,7 @@ Based on the following targeting elements for X, please describe 4 persona types
 most likely to respond to the add. Please present these in a table (Persona Type,
 Description). Once you have identified these, create 4 personas (including names) who
 would be likely to purchase this product, and describe how you would expect them to react
-to it detailing the characteristics. Present each persona with a 12 x 4 table (Persona Type,
+to it detailing the characteristics. Present each persona with a table (Persona Type,
 Description, Analysis) of the characteristics and analysis. Please include each of the
 characteristic that can be selected in the X targeting, and what you would select.
 
@@ -941,10 +941,11 @@ Keywords: Target users based on keywords in their tweets or tweets they engage w
 can be particularly useful for capturing intent and interest in real-time.
 Topics: Engage users who are part of conversations around predefined or custom topics.
 Device: Target users based on the devices or operating systems they use to access X.
+
 Carrier: Target users based on their mobile carrier, which can be useful for mobile-specific
 campaigns.
 Geography: Targeting based on user location can be fine-tuned to match the cultural context
-and regional norms.
+and regional norms. 
 """
         try:
             if is_image:
@@ -1080,6 +1081,28 @@ and regional norms.
             st.error(f"Failed to read or process the media: {e}")
             return None
 
+    def compare_images(image1, image2):
+        prompt = """
+    Compare the two provided images by analyzing their visual elements, marketing messages, and overall effectiveness together. Highlight the contrasts and direct comparisons between the images, and summarize their comparative strengths and weaknesses.
+
+    Consider:
+    - Visual Elements: Contrast colors, composition, focal points, and typography between the two images.
+    - Marketing Message: Discuss how each image targets its audience, the clarity of the message, the tone, and how persuasively each image communicates its message.
+    - Overall Effectiveness: Evaluate the appeal and alignment of visuals with the marketing messages of each image, and compare their effectiveness.
+
+    Provide actionable insights for improvement based on the comparison.
+    """
+        try:
+            response = model.generate_content([prompt, image1, image2])
+            if response.candidates:
+                return response.candidates[0].content.parts[0].text.strip()
+            else:
+                st.error("Model did not provide a valid response.")
+                return None
+        except Exception as e:
+            st.error(f"Failed to process the images: {e}")
+            return None
+        
     def convert_to_json(results):
         return json.dumps(results, indent=4)
 
@@ -1140,6 +1163,7 @@ and regional norms.
         accept_multiple_files=True, 
         type=["png", "jpg", "jpeg", "mp4", "avi"],
         help="Supported formats: PNG, JPG, JPEG, MP4, AVI",
+        key="general_media_uploader"  # Unique key for the general media uploader
     )
 
     # Display Uploaded Media (Responsive Design)
@@ -1295,7 +1319,10 @@ and regional norms.
                     if custom_result:
                         st.write("## Custom Prompt Analysis Results:")
                         st.markdown(custom_result)
-
+                        json_data = convert_to_json(custom_result)
+                        xml_data = convert_to_xml(custom_result)
+                        st.markdown(create_download_link(json_data, "json", "custom_prompt_analysis.json"), unsafe_allow_html=True)
+                        st.markdown(create_download_link(xml_data, "xml", "custom_prompt_analysis.xml"), unsafe_allow_html=True)
 
             if meta_profile_button:
                 with st.spinner("Performing Headline Optimization Report analysis..."):
@@ -1329,3 +1356,32 @@ and regional norms.
                         xml_data = convert_to_xml(x_profile_result)
                         st.markdown(create_download_link(json_data, "json", "headline_optimization_report.json"), unsafe_allow_html=True)
                         st.markdown(create_download_link(xml_data, "xml", "headline_optimization_report.xml"), unsafe_allow_html=True)
+                        
+            # File Uploader for Image Comparison
+            uploaded_files_comparison = st.file_uploader(
+                "Upload Two Marketing Images for Comparison:",
+                accept_multiple_files=True,
+                type=["png", "jpg", "jpeg"],
+                help="Upload exactly two images for comparison."
+            )
+
+            # Display Uploaded Images for Comparison (if any)
+            if uploaded_files_comparison and len(uploaded_files_comparison) == 2:
+                image1, image2 = [Image.open(file) for file in uploaded_files_comparison]
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.image(image1, caption="Image 1", use_column_width=True)
+                with col2:
+                    st.image(image2, caption="Image 2", use_column_width=True)
+
+                # Button to trigger comparison
+            if st.button("Compare Images", key="compare_images_button"):
+                with st.spinner("Comparing images..."):
+                    comparison_result = compare_images(image1, image2)
+                    if comparison_result:
+                        st.write("## Image Comparison Results:")
+                        st.markdown(comparison_result)
+                    else:
+                        st.error("Failed to compare images.")
+            else:
+                st.warning("Please upload exactly two images for comparison.")
