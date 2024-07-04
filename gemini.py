@@ -1040,13 +1040,19 @@ and regional norms.
         except Exception as e:
             st.error(f"Failed to read or process the media: {e}")
             return None
-    def custom_prompt_analysis(image, custom_prompt, is_image=True):
-        image = convert_to_rgb(image) #Make sure the image is in RGB format
+    def custom_prompt_analysis(uploaded_file, custom_prompt, is_image=True):
+        """Analyzes an image or video using a custom prompt."""
 
         try:
             if is_image:
+                # Handle single image (ensure RGB format)
+                image = Image.open(uploaded_file)
+                image = convert_to_rgb(image)
+
+                # Generate response using the image
                 response = model.generate_content([custom_prompt, image]) 
             else:
+                # Handle video file (extract frames)
                 with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
                     tmp.write(uploaded_file.read())
                     tmp_path = tmp.name
@@ -1057,6 +1063,10 @@ and regional norms.
 
                 responses = []
                 for frame in frames:
+                    # Ensure frame is in RGB format
+                    frame = convert_to_rgb(frame)
+
+                    # Generate response using the frame
                     response = model.generate_content([custom_prompt, frame])
 
                     if response and response.candidates and len(response.candidates[0].content.parts) > 0:
@@ -1064,18 +1074,22 @@ and regional norms.
                     else:
                         responses.append("No valid response for this frame.")
                 
-                os.remove(tmp_path) # Clean up temporary file
-                return "\n\n".join(responses) # Combine responses with double newlines
-                
+                os.remove(tmp_path)  # Clean up the temporary video file
+
+                return "\n\n".join(responses)  # Combine individual frame responses
+        
             # Process the response for both image and video
             if response and response.candidates and len(response.candidates[0].content.parts) > 0:
                 return response.candidates[0].content.parts[0].text.strip()
             else:
                 raise ValueError("Model did not provide a valid response or the response structure was unexpected.")
+
         except ValueError as ve:
             st.error(str(ve))
         except Exception as e:
             st.error(f"An error occurred while processing the media: {e}")
+
+        return None  # Return None to signal an error occurred
 
         return None  # Return None on error
     def compare_images(image1, image2):
