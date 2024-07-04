@@ -43,7 +43,11 @@ else:
         model_name="gemini-1.5-flash-latest",
         generation_config=generation_config,
     )
-
+    def convert_to_rgb(image):
+        """Convert an image to RGB format if it is not already."""
+        if image.mode != 'RGB':
+            return image.convert('RGB')
+        return image
     def resize_image(image, max_size=(300, 250)):
         image.thumbnail(max_size)
         return image
@@ -1036,51 +1040,44 @@ and regional norms.
         except Exception as e:
             st.error(f"Failed to read or process the media: {e}")
             return None
-    def custom_prompt_analysis(uploaded_file, custom_prompt, is_image=True):
+    def custom_prompt_analysis(image, custom_prompt, is_image=True):
+        image = convert_to_rgb(image) #Make sure the image is in RGB format
+
         try:
             if is_image:
-                # Handle images directly
-                image = Image.open(io.BytesIO(uploaded_file.read()))
-                response = model.generate_content([custom_prompt, image])
-                if response.candidates and len(response.candidates[0].content.parts) > 0:
-                    return response.candidates[0].content.parts[0].text.strip()
-                else:
-                    st.error("Model did not provide a valid response or the response structure was unexpected.")
-                    return None
+                response = model.generate_content([custom_prompt, image]) 
             else:
-                # Handle videos by processing each extracted frame
                 with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
                     tmp.write(uploaded_file.read())
                     tmp_path = tmp.name
 
-                frames = extract_frames(tmp_path)  # Ensure frames are extracted correctly
+                frames = extract_frames(tmp_path)
                 if frames is None or not frames:
-                    st.error("No frames were extracted from the video. Please check the video format.")
-                    return None
+                    raise ValueError("No frames extracted from the video. Please check the video format.")
 
                 responses = []
-                valid_responses = False  # Track if any valid responses were obtained
                 for frame in frames:
-                    response = model.generate_content([custom_prompt, frame])  # Pass frame in the correct format
-                    if response.candidates and len(response.candidates[0].content.parts) > 0:
+                    response = model.generate_content([custom_prompt, frame])
+
+                    if response and response.candidates and len(response.candidates[0].content.parts) > 0:
                         responses.append(response.candidates[0].content.parts[0].text.strip())
-                        valid_responses = True
                     else:
                         responses.append("No valid response for this frame.")
-
-                # Clean up the temporary file
-                os.remove(tmp_path)
-
-                if not valid_responses:
-                    return "No valid responses were obtained from any of the frames."
-
-                # Combine valid responses from all frames
-                return "\n".join(responses)
-
+                
+                os.remove(tmp_path) # Clean up temporary file
+                return "\n\n".join(responses) # Combine responses with double newlines
+                
+            # Process the response for both image and video
+            if response and response.candidates and len(response.candidates[0].content.parts) > 0:
+                return response.candidates[0].content.parts[0].text.strip()
+            else:
+                raise ValueError("Model did not provide a valid response or the response structure was unexpected.")
+        except ValueError as ve:
+            st.error(str(ve))
         except Exception as e:
-            st.error(f"Failed to read or process the media: {e}")
-            return None
+            st.error(f"An error occurred while processing the media: {e}")
 
+        return None  # Return None on error
     def compare_images(image1, image2):
         prompt = """
     Provide a comprehensive analysis comparing two images, focusing on their visual elements, marketing messages, and overall effectiveness together. Discuss:
@@ -1319,17 +1316,14 @@ and regional norms.
                         xml_data = convert_to_xml(flash_result)
                         st.markdown(create_download_link(json_data, "json", "flash_analysis.json"), unsafe_allow_html=True)
                         st.markdown(create_download_link(xml_data, "xml", "flash_analysis.xml"), unsafe_allow_html=True)
-
-            if custom_prompt_button:
+            if custom_prompt_button and uploaded_files:
                 with st.spinner("Performing custom prompt analysis..."):
-                    custom_result = custom_prompt_analysis(uploaded_file, custom_prompt, is_image)
+                    is_image = uploaded_file.type in ["image/png", "image/jpg", "image/jpeg"]
+                    custom_result = custom_prompt_analysis(uploaded_files[0], custom_prompt, is_image) 
                     if custom_result:
                         st.write("## Custom Prompt Analysis Results:")
                         st.markdown(custom_result)
-                        json_data = convert_to_json(custom_result)
-                        xml_data = convert_to_xml(custom_result)
-                        st.markdown(create_download_link(json_data, "json", "custom_prompt_analysis.json"), unsafe_allow_html=True)
-                        st.markdown(create_download_link(xml_data, "xml", "custom_prompt_analysis.xml"), unsafe_allow_html=True)
+
 
             if meta_profile_button:
                 with st.spinner("Performing Headline Optimization Report analysis..."):
@@ -1374,21 +1368,35 @@ and regional norms.
 
             # Display Uploaded Images for Comparison (if any)
             if uploaded_files_comparison and len(uploaded_files_comparison) == 2:
-                image1, image2 = [Image.open(file) for file in uploaded_files_comparison]
+                image1, image2 = [convert_to_rgb(Image.open(file)) for file in uploaded_files_comparison]
                 col1, col2 = st.columns(2)
                 with col1:
                     st.image(image1, caption="Image 1", use_column_width=True)
                 with col2:
                     st.image(image2, caption="Image 2", use_column_width=True)
 
-                # Button to trigger comparison
-            if st.button("Compare Images", key="compare_images_button"):
-                with st.spinner("Comparing images..."):
-                    comparison_result = compare_images(image1, image2)
-                    if comparison_result:
-                        st.write("## Image Comparison Results:")
-                        st.markdown(comparison_result)
-                    else:
-                        st.error("Failed to compare images.")
-            else:
-                st.warning("Please upload exactly two images for comparison.")
+                # --- Image Comparison Options ---
+                with st.expander("Image Comparison Options"):
+                    # Button to trigger standard comparison
+                    if st.button("Compare Images (Standard)", key="standard_compare_button"):
+                        with st.spinner("Comparing images..."):
+                            comparison_result = compare_images(image1, image2)  # Use the same compare_images function
+                            if comparison_result:
+                                st.write("## Image Comparison Results:")
+                                st.markdown(comparison_result)
+
+                    # Custom Prompt for Comparison
+                    st.markdown("---")
+                    custom_prompt = st.text_area(
+                        "Custom Prompt for Comparison (Optional):",
+                        value="""Provide a detailed comparison of these images, focusing on [your specific areas of interest]. Explain the similarities, differences, and potential impact on the target audience.""",
+                        height=150,  # Adjust height as needed
+                    )
+                    if st.button("Compare with Custom Prompt", key="custom_compare_button"):
+                        with st.spinner("Comparing images with custom prompt..."):
+                            response = model.generate_content([custom_prompt, image1, image2])
+                            if response.candidates and len(response.candidates[0].content.parts) > 0:
+                                st.write("## Custom Comparison Results:")
+                                st.markdown(response.candidates[0].content.parts[0].text.strip())
+                            else:
+                                st.error("Model did not provide a valid response.")
