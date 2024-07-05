@@ -1094,21 +1094,23 @@ and regional norms.
         return None  # Return None on error
     def compare_images(image1, image2):
         prompt = """
-    Provide a comprehensive analysis comparing two images, focusing on their visual elements, marketing messages, and overall effectiveness together. Discuss:
+    Provide a focused analysis comparing two images, emphasizing their observable visual elements and marketing attributes and overall effectiveness together. Your analysis should be factual, based on visible content only, and avoid inferential or speculative details. Discuss:
     
-    - Similarities: Identify and explain the visual and thematic similarities between the images.
-    - Differences: Discuss the visual and thematic differences, emphasizing how these contribute to the distinctiveness of each image.
-    - Comparative Strengths and Weaknesses: Evaluate the strengths and weaknesses of each image in relation to each other.
-    - Actionable Insights for Improvement: Offer specific recommendations for enhancing the marketing effectiveness of each image based on the comparison.
+    - **Visual Similarities**: Identify and describe specific visual elements that are clearly similar in both images (e.g., color schemes, object types, layout).
+    - **Visual Differences**: Detail the visual differences that are evident, such as color variations, the presence or absence of certain elements, and different composition styles.
+    - **Marketing Messages**: Compare any explicit marketing messages or texts that are present in both images. If text is not present, focus only on the overt themes portrayed by the visuals.
+    - **Comparative Strengths and Weaknesses**: Assess the strengths and weaknesses of each image strictly based on the visible content and its potential impact in a marketing context.
 
-    Conclude with an overall assessment of which image might perform better in a marketing context and why. 
+    Conclude with a brief evaluation on which image might perform better in a marketing scenario, based solely on the observed elements.
 
-    Finally, summarize the key findings in a short table that lists the main comparative points, including suggested improvements for each image:
-    | Aspect            | Image 1 Details | Image 1 Improvements | Image 2 Details | Image 2 Improvements | Comparative Insight |
-    |-------------------|-----------------|----------------------|-----------------|----------------------|---------------------|
-    | Visual Appeal     | [Detail]        | [Improvement]        | [Detail]        | [Improvement]        | [Insight]           |
-    | Marketing Message | [Detail]        | [Improvement]        | [Detail]        | [Improvement]        | [Insight]           |
-    | Overall Impact    | [Detail]        | [Improvement]        | [Detail]        | [Improvement]        | [Insight on better performance] |
+    At the end, Summarize the key points of your comparison in a structured table. Ensure that each entry in the table is directly supported by visible content in the images:
+
+    | Aspect              | Image 1 Details              | Image 1 Improvements        | Image 2 Details              | Image 2 Improvements        | Comparative Insight                    |
+    |---------------------|------------------------------|-----------------------------|------------------------------|-----------------------------|----------------------------------------|
+    | Visual Appeal       | Describe the visual appeal based on colors, layout, and imagery. | Suggest improvements based on marketing effectiveness. | Describe the visual appeal based on colors, layout, and imagery. | Suggest improvements based on marketing effectiveness. | Which image has a stronger visual appeal and why?          |
+    | Marketing Message   | State the explicit marketing message if present. | How could the message be made more clear or impactful? | State the explicit marketing message if present. | How could the message be made more clear or impactful? | Which image communicates its message more effectively?     |
+    | Overall Impact      | Detail the immediate impact or the emotional appeal. | Suggest how to enhance the impact. | Detail the immediate impact or the emotional appeal. | Suggest how to enhance the impact. | Overall, which image creates a stronger impact and why?    |
+    
     """
         try:
             response = model.generate_content([prompt, image1, image2])
