@@ -47,16 +47,14 @@ else:
     )
 
 @st.cache_data  # Cache the FAISS index to avoid reprocessing unless the PDF changes
-def process_pdfs(pdf_docs):
+def process_pdfs():
     if pdf_docs:
         with st.spinner("Processing..."):
             raw_text = get_pdf_text(pdf_docs)
             text_chunks = get_text_chunks(raw_text)
             get_vector_store(text_chunks)
             st.success("Done")
-            embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
             return FAISS.load_local("faiss_index", embeddings)
-    return None
 
 def get_pdf_text(pdf_docs):
     text = ""
