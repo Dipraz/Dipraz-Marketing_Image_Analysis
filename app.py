@@ -102,7 +102,8 @@ def get_conversational_chain():
 
 async def user_input(user_question):
     embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
-    new_db = FAISS.load_local("faiss_index", embeddings)
+    # Explicitly allowing deserialization, ensure you trust the source
+    new_db = FAISS.load_local("faiss_index", embeddings, allow_dangerous_deserialization=True)
     docs = new_db.similarity_search(user_question)
 
     chain = get_conversational_chain()
