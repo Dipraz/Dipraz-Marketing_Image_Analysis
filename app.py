@@ -11,9 +11,11 @@ from dotenv import load_dotenv
 import os
 import asyncio
 
-# Solution for the Event Loop Error
-asyncio.set_event_loop(asyncio.new_event_loop()) 
+# Load environment variables
 load_dotenv()
+
+# Set Streamlit page configuration as the first Streamlit command
+st.set_page_config(page_title="Chat PDF")
 
 # Get the API key and credentials file from environment variables
 api_key = os.getenv('GOOGLE_API_KEY')
@@ -45,14 +47,17 @@ else:
     )
 
 @st.cache_data  # Cache the FAISS index to avoid reprocessing unless the PDF changes
-def process_pdfs():
+def process_pdfs(pdf_docs):
     if pdf_docs:
         with st.spinner("Processing..."):
             raw_text = get_pdf_text(pdf_docs)
             text_chunks = get_text_chunks(raw_text)
             get_vector_store(text_chunks)
             st.success("Done")
+            embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
             return FAISS.load_local("faiss_index", embeddings)
+    return None
+
 def get_pdf_text(pdf_docs):
     text = ""
     for pdf in pdf_docs:
@@ -110,7 +115,6 @@ async def user_input(user_question):
     st.write("Reply: ", response["output_text"])
 
 def main():
-    st.set_page_config(page_title="Chat PDF")
     st.header("Chat with PDF using Gemini💁")
 
     user_question = st.text_input("Ask a Question from the PDF Files")
@@ -122,11 +126,7 @@ def main():
         st.title("Menu:")
         pdf_docs = st.file_uploader("Upload your PDF Files and Click on the Submit & Process Button", accept_multiple_files=True)
         if st.button("Submit & Process"):
-            with st.spinner("Processing..."):
-                raw_text = get_pdf_text(pdf_docs)
-                text_chunks = get_text_chunks(raw_text)
-                get_vector_store(text_chunks)
-                st.success("Done")
+            faiss_index = process_pdfs(pdf_docs)
 
 if __name__ == "__main__":
     main()
