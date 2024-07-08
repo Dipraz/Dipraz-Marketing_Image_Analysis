@@ -47,6 +47,21 @@ else:
     )
 
 @st.cache_data  # Cache the FAISS index to avoid reprocessing unless the PDF changes
+def process_pdfs(pdf_docs):
+    if pdf_docs:
+        with st.spinner("Processing PDF files..."):
+            # Extract text from PDFs
+            raw_text = get_pdf_text(pdf_docs)
+            # Split text into manageable chunks
+            text_chunks = get_text_chunks(raw_text)
+            # Generate and save FAISS index from text chunks
+            get_vector_store(text_chunks)
+            st.success("PDFs processed and ready for queries.")
+            # Load the FAISS index back into the application
+            embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
+            return FAISS.load_local("faiss_index", embeddings)
+    return None
+
 def get_pdf_text(pdf_docs):
     text = ""
     for pdf in pdf_docs:
@@ -68,9 +83,7 @@ def get_vector_store(text_chunks):
 def get_conversational_chain():
     prompt_template = """
     You are a helpful and informative AI assistant. Your primary goal is to answer questions based on the provided context, which consists of user-uploaded PDF documents. 
-
     Instructions:
-
     1. First, thoroughly analyze the content of the user-uploaded PDFs to extract relevant information for answering the question.
     2. If the answer can be fully derived from the PDF content, provide it directly and ensure accuracy and completeness.
     3. If the PDF content is insufficient to answer the question fully:
@@ -78,11 +91,8 @@ def get_conversational_chain():
         b. Clearly indicate when you are supplementing the PDF content with your own knowledge by starting the answer with "Based on my knowledge..." or a similar phrase.
     4. If you are uncertain about the answer or if the PDFs and your knowledge do not provide enough information to form a conclusive answer, state clearly that the information is not sufficient to provide a definitive answer.
     5. Avoid fabricating information or making assumptions that cannot be supported by the PDF content or reliable external knowledge.
-
     Uploaded PDF Content:\n{context}
-
     Question: \n{question}
-
     Answer:
     """
     model = ChatGoogleGenerativeAI(model="gemini-1.5-flash-latest", temperature=0.3)
@@ -106,16 +116,16 @@ async def user_input(user_question):
 def main():
     st.header("Chat with PDF using Gemini💁")
 
-    user_question = st.text_input("Ask a Question from the PDF Files")
-
-    if user_question:
-        asyncio.run(user_input(user_question))
-
     with st.sidebar:
         st.title("Menu:")
         pdf_docs = st.file_uploader("Upload your PDF Files and Click on the Submit & Process Button", accept_multiple_files=True)
         if st.button("Submit & Process"):
-            faiss_index = process_pdfs(pdf_docs)
+            # Process the uploaded PDF files
+            process_pdfs(pdf_docs)
+
+    user_question = st.text_input("Ask a Question from the PDF Files")
+    if user_question:
+        asyncio.run(user_input(user_question))
 
 if __name__ == "__main__":
     main()
