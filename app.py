@@ -10,6 +10,7 @@ from langchain.prompts import PromptTemplate
 from dotenv import load_dotenv
 import os
 import asyncio
+import hashlib
 
 # Load environment variables
 load_dotenv()
@@ -50,9 +51,16 @@ def process_pdfs(pdf_docs):
     if not pdf_docs:
         return None
 
-    # Hashing the list of uploaded files to detect changes
-    pdf_files_hash = st.util.hashing.hash_files([pdf.file.name for pdf in pdf_docs])
-    cached_result = st.session_state.get('processed_pdfs', {}).get(pdf_files_hash)
+    # Manually hashing the list of uploaded files to detect changes
+    pdf_files_hash = hashlib.sha256()
+    for pdf in pdf_docs:
+        # Read data from each file and update hash
+        pdf_bytes = pdf.getvalue()  # Read bytes from the uploaded file
+        pdf_files_hash.update(pdf_bytes)
+
+    # Check if we already processed these files by comparing hashes
+    hash_key = pdf_files_hash.hexdigest()
+    cached_result = st.session_state.get('processed_pdfs', {}).get(hash_key)
 
     if cached_result is not None:
         # Use cached result if available
@@ -67,7 +75,7 @@ def process_pdfs(pdf_docs):
         faiss_index = FAISS.load_local("faiss_index", embeddings, allow_dangerous_deserialization=True)
 
         # Cache the result in session state
-        st.session_state['processed_pdfs'] = {pdf_files_hash: faiss_index}
+        st.session_state['processed_pdfs'] = {hash_key: faiss_index}
 
         return faiss_index
 
