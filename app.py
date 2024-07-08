@@ -46,21 +46,30 @@ else:
         generation_config=generation_config,
     )
 
-@st.cache_data  # Cache the FAISS index to avoid reprocessing unless the PDF changes
 def process_pdfs(pdf_docs):
-    if pdf_docs:
-        with st.spinner("Processing PDF files..."):
-            # Extract text from PDFs
-            raw_text = get_pdf_text(pdf_docs)
-            # Split text into manageable chunks
-            text_chunks = get_text_chunks(raw_text)
-            # Generate and save FAISS index from text chunks
-            get_vector_store(text_chunks)
-            st.success("PDFs processed and ready for queries.")
-            # Load the FAISS index back into the application
-            embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
-            return FAISS.load_local("faiss_index", embeddings)
-    return None
+    if not pdf_docs:
+        return None
+
+    # Hashing the list of uploaded files to detect changes
+    pdf_files_hash = st.util.hashing.hash_files([pdf.file.name for pdf in pdf_docs])
+    cached_result = st.session_state.get('processed_pdfs', {}).get(pdf_files_hash)
+
+    if cached_result is not None:
+        # Use cached result if available
+        return cached_result
+
+    with st.spinner("Processing PDF files..."):
+        raw_text = get_pdf_text(pdf_docs)
+        text_chunks = get_text_chunks(raw_text)
+        get_vector_store(text_chunks)
+        st.success("PDFs processed and ready for queries.")
+        embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
+        faiss_index = FAISS.load_local("faiss_index", embeddings, allow_dangerous_deserialization=True)
+
+        # Cache the result in session state
+        st.session_state['processed_pdfs'] = {pdf_files_hash: faiss_index}
+
+        return faiss_index
 
 def get_pdf_text(pdf_docs):
     text = ""
@@ -116,17 +125,17 @@ async def user_input(user_question):
 
 def main():
     st.header("Chat with PDF using Gemini💁")
-
+    
     with st.sidebar:
         st.title("Menu:")
-        pdf_docs = st.file_uploader("Upload your PDF Files and Click on the Submit & Process Button", accept_multiple_files=True)
+        pdf_docs = st.file_uploader("Upload your PDF Files and Click on the Submit & Process Button", accept_multiple_files=True, type=['pdf'])
         if st.button("Submit & Process"):
-            # Process the uploaded PDF files
-            process_pdfs(pdf_docs)
+            faiss_index = process_pdfs(pdf_docs)
 
     user_question = st.text_input("Ask a Question from the PDF Files")
     if user_question:
         asyncio.run(user_input(user_question))
 
 if __name__ == "__main__":
+    main()
     main()
