@@ -11,10 +11,16 @@ pillow
 imageio
 opencv-python-headless
 python-dotenv
-google-generativeai
-python-dotenv
-langchain
+
+
+# Core Dependencies
 PyPDF2
-chromadb
-faiss-cpu
-langchain_google_genai
+langchain
+langchain-google-genai
+google-generativeai
+
+# Vector Store
+faiss-cpu  # or faiss-gpu if you have access to GPU on Hugging Face
+
+# Additional (Recommended)
+langchain_community  # For broader vector store options, if needed
