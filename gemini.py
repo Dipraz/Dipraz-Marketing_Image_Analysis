@@ -1222,21 +1222,12 @@ and regional norms.
                     if overall_analysis_result:
                         st.write("## Overall Marketing Analysis Results:")
                         st.markdown(overall_analysis_result)
-                        json_data = convert_to_json(overall_analysis_result)
-                        xml_data = convert_to_xml(overall_analysis_result)
-                        st.markdown(create_download_link(json_data, "json", "overall_analysis.json"), unsafe_allow_html=True)
-                        st.markdown(create_download_link(xml_data, "xml", "overall_analysis.xml"), unsafe_allow_html=True)
-
             if text_analysis_button:
                 with st.spinner("Performing text analysis..."):
                     text_result = text_analysis(uploaded_file, is_image)
                     if text_result:
                         st.write("## Text Analysis Results:")
                         st.markdown(text_result)
-                        json_data = convert_to_json(text_result)
-                        xml_data = convert_to_xml(text_result)
-                        st.markdown(create_download_link(json_data, "json", "text_analysis.json"), unsafe_allow_html=True)
-                        st.markdown(create_download_link(xml_data, "xml", "text_analysis.xml"), unsafe_allow_html=True)
 
             if headline_analysis_button:
                 with st.spinner("Performing headline analysis..."):
@@ -1244,10 +1235,6 @@ and regional norms.
                     if headline_result:
                         st.write("## Headline Analysis Results:")
                         st.markdown(headline_result)
-                        json_data = convert_to_json(headline_result)
-                        xml_data = convert_to_xml(headline_result)
-                        st.markdown(create_download_link(json_data, "json", "headline_analysis.json"), unsafe_allow_html=True)
-                        st.markdown(create_download_link(xml_data, "xml", "headline_analysis.xml"), unsafe_allow_html=True)
 
             if main_headline_analysis_button:
                 with st.spinner("Performing Main Headline Analysis..."):
@@ -1255,21 +1242,12 @@ and regional norms.
                     if main_headline_result:
                         st.write("## Main Headline Analysis Results:")
                         st.markdown(main_headline_result)
-                        json_data = convert_to_json(main_headline_result)
-                        xml_data = convert_to_xml(main_headline_result)
-                        st.markdown(create_download_link(json_data, "json", "main_headline_analysis.json"), unsafe_allow_html=True)
-                        st.markdown(create_download_link(xml_data, "xml", "main_headline_analysis.xml"), unsafe_allow_html=True)
-
             if image_headline_analysis_button:
                 with st.spinner("Performing Image Headline Analysis..."):
                     image_detailed_headline_result = image_headline_detailed_analysis(uploaded_file, is_image)
                     if image_detailed_headline_result:
                         st.write("## Image Headline Analysis Results:")
                         st.markdown(image_detailed_headline_result)
-                        json_data = convert_to_json(image_detailed_headline_result)
-                        xml_data = convert_to_xml(image_detailed_headline_result)
-                        st.markdown(create_download_link(json_data, "json", "image_headline_analysis.json"), unsafe_allow_html=True)
-                        st.markdown(create_download_link(xml_data, "xml", "image_headline_analysis.xml"), unsafe_allow_html=True)
 
             if supporting_headline_analysis_button:
                 with st.spinner("Performing Supporting Headline Analysis..."):
@@ -1277,10 +1255,6 @@ and regional norms.
                     if supporting_detailed_headline_result:
                         st.write("## Supporting Headline Analysis Report Results:")
                         st.markdown(supporting_detailed_headline_result)
-                        json_data = convert_to_json(supporting_detailed_headline_result)
-                        xml_data = convert_to_xml(supporting_detailed_headline_result)
-                        st.markdown(create_download_link(json_data, "json", "supporting_headline_analysis.json"), unsafe_allow_html=True)
-                        st.markdown(create_download_link(xml_data, "xml", "supporting_headline_analysis.xml"), unsafe_allow_html=True)
 
             if detailed_headline_analysis_button:
                 with st.spinner("Performing Headline Optimization Report analysis..."):
@@ -1288,50 +1262,30 @@ and regional norms.
                     if detailed_headline_result:
                         st.write("## Headline Optimization Report Results:")
                         st.markdown(detailed_headline_result)
-                        json_data = convert_to_json(detailed_headline_result)
-                        xml_data = convert_to_xml(detailed_headline_result)
-                        st.markdown(create_download_link(json_data, "json", "headline_optimization_report.json"), unsafe_allow_html=True)
-                        st.markdown(create_download_link(xml_data, "xml", "headline_optimization_report.xml"), unsafe_allow_html=True)
             if main_headline_text_analysis_button:
                 with st.spinner("Performing Image Headline Analysis..."):
                     main_headline_analysis_result = main_headline_analysis(uploaded_file, is_image)
                     if main_headline_analysis_result:
                         st.write("## Image Headline Analysis Results:")
-                        st.markdown(main_headline_analysis_result)
-                        json_data = convert_to_json(main_headline_analysis_result)
-                        xml_data = convert_to_xml(main_headline_analysis_result)
-                        st.markdown(create_download_link(json_data, "json", "image_headline_analysis.json"), unsafe_allow_html=True)
-                        st.markdown(create_download_link(xml_data, "xml", "image_headline_analysis.xml"), unsafe_allow_html=True)                      
+                        st.markdown(main_headline_analysis_result)                    
             if image_headline_text_analysis_button:
                 with st.spinner("Performing Image Headline Analysis..."):
                     image_headline_analysis_result = image_headline_analysis(uploaded_file, is_image)
                     if image_headline_analysis_result:
                         st.write("## Image Headline Analysis Results:")
                         st.markdown(image_headline_analysis_result)
-                        json_data = convert_to_json(image_headline_analysis_result)
-                        xml_data = convert_to_xml(image_headline_analysis_result)
-                        st.markdown(create_download_link(json_data, "json", "image_headline_analysis.json"), unsafe_allow_html=True)
-                        st.markdown(create_download_link(xml_data, "xml", "image_headline_analysis.xml"), unsafe_allow_html=True)
             if supporting_headline_text_analysis_button:
                 with st.spinner("Performing Image Headline Analysis..."):
                     supporting_headline_analysis_result = supporting_headline_analysis(uploaded_file, is_image)
                     if supporting_headline_analysis_result:
                         st.write("## Image Headline Analysis Results:")
                         st.markdown(supporting_headline_analysis_result)
-                        json_data = convert_to_json(supporting_headline_analysis_result)
-                        xml_data = convert_to_xml(supporting_headline_analysis_result)
-                        st.markdown(create_download_link(json_data, "json", "image_headline_analysis.json"), unsafe_allow_html=True)
-                        st.markdown(create_download_link(xml_data, "xml", "image_headline_analysis.xml"), unsafe_allow_html=True)
             if flash_analysis_button:
                 with st.spinner("Performing Flash analysis..."):
                     flash_result = flash_analysis(uploaded_file, is_image)
                     if flash_result:
                         st.write("## Flash Analysis Results:")
                         st.markdown(flash_result)
-                        json_data = convert_to_json(flash_result)
-                        xml_data = convert_to_xml(flash_result)
-                        st.markdown(create_download_link(json_data, "json", "flash_analysis.json"), unsafe_allow_html=True)
-                        st.markdown(create_download_link(xml_data, "xml", "flash_analysis.xml"), unsafe_allow_html=True)
             if custom_prompt_button and uploaded_files:
                 with st.spinner("Performing custom prompt analysis..."):
                     is_image = uploaded_file.type in ["image/png", "image/jpg", "image/jpeg"]
@@ -1347,10 +1301,6 @@ and regional norms.
                     if meta_profile_result:
                         st.write("## Headline Optimization Report Results:")
                         st.markdown(meta_profile_result)
-                        json_data = convert_to_json(meta_profile_result)
-                        xml_data = convert_to_xml(meta_profile_result)
-                        st.markdown(create_download_link(json_data, "json", "headline_optimization_report.json"), unsafe_allow_html=True)
-                        st.markdown(create_download_link(xml_data, "xml", "headline_optimization_report.xml"), unsafe_allow_html=True)
                         
             if linkedin_profile_button:
                 with st.spinner("Performing Headline Optimization Report analysis..."):
@@ -1358,10 +1308,6 @@ and regional norms.
                     if linked_profile_result:
                         st.write("## Headline Optimization Report Results:")
                         st.markdown(linked_profile_result)
-                        json_data = convert_to_json(linked_profile_result)
-                        xml_data = convert_to_xml(linked_profile_result)
-                        st.markdown(create_download_link(json_data, "json", "headline_optimization_report.json"), unsafe_allow_html=True)
-                        st.markdown(create_download_link(xml_data, "xml", "headline_optimization_report.xml"), unsafe_allow_html=True)
                     
             if x_profile_button:
                 with st.spinner("Performing Headline Optimization Report analysis..."):
@@ -1369,10 +1315,6 @@ and regional norms.
                     if x_profile_result:
                         st.write("## Headline Optimization Report Results:")
                         st.markdown(x_profile_result)
-                        json_data = convert_to_json(x_profile_result)
-                        xml_data = convert_to_xml(x_profile_result)
-                        st.markdown(create_download_link(json_data, "json", "headline_optimization_report.json"), unsafe_allow_html=True)
-                        st.markdown(create_download_link(xml_data, "xml", "headline_optimization_report.xml"), unsafe_allow_html=True)
                         
             # File Uploader for Image Comparison
             uploaded_files_comparison = st.file_uploader(
