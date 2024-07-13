@@ -31,8 +31,8 @@ else:
 
     # Define generation configuration
     generation_config = {
-        "temperature": 0.4,
-        "top_p": 0.95,
+        "temperature": 0.2,
+        "top_p": 0.8,
         "top_k": 64,
         "max_output_tokens": 8192,
         "response_mime_type": "text/plain",
@@ -924,15 +924,15 @@ LinkedIn.
     def x_profile(uploaded_file, is_image=True):
         prompt = f"""
 Based on the following targeting elements for X, please describe 4 persona types that are
-most likely to respond to the add. Please present these in a table (Persona Type,
+most likely to respond to the ad. Please present these in a table (Persona Type,
 Description). Once you have identified these, create 4 personas (including names) who
 would be likely to purchase this product, and describe how you would expect them to react
 to it detailing the characteristics. Present each persona with a table (Persona Type,
 Description, Analysis) of the characteristics and analysis. Please include each of the
-characteristic that can be selected in the X targeting, and what you would select.
+characteristics that can be selected in the X targeting, and what you would select.
 
 Location: Target users by country, region, or metro area. More granular targeting, such as
-city or postal code, is also available.
+city or postal code is also available.
 Gender: You can select audiences based on gender.
 Language: Target users based on the language they speak.
 Interests: Target users based on their interests, which are inferred from their activities and
