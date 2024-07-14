@@ -182,15 +182,14 @@ Analyze the provided image for marketing effectiveness. First, provide detailed 
             "11. Engagement: Assess the engagement level of the user experience. Is the UX design captivating and satisfying to interact with?\n"
             "12. Trust: Assess the trustworthiness of the content based on visual and textual elements. Is the content brand or customer-centric (customer-centric content has a higher trustworthiness)? Assess the credibility, reliability, and intimacy conveyed by the content.\n"
             "13. Motivation: Assess the design's ability to motivate users. Does it align with user motivators and demonstrate authority or provide social proof?\n"
-            "14. Influence: Analyze the influence of the design. Does the asset effectively persuade viewers and lead them toward a desired action?\n"
+            "14. Influence: Analyze the influence of the design. Does the asset effectively persuade viewers and lead them towards a desired action?\n"
             "15. Calls to Action: Analyze the presence, prominence, benefits, and language of CTAs.\n"
             "16. Experience: Assess the overall user experience. How well does the design facilitate a smooth and enjoyable interaction?\n"
             "17. Memorability: Evaluate how memorable the design is. Does it leave a lasting impression?\n"
             "18. Effort: Evaluate the clarity and conciseness of the text. Does it convey the message effectively without being overly wordy? (1: Very Dense & Difficult, 5: Clear & Easy to Understand)\n"
-            "19. Tone: Is the tone used to increase the effectiveness of the asset effectively?\n"
+             "19. Tone: Is the tone used to increase the effectiveness of the asset effectively?\n"
             "20. Framing: Is framing of the message used to increase the effectiveness of the asset effectively?\n"
-
-    Conclude with a concise overall analysis including general suggestions for improvement.
+            "21. Content Investment: Blocks containing paragraphs of text will not be consumed by busy users and would require time to read – this is negative, as the users will not spend the time. Is the amount of content presented kept short and clear?\n"
         """
 
         try:
