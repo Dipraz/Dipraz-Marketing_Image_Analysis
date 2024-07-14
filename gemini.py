@@ -160,36 +160,35 @@ else:
 
     def overall_analysis(uploaded_file, is_image=True):
         prompt = """
-    Analyze the provided image for marketing effectiveness. Begin by addressing the following key points:
-
-    1. **Asset Type:** Identify and describe the type of marketing asset. Possible types include email, social media posts, advertisements, flyers, brochures, landing pages, etc.
-    2. **Purpose:** State and explain the specific purpose of the marketing asset, such as selling a product, increasing sign-ups, driving traffic, enhancing brand awareness, or engaging customers.
-    3. **Asset Audience:** Identify the target audience for the marketing asset, including their demographics, interests, and needs (age, gender, location, income level, education, etc.).
-
-    Proceed to evaluate the asset on the following aspects, providing a score from 1 to 5 (in increments of 0.5), along with an explanation for each score and suggestions for improvement. Present the results in a table format with columns for Aspect, Score, Explanation, and Improvement:
-
-    **Aspects to Consider:**
-    1. **Creative Score:** Assess the design's creativity and its ability to capture attention through innovative elements.
-    2. **Attention:** Evaluate the order in which content is consumed, starting with the headline, followed by text and images, and any interactive elements. Analyze if the content effectively prioritizes important information and maintains viewer attention.
-    3. **Distinction:** Determine if the pictures and overall content design grab user attention and appeal on a visceral level, both with and without text.
-    4. **Purpose and Value:** Assess if the asset's purpose and value are immediately clear within the first 3 seconds and whether the content is product or customer-centric.
-    5. **Clarity:** Evaluate the clarity of design elements, including visuals and text.
-    6. **First Impressions:** Analyze the initial impact of the design and whether it creates a positive first impression.
-    7. **Cognitive Demand:** Evaluate how much cognitive effort is required to understand and navigate the design.
-    8. **Headline Review:** Review the headline for clarity, customer centricity, SEO integration, emotional appeal, uniqueness, urgency, benefits, audience targeting, length, use of numbers/lists, brand consistency, and use of power words.
-    9. **Headline Keywords and Emotional Appeal:** Assess if the headline includes effective keywords and evokes an emotional response.
-    10. **Visual Cues and Color Usage:** Analyze how visual cues and color choices guide attention to key elements.
-    11. **Labeling and Button Clarity:** Evaluate the clarity and effectiveness of any labels or buttons in terms of text size, font choice, and placement.
-    12. **Engagement:** Assess the level of user engagement and satisfaction with the UX design.
-    13. **Trust:** Evaluate the trustworthiness of the content based on visual and textual elements.
-    14. **Motivation:** Assess how well the design aligns with user motivators and whether it demonstrates authority or provides social proof.
-    15. **Influence:** Analyze the design's effectiveness in persuading viewers and leading them towards the desired action.
-    16. **Calls to Action:** Examine the presence, prominence, and language of calls to action and their benefits.
-    17. **Experience:** Assess the overall user experience and how well the design facilitates a smooth and enjoyable interaction.
-    18. **Memorability:** Evaluate the memorability of the design.
-    19. **Effort:** Assess the clarity and conciseness of the text and its effectiveness in conveying the message.
-    20. **Tone:** Evaluate if the tone used increases the effectiveness of the asset.
-    21. **Framing:** Assess if the framing of the message increases the effectiveness of the asset.
+Analyze the provided image for marketing effectiveness. First, provide detailed responses for the following:\n"
+            "\n"
+            "1. Asset Type: Clearly identify and describe the type of marketing asset. Examples include email, social media posts, advertisements, flyers, brochures, landing pages, etc.\n"
+            "2. Purpose: Clearly state the specific purpose of this marketing asset. Provide a detailed explanation of how it aims to achieve this purpose. Examples include selling a product, getting more signups, driving traffic to a webpage, increasing brand awareness, engaging with customers, etc.\n"
+            "3. Asset Audience: Identify the target audience for this marketing asset. Describe the demographics, interests, and needs of this audience. Examples include age group, gender, location, income level, education, interests, behaviors, etc.\n"
+            "\n"
+            "Then, for each aspect listed below, provide a score from 1 to 5 in increments of 0.5 (1 being low, 5 being high) and a concise explanation for each aspect, along with suggestions for improvement. The results should be presented in a table format with the columns: Aspect, Score, Explanation, and Improvement. After the table, provide a concise explanation with suggestions for overall improvement. Here are the aspects to consider:\n"
+            "\n"
+            "The aspects to consider are:\n"
+            "1. Creative Score: Assess the creativity of the design. Does it stand out and capture attention through innovative elements?\n"
+            "2. Attention: Evaluate the order of content consumption in the uploaded image. Start by identifying and analyzing the headline for its prominence and position. Next, evaluate any additional text for visibility and reader engagement sequence. Assess the positioning of images in relation to the text, followed by an examination of interactive elements such as buttons. Discuss the order in which the content is consumed (e.g., headline first, then text, or image then text then button, etc.). Determine if the content prioritizes important information, and draws and holds attention effectively.\n"
+            "3. Distinction: Does the content contain pictures that grab user attention? Does it appeal to the primal brain with and without text?\n"
+            "4. Purpose and Value: Is the purpose and value clear within 3 seconds? Is the content product or customer-centric?\n"
+            "5. Clarity: Evaluate the clarity of the design elements. Are the visuals and text easy to understand?\n"
+            "6. First Impressions: Analyze the initial impact of the design. Does it create a strong positive first impression?\n"
+            "7. Headline Review: Evaluate the headline for clarity, conciseness, customer centricity, SEO keyword integration, emotional appeal, uniqueness, urgency, benefit to the reader, audience targeting, length, use of numbers/lists, brand consistency, and power words.\n"
+            "8. Headline keywords and emotional appeal: Does the headline incorporate keywords and evoke an emotional response?\n"
+            "9. Visual Cues and Color Usage: Does the image use visual cues and colors to draw attention to key elements? Analyze how color choices, contrast, and elements like arrows or frames guide the viewer's attention.\n"
+            "10. Button Clarity: Are any CTA buttons present clearly labelled and easy to understand? Evaluate the use of text size, font choice, and placement for optimal readability.\n"
+            "11. Engagement: Assess the engagement level of the user experience. Is the UX design captivating and satisfying to interact with?\n"
+            "12. Trust: Assess the trustworthiness of the content based on visual and textual elements. Is the content brand or customer-centric (customer-centric content has a higher trustworthiness)? Assess the credibility, reliability, and intimacy conveyed by the content.\n"
+            "13. Motivation: Assess the design's ability to motivate users. Does it align with user motivators and demonstrate authority or provide social proof?\n"
+            "14. Influence: Analyze the influence of the design. Does the asset effectively persuade viewers and lead them toward a desired action?\n"
+            "15. Calls to Action: Analyze the presence, prominence, benefits, and language of CTAs.\n"
+            "16. Experience: Assess the overall user experience. How well does the design facilitate a smooth and enjoyable interaction?\n"
+            "17. Memorability: Evaluate how memorable the design is. Does it leave a lasting impression?\n"
+            "18. Effort: Evaluate the clarity and conciseness of the text. Does it convey the message effectively without being overly wordy? (1: Very Dense & Difficult, 5: Clear & Easy to Understand)\n"
+            "19. Tone: Is the tone used to increase the effectiveness of the asset effectively?\n"
+            "20. Framing: Is framing of the message used to increase the effectiveness of the asset effectively?\n"
 
     Conclude with a concise overall analysis including general suggestions for improvement.
         """
