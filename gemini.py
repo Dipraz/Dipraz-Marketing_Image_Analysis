@@ -219,7 +219,7 @@ Analyze the provided image for marketing effectiveness. First, provide detailed 
             return None
 
     def behavioural_principles(uploaded_file, is_image=True):
-    prompt = """
+        prompt = """
     Using the following Behavioral Science principles, assess whether the marketing content does or does not apply each principle. Present the information in a table with columns: 'Applies the Principle (Y/N)', 'Principle (Description)', 'Explanation', and 'How it could be applied'. The 'Applies the Principle' column should only be marked "Y" if the principle is explicitly applied. These are the principles to assess:
 
     1. Anchoring: The tendency to rely heavily on the first piece of information encountered (the "anchor") when making decisions.
