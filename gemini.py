@@ -218,6 +218,90 @@ Analyze the provided image for marketing effectiveness. First, provide detailed 
             st.error(f"Failed to read or process the media: {e}")
             return None
 
+    def behavioural_principles(uploaded_file, is_image=True):
+        prompt = f"""
+Using the following Behavioural science principles, assess whether the marketing content does or does not apply each principle. present the information in a table with columns: Applies the principle (Y/N), Principle (Description), Explanation, how it could be applied. These are the principles to assess:
+Behavioral science principles play a crucial role in understanding and influencing consumer behavior in marketing. Here are 20 key principles that can significantly impact marketing strategies:
+
+Anchoring: The tendency to rely heavily on the first piece of information encountered (the "anchor") when making decisions.
+
+Example: Displaying a higher original price next to a discounted price to make the discount seem more substantial.
+Social Proof: People tend to follow the actions of others, assuming that those actions are correct.
+
+Example: Showing customer reviews and testimonials to build trust and encourage purchases.
+Scarcity: Items or opportunities become more desirable when they are perceived to be scarce or limited.
+
+Example: Using phrases like "limited time offer" or "only a few left in stock" to create urgency.
+Reciprocity: People feel obligated to return favors or kindnesses received from others.
+
+Example: Offering a free sample or trial to encourage future purchases.
+Loss Aversion: People prefer to avoid losses rather than acquire equivalent gains.
+
+Example: Emphasizing what customers stand to lose if they don't take action, such as missing out on a sale.
+Commitment and Consistency: Once people commit to something, they are more likely to follow through to maintain consistency.
+
+Example: Getting customers to make a small commitment first, like signing up for a newsletter, before asking for a larger commitment.
+Authority: People are more likely to trust and follow the advice of an authority figure.
+
+Example: Featuring endorsements from experts or industry leaders.
+Framing: The way information is presented can influence decision-making.
+
+Example: Highlighting the benefits of a product rather than the features, or framing a price as "only $1 a day" instead of "$30 a month".
+Endowment Effect: People value things more highly if they own them.
+
+Example: Allowing customers to try a product at home before making a purchase decision.
+Priming: Exposure to certain stimuli can influence subsequent behavior and decisions.
+
+Example: Using images and words that evoke positive emotions to enhance the appeal of a product.
+Decoy Effect: Adding a third option can make one of the original two options more attractive.
+Example: Introducing a higher-priced premium option to make the mid-tier option seem like better value.
+Default Effect: People tend to go with the default option presented to them.
+Example: Setting a popular product or service as the default selection on a website.
+Availability Heuristic: People judge the likelihood of events based on how easily examples come to mind.
+Example: Highlighting popular or recent customer success stories to create a perception of common positive outcomes.
+Cognitive Dissonance: The discomfort experienced when holding conflicting beliefs, leading to a change in attitude or behavior to reduce discomfort.
+Example: Reinforcing the positive aspects of a purchase to reduce buyer's remorse.
+Emotional Appeal: Emotions can significantly influence decision-making.
+Example: Using storytelling and emotional imagery to create a connection with the audience.
+Bandwagon Effect: People are more likely to do something if they see others doing it.
+Example: Showcasing the popularity of a product through sales numbers or social media mentions.
+Frequency Illusion (Baader-Meinhof Phenomenon): Once people notice something, they start seeing it everywhere.
+Example: Repeatedly exposing customers to a brand or product through various channels to increase recognition.
+In-group Favoritism: People prefer products or services associated with groups they identify with.
+Example: Creating marketing campaigns that resonate with specific demographics or communities.
+Hyperbolic Discounting: People prefer smaller, immediate rewards over larger, delayed rewards.
+Example: Offering instant discounts or rewards for immediate purchases.
+Paradox of Choice: Having too many options can lead to decision paralysis.
+Example: Simplifying choices by offering curated selections or recommended products.
+
+"""
+        try:
+            if is_image:
+                image = Image.open(io.BytesIO(uploaded_file.read()))
+                response = model.generate_content([prompt, image])
+            else:
+                with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
+                    tmp.write(uploaded_file.read())
+                    tmp_path = tmp.name
+
+                frames = extract_frames(tmp_path)
+                if frames is None or not frames:  # Check if frames were extracted successfully
+                    st.error("No frames were extracted from the video. Please check the video format.")
+                    return None
+
+                response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
+
+            if response.candidates:
+                raw_response = response.candidates[0].content.parts[0].text.strip()
+                st.write("Behavioural Principles Result::")
+                st.markdown(raw_response, unsafe_allow_html=True)  # Assuming the response is in HTML table format
+            else:
+                st.error("Unexpected response structure from the model.")
+            return None
+        except Exception as e:
+            st.error(f"Failed to read or process the media: {e}")
+            return None
+            
     def text_analysis(uploaded_file, is_image=True):
         prompt = """
 As a UX design and marketing analysis consultant, you are tasked with reviewing the text content of a marketing asset (image or video, excluding the headline) for a client. Your goal is to provide a comprehensive analysis of the text's effectiveness and offer actionable recommendations for improvement.
@@ -1148,6 +1232,7 @@ and regional norms.
             flash_analysis_button = st.button("Flash Analysis")
 
         with tab2:
+            behavioural_principles_button = st.button("Behaviour Principles")            
             overall_analysis_button = st.button("Overall Marketing Analysis")
             text_analysis_button = st.button("Text Analysis")
 
@@ -1212,6 +1297,13 @@ and regional norms.
                         xml_data = convert_to_xml(basic_analysis_result)
                         st.markdown(create_download_link(json_data, "json", "basic_analysis.json"), unsafe_allow_html=True)
                         st.markdown(create_download_link(xml_data, "xml", "basic_analysis.xml"), unsafe_allow_html=True)
+
+            if behavioural_principles_button:
+                with st.spinner("Performing basic analysis..."):
+                    behavioural_principles_result = behavioural_principles(uploaded_file, is_image)
+                    if behavioural_principles_result:
+                        st.write("## Behavioural Principles Results:")
+                        st.json(behavioural_principles_result)
 
             if overall_analysis_button:
                 with st.spinner("Performing Overall Marketing Analysis..."):
