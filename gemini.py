@@ -292,47 +292,72 @@ Analyze the provided image for marketing effectiveness. First, provide detailed 
 
     def nlp_principles_analysis(uploaded_file, is_image=True):
         prompt = """
-Using the following Neuro-Linguistic Programming (NLP) techniques, assess whether the marketing content does or does not apply each principle. present the information in a table with columns: Applies the principle (Y/N), Principle (Description), Explanation, how it could be applied. Applies the principle should only be "Y" if the principle is explicitly applied. These are the principles to assess:
-    1. Anchoring: The tendency to rely heavily on the first piece of information encountered (the "anchor") when making decisions.
-       Example: Displaying a higher original price next to a discounted price to make the discount seem more substantial.
-    2. Social Proof: People tend to follow the actions of others, assuming that those actions are correct.
-       Example: Showing customer reviews and testimonials to build trust and encourage purchases.
-    3. Scarcity: Items or opportunities become more desirable when they are perceived to be scarce or limited.
-       Example: Using phrases like "limited time offer" or "only a few left in stock" to create urgency.
-    4. Reciprocity: People feel obligated to return favors or kindnesses received from others.
-       Example: Offering a free sample or trial to encourage future purchases.
-    5. Loss Aversion: People prefer to avoid losses rather than acquire equivalent gains.
-       Example: Emphasizing what customers stand to lose if they don't take action, such as missing out on a sale.
-    6. Commitment and Consistency: Once people commit to something, they are more likely to follow through to maintain consistency.
-       Example: Getting customers to make a small commitment first, like signing up for a newsletter, before asking for a larger commitment.
-    7. Authority: People are more likely to trust and follow the advice of an authority figure.
-       Example: Featuring endorsements from experts or industry leaders.
-    8. Framing: The way information is presented can influence decision-making.
-       Example: Highlighting the benefits of a product rather than the features, or framing a price as "only $1 a day" instead of "$30 a month".
-    9. Endowment Effect: People value things more highly if they own them.
-       Example: Allowing customers to try a product at home before making a purchase decision.
-    10. Priming: Exposure to certain stimuli can influence subsequent behavior and decisions.
-        Example: Using images and words that evoke positive emotions to enhance the appeal of a product.
-    11. Decoy Effect: Adding a third option can make one of the original two options more attractive.
-        Example: Introducing a higher-priced premium option to make the mid-tier option seem like better value.
-    12. Default Effect: People tend to go with the default option presented to them.
-        Example: Setting a popular product or service as the default selection on a website.
-    13. Availability Heuristic: People judge the likelihood of events based on how easily examples come to mind.
-        Example: Highlighting popular or recent customer success stories to create a perception of common positive outcomes.
-    14. Cognitive Dissonance: The discomfort experienced when holding conflicting beliefs, leading to a change in attitude or behavior to reduce discomfort.
-        Example: Reinforcing the positive aspects of a purchase to reduce buyer's remorse.
-    15. Emotional Appeal: Emotions can significantly influence decision-making.
-        Example: Using storytelling and emotional imagery to create a connection with the audience.
-    16. Bandwagon Effect: People are more likely to do something if they see others doing it.
-        Example: Showcasing the popularity of a product through sales numbers or social media mentions.
-    17. Frequency Illusion (Baader-Meinhof Phenomenon): Once people notice something, they start seeing it everywhere.
-        Example: Repeatedly exposing customers to a brand or product through various channels to increase recognition.
-    18. In-group Favoritism: People prefer products or services associated with groups they identify with.
-        Example: Creating marketing campaigns that resonate with specific demographics or communities.
-    19. Hyperbolic Discounting: People prefer smaller, immediate rewards over larger, delayed rewards.
-        Example: Offering instant discounts or rewards for immediate purchases.
-    20. Paradox of Choice: Having too many options can lead to decision paralysis.
-        Example: Simplifying choices by offering curated selections or recommended products.
+Using the following Behavioural science principles, assess whether the marketing content does or does not apply each principle. present the information in a table with columns: Applies the principle (Y/N), Principle (Description), Explanation, how it could be applied. Applies the principle should only be "Y" if the principle is explicitly applied. These are the principles to assess:
+
+
+Here are the top 20 Neuro-Linguistic Programming (NLP) techniques to assess the effectiveness of static marketing content, including examples:
+
+Representational Systems:
+
+Example: If your target audience prefers visual information, ensure the content includes vivid images and visually appealing graphics.
+Anchoring:
+
+Example: Use consistent colors and logos to create positive associations with your brand every time the audience sees them.
+Meta-Modeling:
+
+Example: Clarify ambiguous statements like "Our product is the best" by specifying "Our product is rated #1 for quality by Consumer Reports."
+Milton Model:
+
+Example: Use phrases like "You may find yourself feeling more relaxed when using our product" to embed suggestions subtly.
+Chunking:
+
+Example: Provide both high-level benefits (chunking up) and detailed features (chunking down) of your product to cater to different audience needs.
+Pacing and Leading:
+
+Example: Start with a relatable problem (pacing) like "Do you struggle with time management?" and lead to your solution: "Our planner can help you stay organized and efficient."
+Swish Pattern:
+
+Example: Replace negative images (e.g., cluttered desk) with positive images (e.g., clean, organized workspace) in your content.
+Submodalities:
+
+Example: Use bright, bold colors for calls to action to evoke excitement and urgency.
+Perceptual Positions:
+
+Example: Present content from the user's perspective ("You will benefit from..."), from others' perspectives ("Others will admire your..."), and from an observer's perspective ("Imagine the positive impact...").
+Well-Formed Outcomes:
+
+Example: Clearly state the desired outcome: "Increase your productivity by 20% with our planner in just one month."
+Rapport Building:
+
+Example: Use language that resonates with your audience’s values and experiences: "We understand how hectic life can be, and we’re here to help."
+Calibration:
+
+Example: Monitor engagement metrics like click-through rates and adjust content accordingly to better meet audience needs.
+Reframing:
+
+Example: Turn a negative situation into a positive opportunity: "Stuck in traffic? Use this time to listen to our educational podcasts and learn something new."
+Logical Levels:
+
+Example: Ensure your content addresses different levels, from environment ("Work anywhere") to identity ("Be a proactive leader").
+Timeline Therapy:
+
+Example: Highlight past successes, current benefits, and future potential: "Our product has helped thousands, it’s helping people right now, and it can help you too."
+Meta Programs:
+
+Example: Tailor content to different motivational patterns, such as "towards" goals ("Achieve your dreams with our help") or "away from" problems ("Avoid stress with our solution").
+Strategy Elicitation:
+
+Example: Show step-by-step how to use your product to achieve desired results, aligning with the audience's decision-making strategies.
+Sensory Acuity:
+
+Example: Use descriptive language that appeals to the senses: "Feel the soft texture, see the vibrant colors, and hear the clear sound."
+Pattern Interrupts:
+
+Example: Include unexpected elements like surprising statistics or bold images to capture attention and break habitual thought patterns.
+Belief Change Techniques:
+
+Example: Challenge limiting beliefs with testimonials or case studies that show successful outcomes, shifting beliefs towards the positive.
+By utilizing these NLP techniques, you can create static marketing content that is more engaging, persuasive, and effective in achieving your marketing goals.
     """
         try:
             if is_image:
