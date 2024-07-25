@@ -220,7 +220,7 @@ Analyze the provided image for marketing effectiveness. First, provide detailed 
 
     def behavioural_principles(uploaded_file, is_image=True):
         prompt = f"""
-Using the following Behavioural science principles, assess whether the marketing content does or does not apply each principle. present the information in a table with columns: Applies the principle (Y/N), Principle (Description), Explanation, how it could be applied. These are the principles to assess:
+Using the following Behavioural science principles, assess whether the marketing content does or does not apply each principle. present the information in a table with columns: Applies the principle (Y/N), Principle (Description), Explanation, how it could be applied. Applies the principle should only be "Y" if the principle is explicitly applied. These are the principles to assess:
 Behavioral science principles play a crucial role in understanding and influencing consumer behavior in marketing. Here are 20 key principles that can significantly impact marketing strategies:
 
 Anchoring: The tendency to rely heavily on the first piece of information encountered (the "anchor") when making decisions.
