@@ -352,7 +352,7 @@ Using the following Neuro-Linguistic Programming (NLP) techniques, assess whethe
 
             if response.candidates:
                 raw_response = response.candidates[0].content.parts[0].text.strip()
-                st.write("Behavioural Principles Result::")
+                st.write("NLP Principles Result::")
                 st.markdown(raw_response, unsafe_allow_html=True)  # Assuming the response is in HTML table format
             else:
                 st.error("Unexpected response structure from the model.")
