@@ -289,6 +289,78 @@ Analyze the provided image for marketing effectiveness. First, provide detailed 
         except Exception as e:
             st.error(f"Failed to read or process the media: {e}")
             return None
+
+    def nlp_principles_analysis(uploaded_file, is_image=True):
+        prompt = """
+    Using the following Behavioral Science principles, assess whether the marketing content does or does not apply each principle. Present the information in a table with columns: 'Applies the Principle (Y/N)', 'Principle (Description)', 'Explanation', and 'How it could be applied'. The 'Applies the Principle' column should only be marked "Y" if the principle is explicitly applied. These are the principles to assess:
+
+    1. Anchoring: The tendency to rely heavily on the first piece of information encountered (the "anchor") when making decisions.
+       Example: Displaying a higher original price next to a discounted price to make the discount seem more substantial.
+    2. Social Proof: People tend to follow the actions of others, assuming that those actions are correct.
+       Example: Showing customer reviews and testimonials to build trust and encourage purchases.
+    3. Scarcity: Items or opportunities become more desirable when they are perceived to be scarce or limited.
+       Example: Using phrases like "limited time offer" or "only a few left in stock" to create urgency.
+    4. Reciprocity: People feel obligated to return favors or kindnesses received from others.
+       Example: Offering a free sample or trial to encourage future purchases.
+    5. Loss Aversion: People prefer to avoid losses rather than acquire equivalent gains.
+       Example: Emphasizing what customers stand to lose if they don't take action, such as missing out on a sale.
+    6. Commitment and Consistency: Once people commit to something, they are more likely to follow through to maintain consistency.
+       Example: Getting customers to make a small commitment first, like signing up for a newsletter, before asking for a larger commitment.
+    7. Authority: People are more likely to trust and follow the advice of an authority figure.
+       Example: Featuring endorsements from experts or industry leaders.
+    8. Framing: The way information is presented can influence decision-making.
+       Example: Highlighting the benefits of a product rather than the features, or framing a price as "only $1 a day" instead of "$30 a month".
+    9. Endowment Effect: People value things more highly if they own them.
+       Example: Allowing customers to try a product at home before making a purchase decision.
+    10. Priming: Exposure to certain stimuli can influence subsequent behavior and decisions.
+        Example: Using images and words that evoke positive emotions to enhance the appeal of a product.
+    11. Decoy Effect: Adding a third option can make one of the original two options more attractive.
+        Example: Introducing a higher-priced premium option to make the mid-tier option seem like better value.
+    12. Default Effect: People tend to go with the default option presented to them.
+        Example: Setting a popular product or service as the default selection on a website.
+    13. Availability Heuristic: People judge the likelihood of events based on how easily examples come to mind.
+        Example: Highlighting popular or recent customer success stories to create a perception of common positive outcomes.
+    14. Cognitive Dissonance: The discomfort experienced when holding conflicting beliefs, leading to a change in attitude or behavior to reduce discomfort.
+        Example: Reinforcing the positive aspects of a purchase to reduce buyer's remorse.
+    15. Emotional Appeal: Emotions can significantly influence decision-making.
+        Example: Using storytelling and emotional imagery to create a connection with the audience.
+    16. Bandwagon Effect: People are more likely to do something if they see others doing it.
+        Example: Showcasing the popularity of a product through sales numbers or social media mentions.
+    17. Frequency Illusion (Baader-Meinhof Phenomenon): Once people notice something, they start seeing it everywhere.
+        Example: Repeatedly exposing customers to a brand or product through various channels to increase recognition.
+    18. In-group Favoritism: People prefer products or services associated with groups they identify with.
+        Example: Creating marketing campaigns that resonate with specific demographics or communities.
+    19. Hyperbolic Discounting: People prefer smaller, immediate rewards over larger, delayed rewards.
+        Example: Offering instant discounts or rewards for immediate purchases.
+    20. Paradox of Choice: Having too many options can lead to decision paralysis.
+        Example: Simplifying choices by offering curated selections or recommended products.
+    """
+        try:
+            if is_image:
+                image = Image.open(io.BytesIO(uploaded_file.read()))
+                response = model.generate_content([prompt, image])
+            else:
+                with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
+                    tmp.write(uploaded_file.read())
+                    tmp_path = tmp.name
+
+                frames = extract_frames(tmp_path)
+                if frames is None or not frames:  # Check if frames were extracted successfully
+                    st.error("No frames were extracted from the video. Please check the video format.")
+                    return None
+
+                response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
+
+            if response.candidates:
+                raw_response = response.candidates[0].content.parts[0].text.strip()
+                st.write("Behavioural Principles Result::")
+                st.markdown(raw_response, unsafe_allow_html=True)  # Assuming the response is in HTML table format
+            else:
+                st.error("Unexpected response structure from the model.")
+            return None
+        except Exception as e:
+            st.error(f"Failed to read or process the media: {e}")
+            return None
             
     def text_analysis(uploaded_file, is_image=True):
         prompt = """
@@ -1220,7 +1292,8 @@ and regional norms.
             flash_analysis_button = st.button("Flash Analysis")
 
         with tab2:
-            behavioural_principles_button = st.button("Behaviour Principles")            
+            behavioural_principles_button = st.button("Behaviour Principles")
+            nlp_principles_analysis_button = st.button("NLP Principles Analysis") 
             overall_analysis_button = st.button("Overall Marketing Analysis")
             text_analysis_button = st.button("Text Analysis")
 
@@ -1291,8 +1364,13 @@ and regional norms.
                     behavioural_principles_result = behavioural_principles(uploaded_file, is_image)
                     if behavioural_principles_result:
                         st.write("## Behavioural Principles Results:")
-                        st.json(behavioural_principles_result)
-
+                        st.markdown(behavioural_principles_result)
+            if nlp_principles_analysis_button:
+                with st.spinner("Performing NLP Principles Analysis..."):
+                    nlp_principles_analysis_result = nlp_principles_analysis(uploaded_file, is_image)
+                    if nlp_principles_analysis_result:
+                        st.write("## NLP Principles Analysis Results:")
+                        st.markdown(nlp_principles_analysis_button)
             if overall_analysis_button:
                 with st.spinner("Performing Overall Marketing Analysis..."):
                     overall_analysis_result = overall_analysis(uploaded_file, is_image)
