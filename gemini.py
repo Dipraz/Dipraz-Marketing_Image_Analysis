@@ -19,24 +19,21 @@ load_dotenv()
 api_key = os.getenv('GOOGLE_API_KEY')
 credentials_path = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
 
+# Define generation configuration
+generation_config = {
+    "temperature": 0.2,
+    "top_p": 0.8,
+    "top_k": 64,
+    "max_output_tokens": 8192,
+    "response_mime_type": "text/plain",
+}
+
 # Check if credentials_path is set
 if credentials_path is None:
     st.error("GOOGLE_APPLICATION_CREDENTIALS environment variable not set. Please check your .env file.")
 else:
     # Set the Google application credentials
     os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = credentials_path
-
-    # Configure the Generative AI API key
-    genai.configure(api_key=api_key)
-
-    # Define generation configuration
-    generation_config = {
-        "temperature": 0.2,
-        "top_p": 0.8,
-        "top_k": 64,
-        "max_output_tokens": 8192,
-        "response_mime_type": "text/plain",
-    }
 
     # Initialize Generative AI model with generation configuration
     model = genai.GenerativeModel(
@@ -1309,15 +1306,26 @@ and regional norms.
         st.header("Analysis Options")
 
         # Tabs for better organization
-        tab1, tab2, tab3, tab4, tab5 = st.tabs(["Basic", "Detailed", "Headlines", "Persona","Others"])
+        tab1, tab2, tab3, tab4, tab5 = st.tabs(["Basic", "Detailed", "Headlines", "Persona", "Others"])
 
-        with tab1:
+        with tab1: 
             basic_analysis = st.button("Basic Analysis")
             flash_analysis_button = st.button("Flash Analysis")
 
+            # --- Image Generation --- 
+            st.subheader("Image Generation")
+            image_prompt = st.text_area("Enter a prompt to generate an image:")
+            if st.button("Generate Image"):
+                if image_prompt:
+                    with st.spinner("Generating image..."):
+                        generated_image_url = generate_image(image_prompt)
+                        if generated_image_url:
+                            st.image(generated_image_url, caption="Generated Image")
+                else:
+                    st.warning("Please enter a prompt.")
+
         with tab2:
             behavioural_principles_button = st.button("Behaviour Principles")
-            nlp_principles_analysis_button = st.button("NLP Principles Analysis") 
             overall_analysis_button = st.button("Overall Marketing Analysis")
             text_analysis_button = st.button("Text Analysis")
 
@@ -1329,7 +1337,7 @@ and regional norms.
             meta_profile_button = st.button("Facebook targeting")
             linkedin_profile_button = st.button("LinkedIn targeting")
             x_profile_button = st.button("X (formerly Twitter) targeting")
-            
+
         with tab5:
             main_headline_analysis_button = st.button("Main Headline Analysis")
             image_headline_analysis_button = st.button("Image Headline Analysis")
@@ -1337,10 +1345,41 @@ and regional norms.
             main_headline_text_analysis_button = st.button("Main Headline Text Analysis")
             image_headline_text_analysis_button = st.button("Image Headline Text Analysis")
             supporting_headline_text_analysis_button = st.button("Supporting Headline Text Analysis")
+
+        # Custom prompt analysis
+        custom_prompt_button = st.button("Analyze with Custom Prompt")
+        if custom_prompt_button:
+            custom_prompt = st.text_area("Enter your custom prompt here:")
             
         st.markdown("---")
-        custom_prompt = st.text_area("Custom Prompt (Optional):")
-        custom_prompt_button = st.button("Analyze with Custom Prompt")
+        # LLM API Selection and Key Input
+        llm_api = st.selectbox("Select LLM API", ["Google Gemini", "Custom"])
+        if llm_api == "Google Gemini":
+            # Gemini-specific API key input
+            gemini_api_key = st.text_input("Enter your Gemini Flash API key (optional):", type="password")
+            if gemini_api_key:
+                api_key = gemini_api_key
+            else:
+                load_dotenv()
+                api_key = os.getenv('GOOGLE_API_KEY')
+                credentials_path = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
+                if credentials_path is not None:
+                    os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = credentials_path
+
+        elif llm_api == "Custom":
+            # Custom LLM API key input
+            api_key = st.text_input("Enter your LLM API key:", type="password")
+
+        custom_prompt = st.text_area("Custom Prompt (Optional):", key='custom_prompt_sidebar')
+        custom_prompt = st.text_area("Custom Prompt (Optional):", key='custom_prompt_main')
+        # In one part of your application
+        if st.button("Analyze with Custom Prompt", key='analyze_custom_prompt_sidebar'):
+            # perform analysis for sidebar context
+            pass
+        # In another part of your application
+        if st.button("Analyze with Custom Prompt", key='analyze_custom_prompt_main'):
+            # perform analysis for main content area
+            pass
 
     # --- Main Content Area ---
 
