@@ -1325,6 +1325,7 @@ and regional norms.
                     st.warning("Please enter a prompt.")
 
         with tab2:
+            nlp_principles_analysis_button = st.button("NLP Principles Analysis")
             behavioural_principles_button = st.button("Behaviour Principles")
             overall_analysis_button = st.button("Overall Marketing Analysis")
             text_analysis_button = st.button("Text Analysis")
