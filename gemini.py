@@ -1,4 +1,3 @@
-
 import streamlit as st
 from dotenv import load_dotenv
 import os
@@ -20,15 +19,6 @@ load_dotenv()
 api_key = os.getenv('GOOGLE_API_KEY')
 credentials_path = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
 
-# Define generation configuration
-generation_config = {
-    "temperature": 0.2,
-    "top_p": 0.8,
-    "top_k": 64,
-    "max_output_tokens": 8192,
-    "response_mime_type": "text/plain",
-}
-
 # Check if credentials_path is set
 if credentials_path is None:
     st.error("GOOGLE_APPLICATION_CREDENTIALS environment variable not set. Please check your .env file.")
@@ -36,16 +26,30 @@ else:
     # Set the Google application credentials
     os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = credentials_path
 
+    # Configure the Generative AI API key
+    genai.configure(api_key=api_key)
+
+    # Define generation configuration
+    generation_config = {
+        "temperature": 0.2,
+        "top_p": 0.8,
+        "top_k": 64,
+        "max_output_tokens": 8192,
+        "response_mime_type": "text/plain",
+    }
+
     # Initialize Generative AI model with generation configuration
     model = genai.GenerativeModel(
         model_name="gemini-1.5-flash-latest",
         generation_config=generation_config,
     )
+
     def convert_to_rgb(image):
         """Convert an image to RGB format if it is not already."""
         if image.mode != 'RGB':
             return image.convert('RGB')
         return image
+
     def resize_image(image, max_size=(300, 250)):
         image.thumbnail(max_size)
         return image
@@ -56,40 +60,40 @@ else:
         if not cap.isOpened():
             st.error(f"Failed to open video file {video_file_path}. Check if the file is corrupt or format is unsupported.")
             return None
-    
+
         total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
         frame_step = max(total_frames // num_frames, 1)
         frames = []
-    
+
         for i in range(0, total_frames, frame_step):
             cap.set(cv2.CAP_PROP_POS_FRAMES, i)
             ret, frame = cap.read()
             if not ret:
                 break
-    
+
             # Convert color space and create a PIL Image from bytes
             frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             pil_image = Image.fromarray(frame_rgb)
             frames.append(pil_image)
-    
+
         cap.release()
         if len(frames) == 0:
             st.error("No frames were extracted, possibly due to an error in reading the video.")
             return None
         return frames
-    
+
     def analyze_video(uploaded_file):
         """Analyzes video by extracting frames and performing model inference on the first frame."""
         try:
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
                 tmp.write(uploaded_file.read())
                 tmp_path = tmp.name
-    
+
             frames = extract_frames(tmp_path)
             if frames is None or not frames:
                 st.error("No frames were extracted from the video. Please check the video format.")
                 return None
-    
+
             prompt = (
                 "Analyze the media (image or video frame) for various marketing aspects, ensuring consistent results for each aspect. "
                 "Respond in single words or short phrases separated by commas for each attribute: text amount (High or Low), "
@@ -97,7 +101,7 @@ else:
                 "Focus (Central message or Scattered), customer-centric (Yes or No), credibility (High or Low), "
                 "User interaction (High, Moderate, or Low), CTA presence (Yes or No), CTA clarity (Clear or Unclear)."
             )
-    
+
             response = model.generate_content([prompt, frames[0]])  # Analyzing the first frame
             if response.candidates:
                 return response.candidates[0].content.parts[0].text.strip()
@@ -112,7 +116,7 @@ else:
     if 'headlines' not in st.session_state:
         st.session_state.headlines = {}
     if 'headline_result' not in st.session_state:
-        st.session_state.headline_result = None    
+        st.session_state.headline_result = None
 
     def analyze_media(uploaded_file, is_image=True):
         # General prompt for both images and videos
@@ -131,14 +135,14 @@ else:
                 with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
                     tmp.write(uploaded_file.read())
                     tmp_path = tmp.name
-    
+
                 frames = extract_frames(tmp_path)  # Assuming extract_frames extracts frames from video
                 if frames is None or not frames:
                     st.error("No frames were extracted from the video. Please check the video format.")
                     return None
-    
+
                 response = model.generate_content([prompt, frames[0]])  # Analyzing the first frame
-    
+
             attributes = ["text_amount", "color_usage", "visual_cues", "emotion", "focus", "customer_centric", "credibility", "user_interaction", "cta_presence", "cta_clarity"]
             if response.candidates:
                 raw_response = response.candidates[0].content.parts[0].text.strip()
@@ -188,7 +192,6 @@ Analyze the provided image for marketing effectiveness. First, provide detailed 
             "19. Framing: Is framing of the message used to increase the effectiveness of the asset effectively?\n"
             "20. Content Investment: Blocks containing paragraphs of text will not be consumed by busy users and would require time to read – this is negative, as the users will not spend the time. Is the amount of content presented kept short and clear?\n"
         """
-
         try:
             if is_image:
                 image = Image.open(io.BytesIO(uploaded_file.read()))
@@ -1300,281 +1303,226 @@ and regional norms.
         b64 = base64.b64encode(data.encode()).decode()
         return f'<a href="data:file/{file_format};base64,{b64}" download="{filename}">Download {file_format.upper()}</a>'
 
-    st.title("Marketing Media Analysis AI Assistant")
+# --- Streamlit App ---
+st.title("Marketing Media Analysis AI Assistant")
 
-    # --- Sidebar ---
-    with st.sidebar:
-        st.header("Analysis Options")
+# --- Sidebar ---
+with st.sidebar:
+    st.header("Analysis Options")
+    tabs = st.tabs(["Basic", "Detailed", "Headlines", "Persona", "Others"])
 
-        # Tabs for better organization
-        tab1, tab2, tab3, tab4, tab5 = st.tabs(["Basic", "Detailed", "Headlines", "Persona", "Others"])
+    # Analysis buttons within each tab
+    with tabs[0]:  # Basic
+        basic_analysis = st.button("Basic Analysis")
+        flash_analysis_button = st.button("Flash Analysis")
 
-        with tab1: 
-            basic_analysis = st.button("Basic Analysis")
-            flash_analysis_button = st.button("Flash Analysis")
+    with tabs[1]:  # Detailed
+        behavioural_principles_button = st.button("Behaviour Principles")
+        nlp_principles_analysis_button = st.button("NLP Principles Analysis")
+        overall_analysis_button = st.button("Overall Marketing Analysis")
+        text_analysis_button = st.button("Text Analysis")
 
-            # --- Image Generation --- 
-            st.subheader("Image Generation")
-            image_prompt = st.text_area("Enter a prompt to generate an image:")
-            if st.button("Generate Image"):
-                if image_prompt:
-                    with st.spinner("Generating image..."):
-                        generated_image_url = generate_image(image_prompt)
-                        if generated_image_url:
-                            st.image(generated_image_url, caption="Generated Image")
-                else:
-                    st.warning("Please enter a prompt.")
+    with tabs[2]:  # Headlines
+        headline_analysis_button = st.button("Headline Analysis")
+        detailed_headline_analysis_button = st.button("Headline Optimization Report")
+        main_headline_analysis_button = st.button("Main Headline Analysis")
+        image_headline_analysis_button = st.button("Image Headline Analysis")
+        supporting_headline_analysis_button = st.button("Supporting Headline Analysis")
 
-        with tab2:
-            nlp_principles_analysis_button = st.button("NLP Principles Analysis")
-            behavioural_principles_button = st.button("Behaviour Principles")
-            overall_analysis_button = st.button("Overall Marketing Analysis")
-            text_analysis_button = st.button("Text Analysis")
+    with tabs[3]:  # Persona
+        meta_profile_button = st.button("Facebook targeting")
+        linkedin_profile_button = st.button("LinkedIn targeting")
+        x_profile_button = st.button("X (formerly Twitter) targeting")
 
-        with tab3:
-            headline_analysis_button = st.button("Headline Analysis")
-            detailed_headline_analysis_button = st.button("Headline Optimization Report")
+    with tabs[4]:  # Others
+        main_headline_text_analysis_button = st.button("Main Headline Text Analysis")
+        image_headline_text_analysis_button = st.button("Image Headline Text Analysis")
+        supporting_headline_text_analysis_button = st.button("Supporting Headline Text Analysis")
+    st.markdown("---")
+    custom_prompt = st.text_area("Custom Prompt (Optional):")
+    custom_prompt_button = st.button("Analyze with Custom Prompt")
 
-        with tab4:
-            meta_profile_button = st.button("Facebook targeting")
-            linkedin_profile_button = st.button("LinkedIn targeting")
-            x_profile_button = st.button("X (formerly Twitter) targeting")
+# --- Main Content Area ---
 
-        with tab5:
-            main_headline_analysis_button = st.button("Main Headline Analysis")
-            image_headline_analysis_button = st.button("Image Headline Analysis")
-            supporting_headline_analysis_button = st.button("Supporting Headline Analysis")
-            main_headline_text_analysis_button = st.button("Main Headline Text Analysis")
-            image_headline_text_analysis_button = st.button("Image Headline Text Analysis")
-            supporting_headline_text_analysis_button = st.button("Supporting Headline Text Analysis")
+# File Uploader with Enhanced UI
+uploaded_files = st.file_uploader(
+    "Upload Marketing Media (Image or Video):",
+    accept_multiple_files=True,
+    type=["png", "jpg", "jpeg", "mp4", "avi"],
+    help="Supported formats: PNG, JPG, JPEG, MP4, AVI",
+    key="general_media_uploader"  # Unique key for this uploader
+)
 
-        # Custom prompt analysis
-        custom_prompt_button = st.button("Analyze with Custom Prompt")
-        if custom_prompt_button:
-            custom_prompt = st.text_area("Enter your custom prompt here:")
-            
-        st.markdown("---")
-        # LLM API Selection and Key Input
-        llm_api = st.selectbox("Select LLM API", ["Google Gemini", "Custom"])
-        if llm_api == "Google Gemini":
-            # Gemini-specific API key input
-            gemini_api_key = st.text_input("Enter your Gemini Flash API key (optional):", type="password")
-            if gemini_api_key:
-                api_key = gemini_api_key
-            else:
-                load_dotenv()
-                api_key = os.getenv('GOOGLE_API_KEY')
-                credentials_path = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
-                if credentials_path is not None:
-                    os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = credentials_path
+# Display Uploaded Media (Responsive Design)
+for uploaded_file in uploaded_files:
+    is_image = uploaded_file.type in ["image/png", "image/jpg", "image/jpeg"]
 
-        elif llm_api == "Custom":
-            # Custom LLM API key input
-            api_key = st.text_input("Enter your LLM API key:", type="password")
+    with st.container():  # Use container for better layout
+        # Display the uploaded media
+        if is_image:
+            image = Image.open(uploaded_file)
+            image = resize_image(image)  # Resize for display
+            st.image(image, caption="Uploaded Image", use_column_width='auto')
+        else:
+            st.video(uploaded_file, format="video/mp4")
 
-        custom_prompt = st.text_area("Custom Prompt (Optional):", key='custom_prompt_sidebar')
-        custom_prompt = st.text_area("Custom Prompt (Optional):", key='custom_prompt_main')
-        # In one part of your application
-        if st.button("Analyze with Custom Prompt", key='analyze_custom_prompt_sidebar'):
-            # perform analysis for sidebar context
-            pass
-        # In another part of your application
-        if st.button("Analyze with Custom Prompt", key='analyze_custom_prompt_main'):
-            # perform analysis for main content area
-            pass
+        # Analysis Results
+        uploaded_file.seek(0)  # Reset file pointer for re-analysis
 
-    # --- Main Content Area ---
+        # Check which analysis button was clicked and call the corresponding function
+        if basic_analysis:
+            with st.spinner("Performing basic analysis..."):
+                result = analyze_media(uploaded_file, is_image)
+                if result:
+                    st.write("## Basic Analysis Results:")
+                    display_and_download(result, "basic_analysis") 
 
-    # File Uploader with Enhanced UI
-    uploaded_files = st.file_uploader(
-        "Upload Marketing Media (Image or Video):", 
-        accept_multiple_files=True, 
-        type=["png", "jpg", "jpeg", "mp4", "avi"],
-        help="Supported formats: PNG, JPG, JPEG, MP4, AVI",
-        key="general_media_uploader"  # Unique key for the general media uploader
-    )
+        elif flash_analysis_button:
+            with st.spinner("Performing Flash analysis..."):
+                result = flash_analysis(uploaded_file, is_image)
+                if result:
+                    st.write("## Flash Analysis Results:")
+                    st.markdown(result)  # Display results directly
 
-    # Display Uploaded Media (Responsive Design)
-    for uploaded_file in uploaded_files:
-        is_image = uploaded_file.type in ["image/png", "image/jpg", "image/jpeg"]
+        elif behavioural_principles_button:
+            with st.spinner("Analyzing Behavioral Principles..."):
+                result = behavioural_principles(uploaded_file, is_image)
+                if result:
+                    st.write("## Behavioral Principles Analysis Results:")
+                    st.markdown(result, unsafe_allow_html=True)
 
-        with st.container():  # Use container for better layout
-            col1, col2 = st.columns([1, 2])  # Adjust column ratio as needed
+        elif nlp_principles_analysis_button:
+            with st.spinner("Analyzing NLP Principles..."):
+                result = nlp_principles_analysis(uploaded_file, is_image)
+                if result:
+                    st.write("## NLP Principles Analysis Results:")
+                    st.markdown(result, unsafe_allow_html=True)
 
-            with col1:
-                if is_image:
-                    image = Image.open(uploaded_file)
-                    image = resize_image(image)
-                    st.image(image, caption="Uploaded Image", use_column_width=True)
-                else:
-                    st.video(uploaded_file, format="video/mp4")
+        elif overall_analysis_button:
+            with st.spinner("Performing overall marketing analysis..."):
+                result = overall_analysis(uploaded_file, is_image)
+                if result:
+                    st.write("## Overall Marketing Analysis Results:")
+                    st.markdown(result)
 
-            with col2:
-                uploaded_file.seek(0)
+        elif text_analysis_button:
+            with st.spinner("Performing text analysis..."):
+                result = text_analysis(uploaded_file, is_image)
+                if result:
+                    st.write("## Text Analysis Results:")
+                    st.markdown(result)
+        elif headline_analysis_button:
+            with st.spinner("Performing headline analysis..."):
+                result = headline_analysis(uploaded_file, is_image)
+                if result:
+                    st.write("## Headline Analysis Results:")
+                    st.markdown(result)
+        
+        elif main_headline_analysis_button:
+            with st.spinner("Performing Main Headline Analysis..."):
+                result = main_headline_detailed_analysis(uploaded_file, is_image)
+                if result:
+                    st.write("## Main Headline Analysis Results:")
+                    st.markdown(result)
 
-            # Use the 'is_image' flag correctly in function calls
-            if basic_analysis:
-                with st.spinner("Performing basic analysis..."):
-                    basic_analysis_result = analyze_media(uploaded_file, is_image)
-                    if basic_analysis_result:
-                        st.write("## Basic Analysis Results:")
-                        st.json(basic_analysis_result)
-                        json_data = convert_to_json(basic_analysis_result)
-                        xml_data = convert_to_xml(basic_analysis_result)
-                        st.markdown(create_download_link(json_data, "json", "basic_analysis.json"), unsafe_allow_html=True)
-                        st.markdown(create_download_link(xml_data, "xml", "basic_analysis.xml"), unsafe_allow_html=True)
+        elif image_headline_analysis_button:
+            with st.spinner("Performing Image Headline Analysis..."):
+                result = image_headline_detailed_analysis(uploaded_file, is_image)
+                if result:
+                    st.write("## Image Headline Analysis Results:")
+                    st.markdown(result)
 
-            if behavioural_principles_button:
-                with st.spinner("Performing basic analysis..."):
-                    behavioural_principles_result = behavioural_principles(uploaded_file, is_image)
-                    if behavioural_principles_result:
-                        st.write("## Behavioural Principles Results:")
-                        st.markdown(behavioural_principles_result)
-            if nlp_principles_analysis_button:
-                with st.spinner("Performing NLP Principles Analysis..."):
-                    nlp_principles_analysis_result = nlp_principles_analysis(uploaded_file, is_image)
-                    if nlp_principles_analysis_result:
-                        st.write("## NLP Principles Analysis Results:")
-                        st.markdown(nlp_principles_analysis_button)
-            if overall_analysis_button:
-                with st.spinner("Performing Overall Marketing Analysis..."):
-                    overall_analysis_result = overall_analysis(uploaded_file, is_image)
-                    if overall_analysis_result:
-                        st.write("## Overall Marketing Analysis Results:")
-                        st.markdown(overall_analysis_result)
-            if text_analysis_button:
-                with st.spinner("Performing text analysis..."):
-                    text_result = text_analysis(uploaded_file, is_image)
-                    if text_result:
-                        st.write("## Text Analysis Results:")
-                        st.markdown(text_result)
+        elif supporting_headline_analysis_button:
+            with st.spinner("Performing Supporting Headline Analysis..."):
+                result = supporting_headline_detailed_analysis(uploaded_file, is_image)
+                if result:
+                    st.write("## Supporting Headline Analysis Report Results:")
+                    st.markdown(result)
 
-            if headline_analysis_button:
-                with st.spinner("Performing headline analysis..."):
-                    headline_result = headline_analysis(uploaded_file, is_image)
-                    if headline_result:
-                        st.write("## Headline Analysis Results:")
-                        st.markdown(headline_result)
-
-            if main_headline_analysis_button:
-                with st.spinner("Performing Main Headline Analysis..."):
-                    main_headline_result = main_headline_detailed_analysis(uploaded_file, is_image)
-                    if main_headline_result:
-                        st.write("## Main Headline Analysis Results:")
-                        st.markdown(main_headline_result)
-            if image_headline_analysis_button:
-                with st.spinner("Performing Image Headline Analysis..."):
-                    image_detailed_headline_result = image_headline_detailed_analysis(uploaded_file, is_image)
-                    if image_detailed_headline_result:
-                        st.write("## Image Headline Analysis Results:")
-                        st.markdown(image_detailed_headline_result)
-
-            if supporting_headline_analysis_button:
-                with st.spinner("Performing Supporting Headline Analysis..."):
-                    supporting_detailed_headline_result = supporting_headline_detailed_analysis(uploaded_file, is_image)
-                    if supporting_detailed_headline_result:
-                        st.write("## Supporting Headline Analysis Report Results:")
-                        st.markdown(supporting_detailed_headline_result)
-
-            if detailed_headline_analysis_button:
-                with st.spinner("Performing Headline Optimization Report analysis..."):
-                    detailed_headline_result = headline_detailed_analysis(uploaded_file, is_image)
-                    if detailed_headline_result:
-                        st.write("## Headline Optimization Report Results:")
-                        st.markdown(detailed_headline_result)
-            if main_headline_text_analysis_button:
-                with st.spinner("Performing Image Headline Analysis..."):
-                    main_headline_analysis_result = main_headline_analysis(uploaded_file, is_image)
-                    if main_headline_analysis_result:
-                        st.write("## Image Headline Analysis Results:")
-                        st.markdown(main_headline_analysis_result)                    
-            if image_headline_text_analysis_button:
-                with st.spinner("Performing Image Headline Analysis..."):
-                    image_headline_analysis_result = image_headline_analysis(uploaded_file, is_image)
-                    if image_headline_analysis_result:
-                        st.write("## Image Headline Analysis Results:")
-                        st.markdown(image_headline_analysis_result)
-            if supporting_headline_text_analysis_button:
-                with st.spinner("Performing Image Headline Analysis..."):
-                    supporting_headline_analysis_result = supporting_headline_analysis(uploaded_file, is_image)
-                    if supporting_headline_analysis_result:
-                        st.write("## Image Headline Analysis Results:")
-                        st.markdown(supporting_headline_analysis_result)
-            if flash_analysis_button:
-                with st.spinner("Performing Flash analysis..."):
-                    flash_result = flash_analysis(uploaded_file, is_image)
-                    if flash_result:
-                        st.write("## Flash Analysis Results:")
-                        st.markdown(flash_result)
-            if custom_prompt_button and uploaded_files:
-                with st.spinner("Performing custom prompt analysis..."):
-                    is_image = uploaded_file.type in ["image/png", "image/jpg", "image/jpeg"]
-                    custom_result = custom_prompt_analysis(uploaded_files[0], custom_prompt, is_image) 
-                    if custom_result:
-                        st.write("## Custom Prompt Analysis Results:")
-                        st.markdown(custom_result)
-
-
-            if meta_profile_button:
-                with st.spinner("Performing Headline Optimization Report analysis..."):
-                    meta_profile_result = meta_profile(uploaded_file, is_image)
-                    if meta_profile_result:
-                        st.write("## Headline Optimization Report Results:")
-                        st.markdown(meta_profile_result)
-                        
-            if linkedin_profile_button:
-                with st.spinner("Performing Headline Optimization Report analysis..."):
-                    linked_profile_result = linkedin_profile(uploaded_file, is_image)
-                    if linked_profile_result:
-                        st.write("## Headline Optimization Report Results:")
-                        st.markdown(linked_profile_result)
+        elif detailed_headline_analysis_button:
+            with st.spinner("Performing Headline Optimization Report analysis..."):
+                result = headline_detailed_analysis(uploaded_file, is_image)
+                if result:
+                    st.write("## Headline Optimization Report Results:")
+                    st.markdown(result)
                     
-            if x_profile_button:
-                with st.spinner("Performing Headline Optimization Report analysis..."):
-                    x_profile_result = x_profile(uploaded_file, is_image)
-                    if x_profile_result:
-                        st.write("## Headline Optimization Report Results:")
-                        st.markdown(x_profile_result)
-                        
-            # File Uploader for Image Comparison
-            uploaded_files_comparison = st.file_uploader(
-                "Upload Two Marketing Images for Comparison:",
-                accept_multiple_files=True,
-                type=["png", "jpg", "jpeg"],
-                help="Upload exactly two images for comparison."
-            )
+        elif main_headline_text_analysis_button:
+            with st.spinner("Performing Main Headline Text Analysis..."):
+                result = main_headline_analysis(uploaded_file, is_image)
+                if result:
+                    st.write("## Main Headline Text Analysis Results:")
+                    st.markdown(result)
 
-            # Display Uploaded Images for Comparison (if any)
-            if uploaded_files_comparison and len(uploaded_files_comparison) == 2:
-                image1, image2 = [convert_to_rgb(Image.open(file)) for file in uploaded_files_comparison]
-                col1, col2 = st.columns(2)
-                with col1:
-                    st.image(image1, caption="Image 1", use_column_width=True)
-                with col2:
-                    st.image(image2, caption="Image 2", use_column_width=True)
+        elif image_headline_text_analysis_button:
+            with st.spinner("Performing Image Headline Text Analysis..."):
+                result = image_headline_analysis(uploaded_file, is_image)
+                if result:
+                    st.write("## Image Headline Text Analysis Results:")
+                    st.markdown(result)
 
-                # --- Image Comparison Options ---
-                with st.expander("Image Comparison Options"):
-                    # Button to trigger standard comparison
-                    if st.button("Compare Images (Standard)", key="standard_compare_button"):
-                        with st.spinner("Comparing images..."):
-                            comparison_result = compare_images(image1, image2)  # Use the same compare_images function
-                            if comparison_result:
-                                st.write("## Image Comparison Results:")
-                                st.markdown(comparison_result)
+        elif supporting_headline_text_analysis_button:
+            with st.spinner("Performing Supporting Headline Text Analysis..."):
+                result = supporting_headline_analysis(uploaded_file, is_image)
+                if result:
+                    st.write("## Supporting Headline Text Analysis Results:")
+                    st.markdown(result)
+                    
+        # Custom Prompt Analysis
+        elif custom_prompt_button and custom_prompt:
+            with st.spinner("Performing custom prompt analysis..."):
+                result = custom_prompt_analysis(uploaded_file, custom_prompt, is_image)
+                if result:
+                    st.write("## Custom Prompt Analysis Results:")
+                    st.markdown(result)
+                    
+# File Uploader for Image Comparison
+uploaded_files_comparison = st.file_uploader(
+    "Upload Two Marketing Images for Comparison:",
+    accept_multiple_files=True,
+    type=["png", "jpg", "jpeg"],
+    help="Upload exactly two images for comparison.",
+    key="comparison_uploader"  # Unique key for this uploader
+)
 
-                    # Custom Prompt for Comparison
-                    st.markdown("---")
-                    custom_prompt = st.text_area(
-                        "Custom Prompt for Comparison (Optional):",
-                        value="""Provide a detailed comparison of these images, focusing on [your specific areas of interest]. Explain the similarities, differences, and potential impact on the target audience.""",
-                        height=150,  # Adjust height as needed
-                    )
-                    if st.button("Compare with Custom Prompt", key="custom_compare_button"):
-                        with st.spinner("Comparing images with custom prompt..."):
-                            response = model.generate_content([custom_prompt, image1, image2])
-                            if response.candidates and len(response.candidates[0].content.parts) > 0:
-                                st.write("## Custom Comparison Results:")
-                                st.markdown(response.candidates[0].content.parts[0].text.strip())
-                            else:
-                                st.error("Model did not provide a valid response.")
+# Display Uploaded Images for Comparison
+if uploaded_files_comparison and len(uploaded_files_comparison) == 2:
+    with st.spinner("Processing images..."):
+        image1, image2 = [convert_to_rgb(Image.open(file)) for file in uploaded_files_comparison]
+
+    col1, col2 = st.columns(2)
+    with col1:
+        st.image(image1, caption="Image 1", use_column_width=True)
+    with col2:
+        st.image(image2, caption="Image 2", use_column_width=True)
+
+    # --- Image Comparison Options ---
+    with st.expander("Image Comparison Options"):
+
+        # Standard Comparison
+        if st.button("Compare Images (Standard)", key="standard_compare_button"):
+            with st.spinner("Comparing images..."):
+                comparison_result = compare_images(image1, image2)
+                if comparison_result:
+                    st.write("## Image Comparison Results:")
+                    st.markdown(comparison_result)
+                else:
+                    st.error("Image comparison failed. Please check the images and try again.")
+
+        # Custom Prompt Comparison
+        st.markdown("---")
+        custom_prompt = st.text_area(
+            "Custom Prompt for Comparison (Optional):",
+            value="""Provide a detailed comparison of these images, focusing on [your specific areas of interest]. Explain the similarities, differences, and potential impact on the target audience.""",
+            height=150,  # Adjust height as needed
+        )
+        if st.button("Compare with Custom Prompt", key="custom_compare_button"):
+            with st.spinner("Comparing images with custom prompt..."):
+                response = model.generate_content([custom_prompt, image1, image2])
+                if response and response.candidates and len(response.candidates[0].content.parts) > 0:
+                    st.write("## Custom Comparison Results:")
+                    st.markdown(response.candidates[0].content.parts[0].text.strip())
+                else:
+                    st.error("Model did not provide a valid response.")
+
+elif uploaded_files_comparison:  # If more or less than 2 images are uploaded
+    st.warning("Please upload exactly two images for comparison.")
