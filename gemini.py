@@ -219,102 +219,274 @@ Analyze the provided image for marketing effectiveness. First, provide detailed 
             st.error(f"Failed to read or process the media: {e}")
             return None
     def emotional_resonance(uploaded_file, is_image=True):
-        prompt = """
-Using the following model, please evaluate the content. Please also suggest improvements.
+            prompt = """
+    Using the following model, please evaluate the content. Please also suggest improvements.
 
-Evaluating the emotional resonance of a piece of content involves assessing how effectively it evokes the intended emotional responses in the target audience. Score each element from 1-5, in increments of o.5. Please provide the information in a table, with: element, Score , evaluation. at the end, please provide recommendations. Here are key criteria to consider:
+    Evaluating the emotional resonance of a piece of content involves assessing how effectively it evokes the intended emotional responses in the target audience. Score each element from 1-5, in increments of o.5. Please provide the information in a table, with: element, Score , evaluation. at the end, please provide recommendations. Here are key criteria to consider:
 
-1. Clarity of Emotional Appeal
-Criteria: The content clearly conveys the intended emotion(s).
-Evaluation: Determine if the emotional message is easily understood without ambiguity.
-2. Relevance to Target Audience
-Criteria: The emotional appeal is relevant to the target audience’s experiences, values, and interests.
-Evaluation: Assess if the content connects with the audience’s personal or professional life.
-3. Authenticity
-Criteria: The emotional appeal feels genuine and credible.
-Evaluation: Check if the content avoids exaggeration and resonates as sincere and trustworthy.
-4. Visual and Verbal Consistency
-Criteria: Visual elements (images, colors, design) and verbal elements (language, tone) consistently support the emotional appeal.
-Evaluation: Ensure that all elements of the content align to reinforce the intended emotion.
-5. Emotional Intensity
-Criteria: The strength of the emotional response elicited is appropriate for the context.
-Evaluation: Measure whether the content evokes a strong enough emotional reaction without being overwhelming or underwhelming.
-6. Engagement
-Criteria: The content encourages audience engagement (likes, shares, comments, etc.).
-Evaluation: Analyze engagement metrics to determine if the content successfully drives interaction.
-7. Memory Retention
-Criteria: The emotional content is memorable and sticks with the audience.
-Evaluation: Assess if the audience recalls the content and its emotional impact over time.
-8. Call to Action (CTA)
-Criteria: The content effectively drives the audience to take the desired action.
-Evaluation: Check if the emotional appeal translates into concrete actions, such as clicks, purchases, or sign-ups.
-9. Balance
-Criteria: The emotional appeal is balanced with informative content.
-Evaluation: Ensure that the emotional elements do not overshadow the key message or information.
-10. Cultural Sensitivity
-Criteria: The emotional appeal respects and aligns with cultural norms and values.
-Evaluation: Ensure the content is culturally appropriate and avoids potential offensiveness.
-11. Emotional Variety
-Criteria: The content provides a range of emotions, creating a dynamic experience.
-Evaluation: Determine if the content moves the audience through different emotional states effectively.
-12. Storytelling Quality
-Criteria: The content tells a compelling story that enhances emotional resonance.
-Evaluation: Assess the narrative structure, character development, and plot to ensure a strong emotional arc.
-13. Relatability
-Criteria: The audience can see themselves in the content or relate to the situations presented.
-Evaluation: Determine if the scenarios, characters, or messages are relatable and reflect the audience’s reality.
-14. Emotional Connection to Brand
-Criteria: The content strengthens the emotional connection between the audience and the brand.
-Evaluation: Measure the extent to which the content enhances brand affinity and loyalty.
-        """
-        try:
-            if is_image:
-                image = Image.open(io.BytesIO(uploaded_file.read()))
-                response = model.generate_content([prompt, image])
-            else:
-                with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
-                    tmp.write(uploaded_file.read())
-                    tmp_path = tmp.name
+    1. Clarity of Emotional Appeal
+    Criteria: The content clearly conveys the intended emotion(s).
+    Evaluation: Determine if the emotional message is easily understood without ambiguity.
+    2. Relevance to Target Audience
+    Criteria: The emotional appeal is relevant to the target audience’s experiences, values, and interests.
+    Evaluation: Assess if the content connects with the audience’s personal or professional life.
+    3. Authenticity
+    Criteria: The emotional appeal feels genuine and credible.
+    Evaluation: Check if the content avoids exaggeration and resonates as sincere and trustworthy.
+    4. Visual and Verbal Consistency
+    Criteria: Visual elements (images, colors, design) and verbal elements (language, tone) consistently support the emotional appeal.
+    Evaluation: Ensure that all elements of the content align to reinforce the intended emotion.
+    5. Emotional Intensity
+    Criteria: The strength of the emotional response elicited is appropriate for the context.
+    Evaluation: Measure whether the content evokes a strong enough emotional reaction without being overwhelming or underwhelming.
+    6. Engagement
+    Criteria: The content encourages audience engagement (likes, shares, comments, etc.).
+    Evaluation: Analyze engagement metrics to determine if the content successfully drives interaction.
+    7. Memory Retention
+    Criteria: The emotional content is memorable and sticks with the audience.
+    Evaluation: Assess if the audience recalls the content and its emotional impact over time.
+    8. Call to Action (CTA)
+    Criteria: The content effectively drives the audience to take the desired action.
+    Evaluation: Check if the emotional appeal translates into concrete actions, such as clicks, purchases, or sign-ups.
+    9. Balance
+    Criteria: The emotional appeal is balanced with informative content.
+    Evaluation: Ensure that the emotional elements do not overshadow the key message or information.
+    10. Cultural Sensitivity
+    Criteria: The emotional appeal respects and aligns with cultural norms and values.
+    Evaluation: Ensure the content is culturally appropriate and avoids potential offensiveness.
+    11. Emotional Variety
+    Criteria: The content provides a range of emotions, creating a dynamic experience.
+    Evaluation: Determine if the content moves the audience through different emotional states effectively.
+    12. Storytelling Quality
+    Criteria: The content tells a compelling story that enhances emotional resonance.
+    Evaluation: Assess the narrative structure, character development, and plot to ensure a strong emotional arc.
+    13. Relatability
+    Criteria: The audience can see themselves in the content or relate to the situations presented.
+    Evaluation: Determine if the scenarios, characters, or messages are relatable and reflect the audience’s reality.
+    14. Emotional Connection to Brand
+    Criteria: The content strengthens the emotional connection between the audience and the brand.
+    Evaluation: Measure the extent to which the content enhances brand affinity and loyalty.
+            """
+            try:
+                if is_image:
+                    image = Image.open(io.BytesIO(uploaded_file.read()))
+                    response = model.generate_content([prompt, image])
+                else:
+                    with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
+                        tmp.write(uploaded_file.read())
+                        tmp_path = tmp.name
+                    frames = extract_frames(tmp_path)
+                    if frames is None or not frames:  # Check if frames were extracted successfully
+                        st.error("No frames were extracted from the video. Please check the video format.")
+                        return None
+                    response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
+                if response.candidates:
+                    raw_response = response.candidates[0].content.parts[0].text.strip()
+                    st.write("Emotional Resonance Analysis Results:")
+                    st.markdown(raw_response, unsafe_allow_html=True)  # Assuming the response is in HTML table format
+                else:
+                    st.error("Unexpected response structure from the model.")
+                return None
+            except Exception as e:
+                st.error(f"Failed to read or process the media: {e}")
+                return None
+    def emotional_analysis(uploaded_file, is_image=True):
+            prompt = """
+Using the following list of emotional resonance responses, assess whether the marketing content does or does not apply each. present the information in a table with columns: Name, Applies (None, some, A Lot), Definition, how it is applied, how it could be applied. Applies the principle should only be "Y" if the principle is explicitly applied. These are the principles to assess:
 
-                frames = extract_frames(tmp_path)
-                if frames is None or not frames:  # Check if frames were extracted successfully
-                    st.error("No frames were extracted from the video. Please check the video format.")
-                    return None
+Here are different types of emotional resonance that can be leveraged in marketing to create a strong connection with the audience:
 
-                response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
+1. Empathy
+Definition: The ability to understand and share the feelings of others.
+Application: Crafting messages that show understanding of the audience's challenges and emotions.
+2. Joy
+Definition: A feeling of great pleasure and happiness.
+Application: Creating content that makes the audience feel happy, excited, or entertained.
+3. Surprise
+Definition: A feeling of astonishment or shock caused by something unexpected.
+Application: Using unexpected elements in marketing to capture attention and engage the audience.
+4. Trust
+Definition: Confidence in the honesty, integrity, and reliability of someone or something.
+Application: Building trust through transparent communication, endorsements, and reliable information.
+5. Fear
+Definition: An unpleasant emotion caused by the belief that someone or something is dangerous.
+Application: Highlighting potential risks or losses to motivate the audience to take action.
+6. Sadness
+Definition: A feeling of sorrow or unhappiness.
+Application: Using stories or scenarios that evoke sympathy and compassion to drive support for a cause or product.
+7. Anger
+Definition: A strong feeling of displeasure or hostility.
+Application: Addressing injustices or problems that provoke a sense of outrage, motivating the audience to seek solutions.
+8. Anticipation
+Definition: Excitement or anxiety about a future event.
+Application: Creating a sense of excitement and eagerness for upcoming products, events, or announcements.
+9. Disgust
+Definition: A strong feeling of aversion or repulsion.
+Application: Highlighting negative aspects of a competing product or undesirable conditions to steer the audience towards a better alternative.
+10. Relief
+Definition: A feeling of reassurance and relaxation following release from anxiety or distress.
+Application: Positioning a product or service as a solution that alleviates worries or problems.
+11. Love
+Definition: A deep feeling of affection, attachment, or devotion.
+Application: Creating campaigns that evoke feelings of love and affection towards family, friends, or the brand itself.
+12. Pride
+Definition: A feeling of deep pleasure or satisfaction derived from one's own achievements.
+Application: Celebrating customer achievements and successes, making them feel proud of their association with the brand.
+13. Belonging
+Definition: The feeling of being accepted and included.
+Application: Creating communities and fostering a sense of belonging among customers.
+14. Nostalgia
+Definition: A sentimental longing for the past.
+Application: Using themes and imagery that evoke fond memories and a sense of nostalgia.
+15. Hope
+Definition: A feeling of expectation and desire for a particular thing to happen.
+Application: Inspiring hope and optimism about the future through positive and uplifting messages.
+            """
+            try:
+                if is_image:
+                    image = Image.open(io.BytesIO(uploaded_file.read()))
+                    response = model.generate_content([prompt, image])
+                else:
+                    with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
+                        tmp.write(uploaded_file.read())
+                        tmp_path = tmp.name
 
-            if response.candidates:
-                raw_response = response.candidates[0].content.parts[0].text.strip()
-                st.write("Emotional Resonance Analysis Results:")
-                st.markdown(raw_response, unsafe_allow_html=True)  # Assuming the response is in HTML table format
-            else:
-                st.error("Unexpected response structure from the model.")
-            return None
-        except Exception as e:
-            st.error(f"Failed to read or process the media: {e}")
-            return None
+                    frames = extract_frames(tmp_path)
+                    if frames is None or not frames:  # Check if frames were extracted successfully
+                        st.error("No frames were extracted from the video. Please check the video format.")
+                        return None
+
+                    response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
+
+                if response.candidates:
+                    raw_response = response.candidates[0].content.parts[0].text.strip()
+                    st.write("Emotional Resonance Analysis Results:")
+                    st.markdown(raw_response, unsafe_allow_html=True)  # Assuming the response is in HTML table format
+                else:
+                    st.error("Unexpected response structure from the model.")
+                return None
+            except Exception as e:
+                st.error(f"Failed to read or process the media: {e}")
+                return None
+            
+    def Emotional_Appraisal_Models(uploaded_file, is_image=True):
+            prompt = """
+Using the following emotional appraisal models, please evaluate the content and suggest improvements against each model evaluation:
+
+1. Lazarus’ Cognitive-Motivational-Relational Theory
+Overview: Richard Lazarus proposed that emotions are the result of cognitive appraisals of events, which consider both personal relevance and coping potential.
+Components:
+Primary Appraisal: Evaluation of the significance of an event for personal well-being (e.g., Is this event beneficial or harmful?).
+Secondary Appraisal: Evaluation of one's ability to cope with the event (e.g., Do I have the resources to deal with this?).
+Core Relational Themes: Specific patterns of appraisal that lead to particular emotions (e.g., loss leads to sadness, threat leads to fear).
+2. Scherer's Component Process Model (CPM)
+Overview: Klaus Scherer’s model posits that emotions result from a sequence of appraisals along several dimensions.
+Components:
+Novelty: Is the event new or unexpected?
+Pleasantness: Is the event pleasant or unpleasant?
+Goal Significance: Does the event help or hinder the attainment of goals?
+Coping Potential: Can the individual cope with or manage the event?
+Norm Compatibility: Does the event conform to social and personal norms?
+3. Smith and Ellsworth’s Appraisal Model
+Overview: Craig Smith and Phoebe Ellsworth identified several dimensions of appraisal that influence emotional responses.
+Components:
+Attention: The degree to which the event draws attention.
+Certainty: The certainty or predictability of the event.
+Control/Coping: The degree of control one has over the event and the ability to cope.
+Pleasantness: The pleasantness or unpleasantness of the event.
+Perceived Obstacle: The extent to which the event is perceived as an obstacle to goals.
+Responsibility: Who is responsible for the event (self, others, or circumstances).
+Anticipated Effort: The amount of effort required to deal with the event.
+4. Roseman’s Appraisal Theory
+Overview: Ira Roseman’s model focuses on how appraisals of situations in terms of motivational congruence and agency influence emotions.
+Components:
+Motivational State: Whether the event is consistent or inconsistent with one’s goals.
+Situational State: Whether the event is caused by the environment or the individual.
+Probability: The likelihood of the event occurring.
+Agency: Who is responsible for the event (self, other, or circumstance).
+Power/Control: The degree of control one has over the event.
+5. Weiner’s Attributional Theory of Emotion
+Overview: Bernard Weiner’s model focuses on how attributions about the causes of events influence emotional reactions.
+Components:
+Locus: Whether the cause of the event is internal or external.
+Stability: Whether the cause is stable or unstable over time.
+Controllability: Whether the cause is controllable or uncontrollable by the individual.
+6. Frijda’s Laws of Emotion
+Overview: Nico Frijda proposed several “laws” that describe regularities in the relationship between appraisals and emotional responses.
+Components:
+Law of Situational Meaning: Emotions arise in response to meaning structures of situations.
+Law of Concern: Emotions arise when events are relevant to one’s concerns.
+Law of Apparent Reality: Emotions are elicited by events appraised as real.
+Law of Change: Emotions are triggered by changes in circumstances.
+Law of Habituation: Continuous exposure to a stimulus reduces its emotional impact.
+Law of Comparative Feeling: Emotional intensity depends on comparisons with other events.
+Law of Hedonic Asymmetry: Pleasure is more transient than pain.
+Law of Conservation of Emotional Momentum: Emotions persist until the triggering conditions change.
+7. Ellsworth’s Model of Appraisal Dimensions
+Overview: Phoebe Ellsworth extended appraisal theory by emphasizing the importance of cultural and contextual factors in emotional appraisal.
+Components:
+Certainty: How certain one is about the event.
+Attention: The extent to which the event captures attention.
+Control: The degree of control one has over the event.
+Pleasantness: Whether the event is perceived as pleasant or unpleasant.
+Responsibility: Attribution of responsibility for the event.
+Legitimacy: Whether the event is perceived as fair or unfair.
+Practical Applications in Marketing
+By understanding these emotional appraisal models, marketers can create content that:
+
+Resonates with Core Concerns: Address the primary and secondary appraisals of the target audience.
+Triggers Relevant Emotions: Design messages that align with specific appraisal dimensions to evoke desired emotional responses.
+Enhances Perceived Control: Empower consumers by highlighting how products or services can help them manage or cope with challenges.
+Builds Trust and Credibility: Ensure messages are consistent, predictable, and align with social norms to build trust.
+            """
+            try:
+                if is_image:
+                    image = Image.open(io.BytesIO(uploaded_file.read()))
+                    response = model.generate_content([prompt, image])
+                else:
+                    with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
+                        tmp.write(uploaded_file.read())
+                        tmp_path = tmp.name
+
+                    frames = extract_frames(tmp_path)
+                    if frames is None or not frames:  # Check if frames were extracted successfully
+                        st.error("No frames were extracted from the video. Please check the video format.")
+                        return None
+
+                    response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
+
+                if response.candidates:
+                    raw_response = response.candidates[0].content.parts[0].text.strip()
+                    st.write("Emotional Appraisal Mode Analysis Results:")
+                    st.markdown(raw_response, unsafe_allow_html=True)  # Assuming the response is in HTML table format
+                else:
+                    st.error("Unexpected response structure from the model.")
+                return None
+            except Exception as e:
+                st.error(f"Failed to read or process the media: {e}")
+                return None    
     def behavioural_principles(uploaded_file, is_image=True):
         prompt = """
     Using the following Behavioral Science principles, assess whether the marketing content does or does not apply each principle. Present the information in a table with columns: 'Applies the Principle (Y/N)', 'Principle (Description)', 'Explanation', and 'How it could be applied'. The 'Applies the Principle' column should only be marked "Y" if the principle is explicitly applied. These are the principles to assess:
 
     1. Anchoring: The tendency to rely heavily on the first piece of information encountered (the "anchor") when making decisions.
-       Example: Displaying a higher original price next to a discounted price to make the discount seem more substantial.
+        Example: Displaying a higher original price next to a discounted price to make the discount seem more substantial.
     2. Social Proof: People tend to follow the actions of others, assuming that those actions are correct.
-       Example: Showing customer reviews and testimonials to build trust and encourage purchases.
+        Example: Showing customer reviews and testimonials to build trust and encourage purchases.
     3. Scarcity: Items or opportunities become more desirable when they are perceived to be scarce or limited.
-       Example: Using phrases like "limited time offer" or "only a few left in stock" to create urgency.
+        Example: Using phrases like "limited time offer" or "only a few left in stock" to create urgency.
     4. Reciprocity: People feel obligated to return favors or kindnesses received from others.
-       Example: Offering a free sample or trial to encourage future purchases.
+        Example: Offering a free sample or trial to encourage future purchases.
     5. Loss Aversion: People prefer to avoid losses rather than acquire equivalent gains.
-       Example: Emphasizing what customers stand to lose if they don't take action, such as missing out on a sale.
+        Example: Emphasizing what customers stand to lose if they don't take action, such as missing out on a sale.
     6. Commitment and Consistency: Once people commit to something, they are more likely to follow through to maintain consistency.
-       Example: Getting customers to make a small commitment first, like signing up for a newsletter, before asking for a larger commitment.
+        Example: Getting customers to make a small commitment first, like signing up for a newsletter, before asking for a larger commitment.
     7. Authority: People are more likely to trust and follow the advice of an authority figure.
-       Example: Featuring endorsements from experts or industry leaders.
+        Example: Featuring endorsements from experts or industry leaders.
     8. Framing: The way information is presented can influence decision-making.
-       Example: Highlighting the benefits of a product rather than the features, or framing a price as "only $1 a day" instead of "$30 a month".
+        Example: Highlighting the benefits of a product rather than the features, or framing a price as "only $1 a day" instead of "$30 a month".
     9. Endowment Effect: People value things more highly if they own them.
-       Example: Allowing customers to try a product at home before making a purchase decision.
+        Example: Allowing customers to try a product at home before making a purchase decision.
     10. Priming: Exposure to certain stimuli can influence subsequent behavior and decisions.
         Example: Using images and words that evoke positive emotions to enhance the appeal of a product.
     11. Decoy Effect: Adding a third option can make one of the original two options more attractive.
@@ -1389,6 +1561,8 @@ with st.sidebar:
         basic_analysis = st.button("Basic Analysis")
         flash_analysis_button = st.button("Flash Analysis")
         emotional_resonance_button=st.button("Emotional Resonance")
+        emotional_analysis_button=st.button("Emotional Analysis")
+        Emotional_Appraisal_Models_button=st.button("Emotional Appraisal Models")
 
     with tabs[1]:  # Detailed
         behavioural_principles_button = st.button("Behaviour Principles")
@@ -1452,10 +1626,23 @@ for uploaded_file in uploaded_files:
                     display_and_download(result, "basic_analysis")
         if emotional_resonance_button:
             with st.spinner("Performing Emotional Resonance Analysis..."):
-                result = analyze_media(uploaded_file, is_image)
+                result = emotional_resonance(uploaded_file, is_image)
                 if result:
                     st.write("## Emotional Resonance Results:")
                     st.markdown(result)
+        if emotional_analysis_button:
+            with st.spinner("Performing Emotional Analysis..."):
+                result = emotional_analysis(uploaded_file, is_image)
+                if result:
+                    st.write("## Emotional Analysis Results:")
+                    st.markdown(result)
+        if Emotional_Appraisal_Models_button:
+            with st.spinner("Performing Emotional Appraisal Models Analysis..."):
+                result = Emotional_Appraisal_Models(uploaded_file, is_image)
+                if result:
+                    st.write("## Emotional Appraisal Models Analysis Results:")
+                    st.markdown(result)
+
 
         elif flash_analysis_button:
             with st.spinner("Performing Flash analysis..."):
@@ -1546,7 +1733,24 @@ for uploaded_file in uploaded_files:
                 if result:
                     st.write("## Supporting Headline Text Analysis Results:")
                     st.markdown(result)
-                    
+        elif meta_profile_button:
+            with st.spinner("Performing Meta Analysis..."):
+                result = meta_profile(uploaded_file, is_image)
+                if result:
+                    st.write("## Meta Profile Analysis Results:")
+                    st.markdown(result)
+        elif linkedin_profile_button:
+            with st.spinner("Performing Linkedin profile Analysis..."):
+                result = linkedin_profile(uploaded_file, is_image)
+                if result:
+                    st.write("## Linkedin profile Analysis Results:")
+                    st.markdown(result)
+        elif x_profile_button:
+            with st.spinner("Performing X (formerly Twitter) targeting Analysis..."):
+                result = x_profile(uploaded_file, is_image)
+                if result:
+                    st.write("## X (formerly Twitter) targeting Analysis Results:")
+                    st.markdown(result)                                                            
         # Custom Prompt Analysis
         elif custom_prompt_button and custom_prompt:
             with st.spinner("Performing custom prompt analysis..."):
