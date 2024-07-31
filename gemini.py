@@ -218,7 +218,81 @@ Analyze the provided image for marketing effectiveness. First, provide detailed 
         except Exception as e:
             st.error(f"Failed to read or process the media: {e}")
             return None
+    def emotional_resonance(uploaded_file, is_image=True):
+        prompt = """
+Using the following model, please evaluate the content. Please also suggest improvements.
 
+Evaluating the emotional resonance of a piece of content involves assessing how effectively it evokes the intended emotional responses in the target audience. Score each element from 1-5, in increments of o.5. Please provide the information in a table, with: element, Score , evaluation. at the end, please provide recommendations. Here are key criteria to consider:
+
+1. Clarity of Emotional Appeal
+Criteria: The content clearly conveys the intended emotion(s).
+Evaluation: Determine if the emotional message is easily understood without ambiguity.
+2. Relevance to Target Audience
+Criteria: The emotional appeal is relevant to the target audience’s experiences, values, and interests.
+Evaluation: Assess if the content connects with the audience’s personal or professional life.
+3. Authenticity
+Criteria: The emotional appeal feels genuine and credible.
+Evaluation: Check if the content avoids exaggeration and resonates as sincere and trustworthy.
+4. Visual and Verbal Consistency
+Criteria: Visual elements (images, colors, design) and verbal elements (language, tone) consistently support the emotional appeal.
+Evaluation: Ensure that all elements of the content align to reinforce the intended emotion.
+5. Emotional Intensity
+Criteria: The strength of the emotional response elicited is appropriate for the context.
+Evaluation: Measure whether the content evokes a strong enough emotional reaction without being overwhelming or underwhelming.
+6. Engagement
+Criteria: The content encourages audience engagement (likes, shares, comments, etc.).
+Evaluation: Analyze engagement metrics to determine if the content successfully drives interaction.
+7. Memory Retention
+Criteria: The emotional content is memorable and sticks with the audience.
+Evaluation: Assess if the audience recalls the content and its emotional impact over time.
+8. Call to Action (CTA)
+Criteria: The content effectively drives the audience to take the desired action.
+Evaluation: Check if the emotional appeal translates into concrete actions, such as clicks, purchases, or sign-ups.
+9. Balance
+Criteria: The emotional appeal is balanced with informative content.
+Evaluation: Ensure that the emotional elements do not overshadow the key message or information.
+10. Cultural Sensitivity
+Criteria: The emotional appeal respects and aligns with cultural norms and values.
+Evaluation: Ensure the content is culturally appropriate and avoids potential offensiveness.
+11. Emotional Variety
+Criteria: The content provides a range of emotions, creating a dynamic experience.
+Evaluation: Determine if the content moves the audience through different emotional states effectively.
+12. Storytelling Quality
+Criteria: The content tells a compelling story that enhances emotional resonance.
+Evaluation: Assess the narrative structure, character development, and plot to ensure a strong emotional arc.
+13. Relatability
+Criteria: The audience can see themselves in the content or relate to the situations presented.
+Evaluation: Determine if the scenarios, characters, or messages are relatable and reflect the audience’s reality.
+14. Emotional Connection to Brand
+Criteria: The content strengthens the emotional connection between the audience and the brand.
+Evaluation: Measure the extent to which the content enhances brand affinity and loyalty.
+        """
+        try:
+            if is_image:
+                image = Image.open(io.BytesIO(uploaded_file.read()))
+                response = model.generate_content([prompt, image])
+            else:
+                with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
+                    tmp.write(uploaded_file.read())
+                    tmp_path = tmp.name
+
+                frames = extract_frames(tmp_path)
+                if frames is None or not frames:  # Check if frames were extracted successfully
+                    st.error("No frames were extracted from the video. Please check the video format.")
+                    return None
+
+                response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
+
+            if response.candidates:
+                raw_response = response.candidates[0].content.parts[0].text.strip()
+                st.write("Emotional Resonance Analysis Results:")
+                st.markdown(raw_response, unsafe_allow_html=True)  # Assuming the response is in HTML table format
+            else:
+                st.error("Unexpected response structure from the model.")
+            return None
+        except Exception as e:
+            st.error(f"Failed to read or process the media: {e}")
+            return None
     def behavioural_principles(uploaded_file, is_image=True):
         prompt = """
     Using the following Behavioral Science principles, assess whether the marketing content does or does not apply each principle. Present the information in a table with columns: 'Applies the Principle (Y/N)', 'Principle (Description)', 'Explanation', and 'How it could be applied'. The 'Applies the Principle' column should only be marked "Y" if the principle is explicitly applied. These are the principles to assess:
@@ -1257,7 +1331,6 @@ and regional norms.
 
         return None  # Return None to signal an error occurred
 
-        return None  # Return None on error
     def compare_images(image1, image2):
         prompt = """
     Provide a focused analysis comparing two images, emphasizing their observable visual elements and marketing attributes and overall effectiveness together. Your analysis should be factual, based on visible content only, and avoid inferential or speculative details. Discuss:
@@ -1315,6 +1388,7 @@ with st.sidebar:
     with tabs[0]:  # Basic
         basic_analysis = st.button("Basic Analysis")
         flash_analysis_button = st.button("Flash Analysis")
+        emotional_resonance_button=st.button("Emotional Resonance")
 
     with tabs[1]:  # Detailed
         behavioural_principles_button = st.button("Behaviour Principles")
@@ -1375,7 +1449,13 @@ for uploaded_file in uploaded_files:
                 result = analyze_media(uploaded_file, is_image)
                 if result:
                     st.write("## Basic Analysis Results:")
-                    display_and_download(result, "basic_analysis") 
+                    display_and_download(result, "basic_analysis")
+        if emotional_resonance_button:
+            with st.spinner("Performing Emotional Resonance Analysis..."):
+                result = analyze_media(uploaded_file, is_image)
+                if result:
+                    st.write("## Emotional Resonance Results:")
+                    st.markdown(result)
 
         elif flash_analysis_button:
             with st.spinner("Performing Flash analysis..."):
