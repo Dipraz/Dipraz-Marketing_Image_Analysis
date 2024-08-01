@@ -539,7 +539,7 @@ Using the following Behavioral Science principles, assess whether the marketing 
 
     def nlp_principles_analysis(uploaded_file, is_image=True):
         prompt = """
-Using the following Neuro-Linguistic Programming (NLP) techniques, assess whether the marketing content does or does not apply each principle. present the information in a table with columns: Applies the principle (None, some, A Lot), Principle (Description), Explanation, how it could be applied. These are the principles to assess:
+Using the following Neuro-Linguistic Programming (NLP) techniques, assess whether the marketing content does or does not apply each principle. present the information in a table with columns: Applies the principle (None, some, A Lot), Principle (Description), Explanation, how it could be implemented. These are the principles to assess:
 
 
 Here are the top 20 Neuro-Linguistic Programming (NLP) techniques to assess the effectiveness of static marketing content, including examples:
