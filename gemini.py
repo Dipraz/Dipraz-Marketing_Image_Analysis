@@ -371,7 +371,7 @@ Application: Inspiring hope and optimism about the future through positive and u
             
     def Emotional_Appraisal_Models(uploaded_file, is_image=True):
             prompt = """
-Using the following emotional appraisal models, please evaluate the content and suggest improvements against each model evaluation:
+Firstly, translate any non-english text to english. Using the following emotional appraisal models, please evaluate the content. Please suggest possible  improvements against each model evaluation:
 
 1. Lazarus’ Cognitive-Motivational-Relational Theory
 Overview: Richard Lazarus proposed that emotions are the result of cognitive appraisals of events, which consider both personal relevance and coping potential.
