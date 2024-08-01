@@ -467,26 +467,26 @@ Builds Trust and Credibility: Ensure messages are consistent, predictable, and a
                 return None    
     def behavioural_principles(uploaded_file, is_image=True):
         prompt = """
-    Using the following Behavioral Science principles, assess whether the marketing content does or does not apply each principle. Present the information in a table with columns: 'Applies the Principle (Y/N)', 'Principle (Description)', 'Explanation', and 'How it could be applied'. The 'Applies the Principle' column should only be marked "Y" if the principle is explicitly applied. These are the principles to assess:
+Using the following Behavioral Science principles, assess whether the marketing content does or does not apply each principle. Present the information in a table with columns: 'Applies the Principle (None, Some, A Lot)', 'Principle (Description)', 'Explanation', and 'How it could be applied'. These are the principles to assess:
 
     1. Anchoring: The tendency to rely heavily on the first piece of information encountered (the "anchor") when making decisions.
-        Example: Displaying a higher original price next to a discounted price to make the discount seem more substantial.
+       Example: Displaying a higher original price next to a discounted price to make the discount seem more substantial.
     2. Social Proof: People tend to follow the actions of others, assuming that those actions are correct.
-        Example: Showing customer reviews and testimonials to build trust and encourage purchases.
+       Example: Showing customer reviews and testimonials to build trust and encourage purchases.
     3. Scarcity: Items or opportunities become more desirable when they are perceived to be scarce or limited.
-        Example: Using phrases like "limited time offer" or "only a few left in stock" to create urgency.
+       Example: Using phrases like "limited time offer" or "only a few left in stock" to create urgency.
     4. Reciprocity: People feel obligated to return favors or kindnesses received from others.
-        Example: Offering a free sample or trial to encourage future purchases.
+       Example: Offering a free sample or trial to encourage future purchases.
     5. Loss Aversion: People prefer to avoid losses rather than acquire equivalent gains.
-        Example: Emphasizing what customers stand to lose if they don't take action, such as missing out on a sale.
+       Example: Emphasizing what customers stand to lose if they don't take action, such as missing out on a sale.
     6. Commitment and Consistency: Once people commit to something, they are more likely to follow through to maintain consistency.
-        Example: Getting customers to make a small commitment first, like signing up for a newsletter, before asking for a larger commitment.
+       Example: Getting customers to make a small commitment first, like signing up for a newsletter, before asking for a larger commitment.
     7. Authority: People are more likely to trust and follow the advice of an authority figure.
-        Example: Featuring endorsements from experts or industry leaders.
+       Example: Featuring endorsements from experts or industry leaders.
     8. Framing: The way information is presented can influence decision-making.
-        Example: Highlighting the benefits of a product rather than the features, or framing a price as "only $1 a day" instead of "$30 a month".
+       Example: Highlighting the benefits of a product rather than the features, or framing a price as "only $1 a day" instead of "$30 a month".
     9. Endowment Effect: People value things more highly if they own them.
-        Example: Allowing customers to try a product at home before making a purchase decision.
+       Example: Allowing customers to try a product at home before making a purchase decision.
     10. Priming: Exposure to certain stimuli can influence subsequent behavior and decisions.
         Example: Using images and words that evoke positive emotions to enhance the appeal of a product.
     11. Decoy Effect: Adding a third option can make one of the original two options more attractive.
