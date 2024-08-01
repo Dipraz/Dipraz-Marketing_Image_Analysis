@@ -467,7 +467,7 @@ Builds Trust and Credibility: Ensure messages are consistent, predictable, and a
                 return None    
     def behavioural_principles(uploaded_file, is_image=True):
         prompt = """
-Using the following Behavioral Science principles, assess whether the marketing content does or does not apply each principle. Present the information in a table with columns: 'Applies the Principle (None, Some, A Lot)', 'Principle (Description)', 'Explanation', and 'How it could be applied'. These are the principles to assess:
+Using the following Behavioral Science principles, assess whether the marketing content does or does not apply each principle. Present the information in a table with columns: 'Applies the Principle (None, Some, A Lot)', 'Principle (Description)', 'Explanation', and 'How it could be implemented'. These are the principles to assess:
 
     1. Anchoring: The tendency to rely heavily on the first piece of information encountered (the "anchor") when making decisions.
        Example: Displaying a higher original price next to a discounted price to make the discount seem more substantial.
