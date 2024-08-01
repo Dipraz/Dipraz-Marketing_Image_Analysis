@@ -635,13 +635,13 @@ By utilizing these NLP techniques, you can create static marketing content that 
             
     def text_analysis(uploaded_file, is_image=True):
         prompt = """
-As a UX design and marketing analysis consultant, you are tasked with reviewing the text content of a marketing asset (image or video, excluding the headline) for a client. Your goal is to provide a comprehensive analysis of the text's effectiveness and offer actionable recommendations for improvement.
+As a UX design and marketing analysis consultant, you are tasked with reviewing the text content of a marketing asset (image or video, excluding the headline) for a client. Your goal is to provide a comprehensive analysis of the text's effectiveness and offer actionable recommendations for improvement, making sure that all responses are provided in English.
 **Important:** Please provide all your analysis and recommendations in English, regardless of the language used in the original marketing asset.
 **Part 1: Text Extraction and Contextualization**
 
 * **Image Analysis:**
-  1. **Text Extraction:** Thoroughly identify and extract ALL visible text within the image, including headlines, body copy, captions, calls to action, taglines, logos, and any other textual elements.
-  2. **Presentation:** Present the extracted text in a clear, bulleted list format, maintaining the original order and structure to the extent possible.
+  1. **Text Extraction:** Thoroughly identify and extract ALL visible text within the image, including headlines, body copy, captions, calls to action, taglines, logos, and any other textual elements. Also, Translate non-English text to English.
+  2. **Presentation:** Present the extracted text in a clear, bulleted list format, maintaining the original order and structure as much as possible.
   3. **Visual Analysis:**
      * **Placement:** Specify the location of each text element within the image (e.g., top left, centered, bottom right). Note any instances of overlapping text or elements that might hinder readability.
      * **Font Choices:** Describe the font style (serif, sans-serif, script, etc.), weight (bold, regular, light), size, and color of each distinct text element.
