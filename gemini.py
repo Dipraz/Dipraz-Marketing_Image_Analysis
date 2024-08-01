@@ -291,7 +291,7 @@ Evaluation: Measure the extent to which the content enhances brand affinity and 
                 return None
     def emotional_analysis(uploaded_file, is_image=True):
             prompt = """
-Using the following list of emotional resonance responses, assess whether the marketing content does or does not apply each. present the information in a table with columns: Name, Applies (None, some, A Lot), Definition, how it is applied, how it could be applied. These are the principles to assess:
+Using the following list of emotional resonance responses, assess whether the marketing content does or does not apply each. present the information in a table with columns: Name, Applies (None, some, A Lot), Definition, how it is applied, how it could be implemented. These are the principles to assess:
 
 
 Here are different types of emotional resonance that can be leveraged in marketing to create a strong connection with the audience:
