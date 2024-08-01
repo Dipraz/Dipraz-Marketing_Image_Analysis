@@ -636,7 +636,7 @@ By utilizing these NLP techniques, you can create static marketing content that 
     def text_analysis(uploaded_file, is_image=True):
         prompt = """
 As a UX design and marketing analysis consultant, you are tasked with reviewing the text content of a marketing asset (image or video, excluding the headline) for a client. Your goal is to provide a comprehensive analysis of the text's effectiveness and offer actionable recommendations for improvement.
-
+**Important:** Please provide all your analysis and recommendations in English, regardless of the language used in the original marketing asset.
 **Part 1: Text Extraction and Contextualization**
 
 * **Image Analysis:**
