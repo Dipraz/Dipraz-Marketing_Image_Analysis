@@ -218,9 +218,87 @@ Analyze the provided image for marketing effectiveness. First, provide detailed 
         except Exception as e:
             st.error(f"Failed to read or process the media: {e}")
             return None
+
+    def Story_Telling_Analysis(uploaded_file, is_image=True):
+        prompt = """
+Storytelling has a significant impact on creative, enriching the content and enhancing its effectiveness in various ways. Here are some key impacts of storytelling on static creative:
+
+1. Emotional Engagement
+Impact: Storytelling evokes emotions, making the content more relatable and memorable.
+Explanation: A well-crafted story can connect with the audience on an emotional level, fostering empathy, joy, sadness, or excitement. This emotional engagement makes the static creative more impactful.
+Example: An image of a family enjoying a product can tell a story of togetherness and happiness, evoking positive emotions in the viewer.
+2. Attention and Interest
+Impact: Stories capture and hold the audience's attention.
+Explanation: Humans are naturally drawn to stories. Incorporating a narrative element in static creative can intrigue viewers, encouraging them to spend more time engaging with the content.
+Example: A before-and-after image showing the transformation of a product's user tells a story of change and improvement, keeping the viewer interested.
+3. Memorability
+Impact: Stories enhance recall and retention.
+Explanation: Information presented within a story is easier to remember than standalone facts. Storytelling makes the content more memorable, ensuring that the audience retains the message.
+Example: An image series depicting the journey of a product from creation to customer use embeds the brand story in the viewer's mind.
+4. Brand Identity and Values
+Impact: Storytelling conveys brand identity and values.
+Explanation: Through stories, brands can express their mission, vision, and core values, building a strong identity. This helps in differentiating the brand from competitors and building loyalty.
+Example: A static ad featuring a company’s founders working passionately on their first product conveys values of dedication and authenticity.
+5. Simplification of Complex Messages
+Impact: Stories simplify complex messages.
+Explanation: Complex information can be conveyed more easily and understandably through storytelling. This makes the content more accessible and engaging for the audience.
+Example: A static infographic that tells a story about the impact of climate change through visuals and short narratives simplifies a complex issue.
+6. Connection and Trust
+Impact: Stories build a connection and trust with the audience.
+Explanation: Authentic stories foster trust and build a connection with the audience. When viewers relate to the story, they are more likely to trust the brand and its message.
+Example: An image featuring testimonials from real customers sharing their success stories with the product builds credibility and trust.
+7. Call to Action (CTA) Effectiveness
+Impact: Storytelling enhances the effectiveness of CTAs.
+Explanation: When a story is compelling, viewers are more likely to respond to the call to action. The narrative creates a context that makes the CTA more appealing and urgent.
+Example: A static creative that tells a story of someone achieving their goals with the help of a product, followed by a CTA to “Join the success,” is more persuasive.
+Practical Applications of Storytelling in Static Creative:
+Visual Storytelling: Use images that depict a sequence or a moment that implies a broader story.
+
+Example: An image of a person holding a graduation certificate can imply the story of hard work, achievement, and success.
+Textual Elements: Incorporate short, compelling copy that suggests a narrative.
+
+Example: A tagline like “From our family to yours” paired with a family photo tells a story of care and tradition.
+Contextual Backgrounds: Use backgrounds and settings that imply a story.
+
+Example: A product placed in a home setting can imply how it fits into daily life, telling a story of convenience and comfort.
+Character and Journey: Introduce characters and show their journey.
+
+Example: A static ad featuring a character's journey from a problem to a solution using the product.
+User-Generated Content: Share stories from actual customers.
+
+Example: Customer photos with quotes about their experiences tell authentic stories that resonate with new customers.
+
+Evaluate the content using the 7 principles above. Score each element from 1-5, in increments of o.5. Please provide the information in a table, with: element, Score , evaluation, How it could be improved. at the end, please provide a summary of your recommendations.
+        """
+        try:
+            if is_image:
+                image = Image.open(io.BytesIO(uploaded_file.read()))
+                response = model.generate_content([prompt, image])
+            else:
+                with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
+                    tmp.write(uploaded_file.read())
+                    tmp_path = tmp.name
+
+                frames = extract_frames(tmp_path)
+                if frames is None or not frames:  # Check if frames were extracted successfully
+                    st.error("No frames were extracted from the video. Please check the video format.")
+                    return None
+
+                response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
+
+            if response.candidates:
+                raw_response = response.candidates[0].content.parts[0].text.strip()
+                st.write("Combined Marketing Analysis Results_V6:")
+                st.markdown(raw_response, unsafe_allow_html=True)  # Assuming the response is in HTML table format
+            else:
+                st.error("Unexpected response structure from the model.")
+            return None
+        except Exception as e:
+            st.error(f"Failed to read or process the media: {e}")
+            return None
     def emotional_resonance(uploaded_file, is_image=True):
             prompt = """
-    If the content is non-english, translate the content to english. Using the following model, please evaluate the content. Please also suggest improvements.
+    If the content is non-English, translate the content to English. Using the following model, please evaluate the content. Please also suggest improvements.
 
 Evaluating the emotional resonance of a piece of content involves assessing how effectively it evokes the intended emotional responses in the target audience. Score each element from 1-5, in increments of o.5. Please provide the information in a table, with: element, Score , evaluation, how it could be improved. at the end, please provide recommendations. Here are key criteria to consider:
 1. Clarity of Emotional Appeal
@@ -1568,6 +1646,7 @@ with st.sidebar:
         behavioural_principles_button = st.button("Behaviour Principles")
         nlp_principles_analysis_button = st.button("NLP Principles Analysis")
         overall_analysis_button = st.button("Overall Marketing Analysis")
+        Story_Telling_Analysis_button = st.button("Overall Marketing Analysis")
         text_analysis_button = st.button("Text Analysis")
 
     with tabs[2]:  # Headlines
@@ -1642,36 +1721,36 @@ for uploaded_file in uploaded_files:
                 if result:
                     st.write("## Emotional Appraisal Models Analysis Results:")
                     st.markdown(result)
-
-
         elif flash_analysis_button:
             with st.spinner("Performing Flash analysis..."):
                 result = flash_analysis(uploaded_file, is_image)
                 if result:
                     st.write("## Flash Analysis Results:")
                     st.markdown(result)  # Display results directly
-
         elif behavioural_principles_button:
             with st.spinner("Analyzing Behavioral Principles..."):
                 result = behavioural_principles(uploaded_file, is_image)
                 if result:
                     st.write("## Behavioral Principles Analysis Results:")
                     st.markdown(result, unsafe_allow_html=True)
-
         elif nlp_principles_analysis_button:
             with st.spinner("Analyzing NLP Principles..."):
                 result = nlp_principles_analysis(uploaded_file, is_image)
                 if result:
                     st.write("## NLP Principles Analysis Results:")
                     st.markdown(result, unsafe_allow_html=True)
-
         elif overall_analysis_button:
             with st.spinner("Performing overall marketing analysis..."):
                 result = overall_analysis(uploaded_file, is_image)
                 if result:
                     st.write("## Overall Marketing Analysis Results:")
                     st.markdown(result)
-
+        elif Story_Telling_Analysis_button:
+            with st.spinner("Performing Story Telling Analysis..."):
+                result = Story_Telling_Analysis(uploaded_file, is_image)
+                if result:
+                    st.write("## Overall Story Telling Analysis Results:")
+                    st.markdown(result)
         elif text_analysis_button:
             with st.spinner("Performing text analysis..."):
                 result = text_analysis(uploaded_file, is_image)
