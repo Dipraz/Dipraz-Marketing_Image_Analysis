@@ -288,7 +288,7 @@ Evaluate the content using the 7 principles above. Score each element from 1-5, 
 
             if response.candidates:
                 raw_response = response.candidates[0].content.parts[0].text.strip()
-                st.write("Combined Marketing Analysis Results_V6:")
+                st.write("Story Telling Analysis Results:")
                 st.markdown(raw_response, unsafe_allow_html=True)  # Assuming the response is in HTML table format
             else:
                 st.error("Unexpected response structure from the model.")
@@ -1646,7 +1646,7 @@ with st.sidebar:
         behavioural_principles_button = st.button("Behaviour Principles")
         nlp_principles_analysis_button = st.button("NLP Principles Analysis")
         overall_analysis_button = st.button("Overall Marketing Analysis")
-        Story_Telling_Analysis_button = st.button("Overall Marketing Analysis")
+        Story_Telling_Analysis_button = st.button("Story Telling Analysis")
         text_analysis_button = st.button("Text Analysis")
 
     with tabs[2]:  # Headlines
