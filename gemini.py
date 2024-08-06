@@ -1467,7 +1467,97 @@ and regional norms.
         except Exception as e:
             st.error(f"Failed to read or process the media: {e}")
             return None
+    def Image_Analysis(uploaded_file, is_image=True):
+        prompt = f"""
+For each aspect listed below, provide a score from 1 to 5 in increments of 0.5 (1 being low, 5 being high) and an explanation for each aspect, along with suggestions for improvement. The results should be presented in a table format with the columns: Aspect, Score, Explanation, and Improvement. After the table, provide an explanation with suggestions for overall improvement. Here are the aspects to consider:
 
+Visual Appeal
+
+Impact: Attracts attention and conveys emotions.
+Analysis: Assess color scheme, composition, clarity, and aesthetic quality.
+Application: Ensure the image is clear, visually appealing, and professionally designed.
+Relevance
+
+Impact: Resonates with the target audience.
+Analysis: Determine if the image matches audience preferences, context, and brand alignment.
+Application: Align the image with the audience’s interests and brand values.
+Emotional Impact
+
+Impact: Evokes desired emotions.
+Analysis: Analyze the emotional resonance of the image.
+Application: Use storytelling and relatable scenarios to connect emotionally with the audience.
+Message Clarity
+
+Impact: Communicates the intended message effectively.
+Analysis: Ensure the main subject is clear and the image is not cluttered.
+Application: Focus on the key message and keep the design simple and straightforward.
+Engagement Potential
+
+Impact: Captures and retains audience attention.
+Analysis: Evaluate attention-grabbing aspects and interaction potential.
+Application: Use compelling visuals and narratives to encourage interaction.
+Brand Recognition
+
+Impact: Enhances brand recall and association.
+Analysis: Check for visible and well-integrated brand elements.
+Application: Use brand colors, logos, and consistent style to reinforce brand identity.
+Cultural Sensitivity
+
+Impact: Respects and represents cultural norms and diversity.
+Analysis: Assess inclusivity, cultural appropriateness, and global appeal.
+Application: Ensure the image is inclusive and culturally sensitive.
+Technical Quality
+
+Impact: Maintains high resolution and professional editing.
+Analysis: Evaluate resolution, lighting, and post-processing quality.
+Application: Use high-resolution images with proper lighting and professional editing.
+Color
+
+Impact: Influences mood, perception, and attention.
+Analysis: Analyze the psychological impact of colors used.
+Application: Use colors purposefully to evoke desired emotions and enhance brand recognition.
+Typography
+
+Impact: Affects readability and engagement.
+Analysis: Assess font choice, size, placement, and readability.
+Application: Ensure typography complements the image and enhances readability.
+Symbolism
+
+Impact: Conveys complex ideas quickly.
+Analysis: Examine the use of symbols and icons.
+Application: Use universally recognized symbols that align with the ad’s message.
+Contrast
+
+Impact: Highlights important elements and improves visibility.
+Analysis: Check the contrast between different elements.
+Application: Use contrast to draw attention to key parts of the image.
+"""
+        try:
+            if is_image:
+                image = Image.open(io.BytesIO(uploaded_file.read()))
+                response = model.generate_content([prompt, image])
+            else:
+                with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
+                    tmp.write(uploaded_file.read())
+                    tmp_path = tmp.name
+
+                frames = extract_frames(tmp_path)
+                if frames is None or not frames:  # Check if frames were extracted successfully
+                    st.error("No frames were extracted from the video. Please check the video format.")
+                    return None
+
+                response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
+
+            if response.candidates:
+                raw_response = response.candidates[0].content.parts[0].text.strip()
+                st.write("Image Analysis::")
+                st.markdown(raw_response, unsafe_allow_html=True)  # Assuming the response is in HTML table format
+            else:
+                st.error("Unexpected response structure from the model.")
+            return None
+        except Exception as e:
+            st.error(f"Failed to read or process the media: {e}")
+            return None
     def flash_analysis(uploaded_file, is_image=True):
         prompt = f"""
         Imagine you are a visual content analyst reviewing a marketing asset ({'image' if is_image else 'video'}) for a client. Your goal is to provide a detailed, objective description that captures essential information relevant to marketing decisions.
@@ -1594,6 +1684,7 @@ with st.sidebar:
         emotional_resonance_button=st.button("Emotional Resonance")
         emotional_analysis_button=st.button("Emotional Analysis")
         Emotional_Appraisal_Models_button=st.button("Emotional Appraisal Models")
+        Image_Analysis_button=st.button("Image Analysis")        
 
     with tabs[1]:  # Detailed
         behavioural_principles_button = st.button("Behaviour Principles")
@@ -1781,7 +1872,13 @@ for uploaded_file in uploaded_files:
                 result = x_profile(uploaded_file, is_image)
                 if result:
                     st.write("## X (formerly Twitter) targeting Analysis Results:")
-                    st.markdown(result)                                                            
+                    st.markdown(result)
+        elif Image_Analysis_button:
+            with st.spinner("Performing Image Analysis..."):
+                result = Image_Analysis(uploaded_file, is_image)
+                if result:
+                    st.write("## Image Analysis Results:")
+                    st.markdown(result)                     
         # Custom Prompt Analysis
         elif custom_prompt_button and custom_prompt:
             with st.spinner("Performing custom prompt analysis..."):
