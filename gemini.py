@@ -1578,54 +1578,7 @@ and regional norms.
             st.error(str(ve))
         except Exception as e:
             st.error(f"An error occurred while processing the media: {e}")
-
         return None  # Return None to signal an error occurred
-
-    def compare_images(image1, image2):
-        prompt = """
-    Provide a focused analysis comparing two images, emphasizing their observable visual elements and marketing attributes and overall effectiveness together. Your analysis should be factual, based on visible content only, and avoid inferential or speculative details. Discuss:
-    
-    - **Visual Similarities**: Identify and describe specific visual elements that are clearly similar in both images (e.g., color schemes, object types, layout).
-    - **Visual Differences**: Detail the visual differences that are evident, such as color variations, the presence or absence of certain elements, and different composition styles.
-    - **Marketing Messages**: Compare any explicit marketing messages or texts that are present in both images. If text is not present, focus only on the overt themes portrayed by the visuals.
-    - **Comparative Strengths and Weaknesses**: Assess the strengths and weaknesses of each image strictly based on the visible content and its potential impact in a marketing context.
-
-    Conclude with a brief evaluation on which image might perform better in a marketing scenario, based solely on the observed elements.
-
-    At the end, Summarize the key points of your comparison in a structured table. Ensure that each entry in the table is directly supported by visible content in the images:
-
-    | Aspect              | Image 1 Details              | Image 1 Improvements        | Image 2 Details              | Image 2 Improvements        | Comparative Insight                    |
-    |---------------------|------------------------------|-----------------------------|------------------------------|-----------------------------|----------------------------------------|
-    | Visual Appeal       | Describe the visual appeal based on colors, layout, and imagery. | Suggest improvements based on marketing effectiveness. | Describe the visual appeal based on colors, layout, and imagery. | Suggest improvements based on marketing effectiveness. | Which image has a stronger visual appeal and why?          |
-    | Marketing Message   | State the explicit marketing message if present. | How could the message be made more clear or impactful? | State the explicit marketing message if present. | How could the message be made more clear or impactful? | Which image communicates its message more effectively?     |
-    | Overall Impact      | Detail the immediate impact or the emotional appeal. | Suggest how to enhance the impact. | Detail the immediate impact or the emotional appeal. | Suggest how to enhance the impact. | Overall, which image creates a stronger impact and why?    |
-    
-    """
-        try:
-            response = model.generate_content([prompt, image1, image2])
-            if response.candidates:
-                return response.candidates[0].content.parts[0].text.strip()
-            else:
-                st.error("Model did not provide a valid response.")
-                return None
-        except Exception as e:
-            st.error(f"Failed to process the images: {e}")
-            return None
-        
-    def convert_to_json(results):
-        return json.dumps(results, indent=4)
-
-    def convert_to_xml(results):
-        root = ET.Element("Results")
-        for key, value in results.items():
-            item = ET.SubElement(root, key)
-            item.text = str(value)
-        return ET.tostring(root, encoding='unicode')
-
-    def create_download_link(data, file_format, filename):
-        b64 = base64.b64encode(data.encode()).decode()
-        return f'<a href="data:file/{file_format};base64,{b64}" download="{filename}">Download {file_format.upper()}</a>'
-
 # --- Streamlit App ---
 st.title("Marketing Media Analysis AI Assistant")
 
@@ -1668,7 +1621,6 @@ with st.sidebar:
     st.markdown("---")
     custom_prompt = st.text_area("Custom Prompt (Optional):")
     custom_prompt_button = st.button("Analyze with Custom Prompt")
-
 # --- Main Content Area ---
 
 # File Uploader with Enhanced UI
@@ -1837,55 +1789,106 @@ for uploaded_file in uploaded_files:
                 if result:
                     st.write("## Custom Prompt Analysis Results:")
                     st.markdown(result)
-                    
-# File Uploader for Image Comparison
-uploaded_files_comparison = st.file_uploader(
-    "Upload Two Marketing Images for Comparison:",
+# Function to compare all images with a standard prompt or custom prompt
+def compare_all_images(images, filenames, model, custom_prompt=None):
+    # Define the prompt
+    if custom_prompt is None:
+        # Construct the prompt string with proper concatenation
+        image_list_str = '\n'.join([f'- **Image {i+1}:** {filenames[i]}' for i in range(len(images))])
+        table_rows = '\n'.join(
+            [
+                f'| {i+1} | Description: | Statement: | Impact: |\n|   | Suggestions: | Enhancements: | Improvements: |'
+                for i in range(len(images))
+            ]
+        )
+        
+        prompt = (
+            f"Analyze and compare the following {len(images)} marketing images. Focus on their visual elements, "
+            f"marketing attributes, and overall effectiveness. The images to be analyzed are:\n\n"
+            f"{image_list_str}\n\n"
+            "Your analysis should be factual, based solely on visible content, and avoid inferential or speculative details. "
+            "Please address the following points:\n\n"
+            "1. **Visual Elements**:\n"
+            "   - Identify and describe common visual elements across all images (e.g., color schemes, object types, layout, composition styles).\n"
+            "   - Highlight unique elements that distinguish each image from the others.\n\n"
+            "2. **Marketing Messages**:\n"
+            "   - Examine any explicit and implicit marketing messages conveyed in the images.\n"
+            "   - Discuss how these messages align with or diverge from the visual elements.\n\n"
+            "3. **Comparative Analysis**:\n"
+            "   - Assess the relative strengths and weaknesses of each image in a marketing context.\n"
+            "   - Consider factors like visual appeal, clarity of message, and potential audience impact.\n\n"
+            "4. **Overall Evaluation**:\n"
+            "   - Provide a summary of the key findings.\n"
+            "   - Highlight the most effective image(s) based on the analysis and justify your choice.\n\n"
+            "Structure the results in a detailed table summarizing the key points for each image:\n\n"
+            "| Img # | Visual Appeal | Marketing Message | Overall Impact |\n"
+            "|-------|---------------|-------------------|----------------|\n"
+            f"{table_rows}\n\n"
+            "In your response, ensure each section is covered thoroughly with clear, concise points, and present any necessary "
+            "improvements or recommendations for each image. Use factual observations to support your analysis."
+        )
+    else:
+        # Use custom prompt if provided
+        prompt = custom_prompt
+
+    # Generate content using the model and prompt
+    try:
+        response = model.generate_content([prompt] + images)
+        if response.candidates:
+            return response.candidates[0].content.parts[0].text.strip()
+        else:
+            st.error("Model did not provide a valid response.")
+            return None
+    except Exception as e:
+        st.error(f"Failed to process the images: {e}")
+        return None
+
+# Initialize the Streamlit app
+st.title("Marketing Image Comparison AI Assistant")
+
+# File Uploader for Multiple Images
+uploaded_files = st.file_uploader(
+    "Upload Marketing Images for Comparison (minimum 2, maximum 10):",
     accept_multiple_files=True,
     type=["png", "jpg", "jpeg"],
-    help="Upload exactly two images for comparison.",
-    key="comparison_uploader"  # Unique key for this uploader
+    help="Select multiple images for comparison.",
 )
 
-# Display Uploaded Images for Comparison
-if uploaded_files_comparison and len(uploaded_files_comparison) == 2:
-    with st.spinner("Processing images..."):
-        image1, image2 = [convert_to_rgb(Image.open(file)) for file in uploaded_files_comparison]
+# Display Uploaded Images in a Grid (if multiple)
+if uploaded_files:
+    st.write("## Uploaded Images:")
+    st.image([convert_to_rgb(Image.open(file)) for file in uploaded_files], width=200, caption=[f"Image {i + 1}" for i in range(len(uploaded_files))])
 
-    col1, col2 = st.columns(2)
-    with col1:
-        st.image(image1, caption="Image 1", use_column_width=True)
-    with col2:
-        st.image(image2, caption="Image 2", use_column_width=True)
-
-    # --- Image Comparison Options ---
+# Image Comparison if there are at least 2 uploaded files
+if uploaded_files and len(uploaded_files) >= 2:
+    # Image Comparison Options
     with st.expander("Image Comparison Options"):
 
-        # Standard Comparison
-        if st.button("Compare Images (Standard)", key="standard_compare_button"):
-            with st.spinner("Comparing images..."):
-                comparison_result = compare_images(image1, image2)
-                if comparison_result:
+        # Standard Comparison (All Images Together)
+        if st.button("Compare All Images Together (Standard)", key="all_images_compare_button"):
+            with st.spinner("Comparing all images..."):
+                image_list = [convert_to_rgb(Image.open(file)) for file in uploaded_files]
+                filenames = [file.name for file in uploaded_files]
+                results = compare_all_images(image_list, filenames, model)
+                if results:
                     st.write("## Image Comparison Results:")
-                    st.markdown(comparison_result)
-                else:
-                    st.error("Image comparison failed. Please check the images and try again.")
+                    st.markdown(results)
 
-        # Custom Prompt Comparison
-        st.markdown("---")
+        # Custom Prompt Comparison (All Images Together)
         custom_prompt = st.text_area(
             "Custom Prompt for Comparison (Optional):",
             value="""Provide a detailed comparison of these images, focusing on [your specific areas of interest]. Explain the similarities, differences, and potential impact on the target audience.""",
-            height=150,  # Adjust height as needed
+            height=150
         )
-        if st.button("Compare with Custom Prompt", key="custom_compare_button"):
-            with st.spinner("Comparing images with custom prompt..."):
-                response = model.generate_content([custom_prompt, image1, image2])
-                if response and response.candidates and len(response.candidates[0].content.parts) > 0:
-                    st.write("## Custom Comparison Results:")
-                    st.markdown(response.candidates[0].content.parts[0].text.strip())
-                else:
-                    st.error("Model did not provide a valid response.")
 
-elif uploaded_files_comparison:  # If more or less than 2 images are uploaded
-    st.warning("Please upload exactly two images for comparison.")
+        if st.button("Compare with Custom Prompt", key="all_images_custom_compare_button"):
+            with st.spinner("Comparing all images with custom prompt..."):
+                image_list = [convert_to_rgb(Image.open(file)) for file in uploaded_files]
+                filenames = [file.name for file in uploaded_files]
+                results = compare_all_images(image_list, filenames, model, custom_prompt)
+                if results:
+                    st.write("## Custom Image Comparison Results:")
+                    st.markdown(results)
+
+elif uploaded_files and len(uploaded_files) < 2:
+    st.warning("Please upload at least two images for comparison.")
