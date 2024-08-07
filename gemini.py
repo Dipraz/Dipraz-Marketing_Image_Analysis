@@ -1472,65 +1472,74 @@ and regional norms.
 For each aspect listed below, provide a score from 1 to 5 in increments of 0.5 (1 being low, 5 being high) and an explanation for each aspect, along with suggestions for improvement. The results should be presented in a table format with the columns: Aspect, Score, Explanation, and Improvement. After the table, provide an explanation with suggestions for overall improvement. Here are the aspects to consider:
 
 Visual Appeal
-
 Impact: Attracts attention and conveys emotions.
 Analysis: Assess color scheme, composition, clarity, and aesthetic quality.
 Application: Ensure the image is clear, visually appealing, and professionally designed.
-Relevance
 
+Relevance
 Impact: Resonates with the target audience.
 Analysis: Determine if the image matches audience preferences, context, and brand alignment.
 Application: Align the image with the audience’s interests and brand values.
-Emotional Impact
 
+Emotional Impact
 Impact: Evokes desired emotions.
 Analysis: Analyze the emotional resonance of the image.
 Application: Use storytelling and relatable scenarios to connect emotionally with the audience.
-Message Clarity
 
+Message Clarity
 Impact: Communicates the intended message effectively.
 Analysis: Ensure the main subject is clear and the image is not cluttered.
 Application: Focus on the key message and keep the design simple and straightforward.
-Engagement Potential
 
+Engagement Potential
 Impact: Captures and retains audience attention.
 Analysis: Evaluate attention-grabbing aspects and interaction potential.
 Application: Use compelling visuals and narratives to encourage interaction.
-Brand Recognition
 
+Brand Recognition
 Impact: Enhances brand recall and association.
 Analysis: Check for visible and well-integrated brand elements.
 Application: Use brand colors, logos, and consistent style to reinforce brand identity.
-Cultural Sensitivity
 
+Cultural Sensitivity
 Impact: Respects and represents cultural norms and diversity.
 Analysis: Assess inclusivity, cultural appropriateness, and global appeal.
 Application: Ensure the image is inclusive and culturally sensitive.
-Technical Quality
 
+Technical Quality
 Impact: Maintains high resolution and professional editing.
 Analysis: Evaluate resolution, lighting, and post-processing quality.
 Application: Use high-resolution images with proper lighting and professional editing.
+
 Color
-
 Impact: Influences mood, perception, and attention.
-Analysis: Analyze the psychological impact of colors used.
+Analysis: Analyze the psychological impact of the colors used.
 Application: Use colors purposefully to evoke desired emotions and enhance brand recognition.
-Typography
 
+Typography
 Impact: Affects readability and engagement.
 Analysis: Assess font choice, size, placement, and readability.
 Application: Ensure typography complements the image and enhances readability.
-Symbolism
 
+Symbolism
 Impact: Conveys complex ideas quickly.
 Analysis: Examine the use of symbols and icons.
 Application: Use universally recognized symbols that align with the ad’s message.
-Contrast
 
+Contrast
 Impact: Highlights important elements and improves visibility.
 Analysis: Check the contrast between different elements.
 Application: Use contrast to draw attention to key parts of the image.
+
+Layout Balance
+Impact: Ensures the image is visually balanced and pleasing to the eye.
+Analysis: Assess the distribution of elements within the image to ensure they are evenly balanced.
+Application: Arrange elements so that the visual weight is evenly distributed, avoiding clutter and ensuring harmony.
+
+Hierarchy
+Impact: Guides the viewer’s eye through the most important elements first.
+Analysis: Evaluate the visual hierarchy to ensure the most important elements stand out.
+Application: Use size, color, and placement to create a clear visual hierarchy, directing attention to key messages or elements.
 """
         try:
             if is_image:
