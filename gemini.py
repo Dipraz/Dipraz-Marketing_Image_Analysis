@@ -298,9 +298,10 @@ Evaluate the content using the 7 principles above. Score each element from 1-5, 
             return None
     def emotional_resonance(uploaded_file, is_image=True):
             prompt = """
-    If the content is non-English, translate the content to English. Using the following model, please evaluate the content. Please also suggest improvements.
+If the content is non-english, translate the content to English. Using the following model, please evaluate the content. Please also suggest improvements.
 
 Evaluating the emotional resonance of a piece of content involves assessing how effectively it evokes the intended emotional responses in the target audience. Score each element from 1-5, in increments of o.5. Please provide the information in a table, with: element, Score , evaluation, how it could be improved. at the end, please provide recommendations. Here are key criteria to consider:
+
 1. Clarity of Emotional Appeal
 Criteria: The content clearly conveys the intended emotion(s).
 Evaluation: Determine if the emotional message is easily understood without ambiguity.
@@ -318,31 +319,7 @@ Criteria: The strength of the emotional response elicited is appropriate for the
 Evaluation: Measure whether the content evokes a strong enough emotional reaction without being overwhelming or underwhelming.
 6. Engagement
 Criteria: The content encourages audience engagement (likes, shares, comments, etc.).
-Evaluation: Analyze engagement metrics to determine if the content successfully drives interaction.
-7. Memory Retention
-Criteria: The emotional content is memorable and sticks with the audience.
-Evaluation: Assess if the audience recalls the content and its emotional impact over time.
-8. Call to Action (CTA)
-Criteria: The content effectively drives the audience to take the desired action.
-Evaluation: Check if the emotional appeal translates into concrete actions, such as clicks, purchases, or sign-ups.
-9. Balance
-Criteria: The emotional appeal is balanced with informative content.
-Evaluation: Ensure that the emotional elements do not overshadow the key message or information.
-10. Cultural Sensitivity
-Criteria: The emotional appeal respects and aligns with cultural norms and values.
-Evaluation: Ensure the content is culturally appropriate and avoids potential offensiveness.
-11. Emotional Variety
-Criteria: The content provides a range of emotions, creating a dynamic experience.
-Evaluation: Determine if the content moves the audience through different emotional states effectively.
-12. Storytelling Quality
-Criteria: The content tells a compelling story that enhances emotional resonance.
-Evaluation: Assess the narrative structure, character development, and plot to ensure a strong emotional arc.
-13. Relatability
-Criteria: The audience can see themselves in the content or relate to the situations presented.
-Evaluation: Determine if the scenarios, characters, or messages are relatable and reflect the audience’s reality.
-14. Emotional Connection to Brand
-Criteria: The content strengthens the emotional connection between the audience and the brand.
-Evaluation: Measure the extent to which the content enhances brand affinity and loyalty.
+Evaluation: Does the content explicitly encourage engagement, and have the means for users to share, like, comment etc.
             """
             try:
                 if is_image:
