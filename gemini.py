@@ -755,7 +755,116 @@ Evaluate the extracted text based on the following criteria. For each aspect, pr
         except Exception as e:
             st.error(f"Failed to read or process the media: {e}")
             return None
+    def Text_Analysis_2(uploaded_file, is_image=True):
+        prompt = """
+If the content is non-english, translate the content to English. PLease evaluate the image against these principles:
 
+1. Textual Analysis
+Readability Analysis: Use tools like the Flesch-Kincaid readability tests to determine how easy the content is to read. This helps ensure that the language is appropriate for the target audience.
+Lexical Diversity: Analyze the variety of words used in the content. High lexical diversity can indicate richness in language, which can be engaging, while lower diversity might be simpler and clearer.
+2. Semantic Analysis
+Keyword Analysis: Evaluate the frequency and placement of key terms related to the brand or product. Ensure that the most important keywords are prominently featured and well-integrated.
+Topic Modeling: Use techniques like Latent Dirichlet Allocation (LDA) to identify the main topics covered in the content. This helps in understanding if the content aligns with the intended message and themes.
+3. Sentiment Analysis
+Polarity Assessment: Use natural language processing (NLP) tools to analyze the sentiment of the content, categorizing it as positive, negative, or neutral. This helps in ensuring the tone matches the intended emotional impact.
+Emotion Detection: Beyond simple sentiment, more advanced NLP tools can detect specific emotions (joy, anger, sadness, etc.) conveyed by the content.
+4. Structural Analysis
+Narrative Structure: Examine the structure of the content to ensure it follows a logical flow. For instance, a typical narrative structure might include an introduction, problem statement, solution, and conclusion.
+Visual Composition Analysis: For visual marketing content, analyze the layout, use of colors, fonts, and imagery. Ensure that these elements are aligned with branding guidelines and are aesthetically pleasing.
+5. Linguistic Style Matching
+Consistency with Brand Voice: Analyze if the content maintains consistency with the established brand voice and style guidelines. This involves checking for tone, style, and terminology.
+Grammar and Syntax Analysis: Use grammar checking tools to ensure the content is free from grammatical errors and awkward phrasing.
+6. Cohesion and Coherence Analysis
+Cohesion Metrics: Measure how well different parts of the text link together. Tools like Coh-Metrix can provide insights into the coherence of the content.
+Logical Flow: Evaluate the logical progression of ideas to ensure the content flows smoothly and makes logical sense from start to finish.
+7. Visual and Multimodal Analysis
+Image and Text Alignment: Analyze the relationship between text and images in the content. Ensure that images support and enhance the message conveyed by the text.
+Aesthetic Quality: Evaluate the aesthetic elements of visual content, considering aspects like balance, symmetry, color harmony, and typography.
+8. Compliance and Ethical Analysis
+Regulatory Compliance: Ensure that the content complies with advertising regulations and industry standards.
+Ethical Considerations: Analyze the content for any potential ethical issues, such as misleading claims, cultural insensitivity, or inappropriate content.
+"""
+        try:
+            if is_image:
+                image = Image.open(io.BytesIO(uploaded_file.read()))
+                response = model.generate_content([prompt, image])
+            else:
+                with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
+                    tmp.write(uploaded_file.read())
+                    tmp_path = tmp.name
+
+                frames = extract_frames(tmp_path)
+                if frames is None or not frames:  # Check if frames were extracted successfully
+                    st.error("No frames were extracted from the video. Please check the video format.")
+                    return None
+
+                response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
+
+            if response.candidates:
+                raw_response = response.candidates[0].content.parts[0].text.strip()
+                st.write("Text Analysis 2 Results:")
+                st.markdown(raw_response, unsafe_allow_html=True)  # Assuming the response is in HTML table format
+            else:
+                st.error("Unexpected response structure from the model.")
+            return None
+        except Exception as e:
+            st.error(f"Failed to read or process the media: {e}")
+            return None
+    def Text_Analysis_2_table(uploaded_file, is_image=True):
+        prompt = """
+If the content is non-english, translate the content to English. PLease evaluate the image against these principles in a table with a score for each element and sub element, from 1-5, in increments of 0.5. Please also include columns for analysis and  recommendations:
+
+1. Textual Analysis
+Readability Analysis: Use tools like the Flesch-Kincaid readability tests to determine how easy the content is to read. This helps ensure that the language is appropriate for the target audience.
+Lexical Diversity: Analyze the variety of words used in the content. High lexical diversity can indicate richness in language, which can be engaging, while lower diversity might be simpler and clearer.
+2. Semantic Analysis
+Keyword Analysis: Evaluate the frequency and placement of key terms related to the brand or product. Ensure that the most important keywords are prominently featured and well-integrated.
+Topic Modeling: Use techniques like Latent Dirichlet Allocation (LDA) to identify the main topics covered in the content. This helps in understanding if the content aligns with the intended message and themes.
+3. Sentiment Analysis
+Polarity Assessment: Use natural language processing (NLP) tools to analyze the sentiment of the content, categorizing it as positive, negative, or neutral. This helps in ensuring the tone matches the intended emotional impact.
+Emotion Detection: Beyond simple sentiment, more advanced NLP tools can detect specific emotions (joy, anger, sadness, etc.) conveyed by the content.
+4. Structural Analysis
+Narrative Structure: Examine the structure of the content to ensure it follows a logical flow. For instance, a typical narrative structure might include an introduction, problem statement, solution, and conclusion.
+Visual Composition Analysis: For visual marketing content, analyze the layout, use of colors, fonts, and imagery. Ensure that these elements are aligned with branding guidelines and are aesthetically pleasing.
+5. Linguistic Style Matching
+Consistency with Brand Voice: Analyze if the content maintains consistency with the established brand voice and style guidelines. This involves checking for tone, style, and terminology.
+Grammar and Syntax Analysis: Use grammar checking tools to ensure the content is free from grammatical errors and awkward phrasing.
+6. Cohesion and Coherence Analysis
+Cohesion Metrics: Measure how well different parts of the text link together. Tools like Coh-Metrix can provide insights into the coherence of the content.
+Logical Flow: Evaluate the logical progression of ideas to ensure the content flows smoothly and makes logical sense from start to finish.
+7. Visual and Multimodal Analysis
+Image and Text Alignment: Analyze the relationship between text and images in the content. Ensure that images support and enhance the message conveyed by the text.
+Aesthetic Quality: Evaluate the aesthetic elements of visual content, considering aspects like balance, symmetry, color harmony, and typography.
+8. Compliance and Ethical Analysis
+Regulatory Compliance: Ensure that the content complies with advertising regulations and industry standards.
+Ethical Considerations: Analyze the content for any potential ethical issues, such as misleading claims, cultural insensitivity, or inappropriate content.
+"""
+        try:
+            if is_image:
+                image = Image.open(io.BytesIO(uploaded_file.read()))
+                response = model.generate_content([prompt, image])
+            else:
+                with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
+                    tmp.write(uploaded_file.read())
+                    tmp_path = tmp.name
+
+                frames = extract_frames(tmp_path)
+                if frames is None or not frames:  # Check if frames were extracted successfully
+                    st.error("No frames were extracted from the video. Please check the video format.")
+                    return None
+
+                response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
+
+            if response.candidates:
+                raw_response = response.candidates[0].content.parts[0].text.strip()
+                st.write("ext Analysis 2 - table Results:")
+                st.markdown(raw_response, unsafe_allow_html=True)  # Assuming the response is in HTML table format
+            else:
+                st.error("Unexpected response structure from the model.")
+            return None
+        except Exception as e:
+            st.error(f"Failed to read or process the media: {e}")
+            return None        
     def headline_analysis(uploaded_file, is_image=True):
         prompt = f"""
 Imagine you are a marketing consultant reviewing the headline text of a marketing asset ({'image' if is_image else 'video'}) for a client. Your task is to assess the various headline's effectiveness based on various linguistic and marketing criteria.
@@ -1544,6 +1653,251 @@ Application: Use size, color, and placement to create a clear visual hierarchy, 
         except Exception as e:
             st.error(f"Failed to read or process the media: {e}")
             return None
+        
+    def Image_Analysis_2(uploaded_file, is_image=True):
+        prompt = f"""
+If the content is non-english, translate the content to English. PLease evaluate the image against these principles:
+
+1. Emotional Appeal
+Does the image evoke a strong emotional response?
+What specific emotions are triggered (e.g., happiness, nostalgia, excitement, urgency)?
+How might these emotions influence the viewer's perception of the brand or product?
+How well does the image align with the intended emotional tone of the campaign?
+Does the emotional tone match the target audience's expectations and values?
+2. Eye Attraction
+Does the image grab attention immediately?
+Which elements (color, subject, composition) are most effective in drawing the viewer’s attention?
+Is there anything in the image that distracts from the main focal point?
+Is there a clear focal point in the image that naturally draws the viewer's eye?
+How effectively does the focal point communicate the key message or subject?
+3. Visual Appeal
+How aesthetically pleasing is the image overall?
+Are the elements of balance, symmetry, and composition well-executed?
+Does the image use any unique or creative visual techniques that enhance its appeal?
+Are the visual elements harmonious and balanced?
+Do any elements feel out of place or clash with the overall design?
+4. Text Overlay (Clarity, Emotional Connection, Readability)
+Is the text overlay easily readable?
+Is there sufficient contrast between the text and the background?
+Are font size, style, and color appropriate for readability?
+Does the text complement the image?
+Does it enhance the emotional connection with the audience?
+Is the messaging clear, concise, and impactful?
+Is the text aligned with the brand's identity?
+Does it maintain consistency with the brand’s tone and voice?
+5. Contrast and Clarity
+Is there adequate contrast between different elements of the image?
+How well do the foreground and background elements distinguish themselves?
+Does the contrast help highlight the key message or subject?
+Is the image clear and sharp?
+Are all important details easy to distinguish?
+Does the image suffer from any blurriness or pixelation?
+6. Visual Hierarchy
+Is there a clear visual hierarchy guiding the viewer’s eye?
+Are the most important elements (e.g., brand name, product, call to action) placed prominently?
+How effectively does the hierarchy direct attention from one element to the next?
+Are key elements ordered in terms of importance?
+Does the visual flow help reinforce the intended message?
+7. Negative Space
+Is negative space used effectively to balance the composition?
+Does the negative space help focus attention on the key elements?
+Is there enough negative space to avoid clutter without making the image feel empty?
+Does the use of negative space enhance the overall clarity of the message?
+How does it contribute to the image’s visual hierarchy and readability?
+8. Color Psychology
+Are the colors used in the image appropriate for the message and target audience?
+Do the colors evoke the intended emotional response (e.g., trust, excitement, calm)?
+Are any colors potentially off-putting or conflicting for the audience?
+How well do the colors align with the brand’s color palette?
+Are they consistent with the brand’s identity and overall messaging?
+Does the color scheme contribute to or detract from brand recognition?
+9. Depth and Texture
+Does the image have a sense of depth and texture?
+Are shadows, gradients, or layering techniques used effectively to create a three-dimensional feel?
+How does the depth or texture contribute to the realism and engagement of the image?
+Is the texture or depth distracting or enhancing?
+Does it add value to the visual appeal, or does it complicate the message?
+10. Brand Consistency
+Is the image consistent with the brand’s visual identity?
+Are color schemes, fonts, and overall style in line with the brand guidelines?
+Does the image reinforce the brand’s core values and messaging?
+Does the image maintain a coherent connection to previous branding efforts?
+Is there a risk of confusing the audience with a departure from established brand aesthetics?
+11. Psychological Triggers
+Does the image use any psychological triggers effectively?
+Are elements like scarcity, social proof, or authority present to encourage a desired action?
+How well do these triggers align with the target audience’s motivations and behaviors?
+Are the psychological triggers subtle or overt?
+Does the image risk appearing manipulative, or is the influence balanced and respectful?
+12. Emotional Connection
+How strong is the emotional connection between the image and the target audience?
+Does the image resonate with the audience’s values, desires, or pain points?
+Is the connection likely to inspire action or loyalty?
+Is the emotional connection authentic?
+Does it feel genuine, or is there a risk of the audience perceiving it as forced or inauthentic?
+13. Suitable Effect Techniques
+Are any special effects or filters used in the image?
+Do they enhance the overall message and visual appeal?
+Are the effects aligned with the brand’s identity and the image’s purpose?
+Do these effects support the key message and theme?
+Is there a risk of the effects distracting from or diluting the message?
+14. Key Message and Subject
+Is the key message of the image clear and easily understood at a glance?
+Is the message prominent, or does it get lost in other elements?
+How well does the image communicate its purpose or call to action?
+Is the subject of the image (product, service, idea) highlighted appropriately?
+Does the subject stand out as the main focus?
+Is there a clear connection between the subject and the intended message?
+"""
+        try:
+            if is_image:
+                image = Image.open(io.BytesIO(uploaded_file.read()))
+                response = model.generate_content([prompt, image])
+            else:
+                with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
+                    tmp.write(uploaded_file.read())
+                    tmp_path = tmp.name
+
+                frames = extract_frames(tmp_path)
+                if frames is None or not frames:  # Check if frames were extracted successfully
+                    st.error("No frames were extracted from the video. Please check the video format.")
+                    return None
+
+                response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
+
+            if response.candidates:
+                raw_response = response.candidates[0].content.parts[0].text.strip()
+                st.write("Image Analysis 2 ::")
+                st.markdown(raw_response, unsafe_allow_html=True)  # Assuming the response is in HTML table format
+            else:
+                st.error("Unexpected response structure from the model.")
+            return None
+        except Exception as e:
+            st.error(f"Failed to read or process the media: {e}")
+            return None
+        
+    def Image_Analysis_2_table(uploaded_file, is_image=True):
+        prompt = f"""
+If the content is non-english, translate the content to English. PLease evaluate the image against these principles in a table with a score for each element, from 1-5, in increments of 0.5. Please also include columns for analysis and  recommendations:
+
+1. Emotional Appeal
+Does the image evoke a strong emotional response?
+What specific emotions are triggered (e.g., happiness, nostalgia, excitement, urgency)?
+How might these emotions influence the viewer's perception of the brand or product?
+How well does the image align with the intended emotional tone of the campaign?
+Does the emotional tone match the target audience's expectations and values?
+2. Eye Attraction
+Does the image grab attention immediately?
+Which elements (color, subject, composition) are most effective in drawing the viewer’s attention?
+Is there anything in the image that distracts from the main focal point?
+Is there a clear focal point in the image that naturally draws the viewer's eye?
+How effectively does the focal point communicate the key message or subject?
+3. Visual Appeal
+How aesthetically pleasing is the image overall?
+Are the elements of balance, symmetry, and composition well-executed?
+Does the image use any unique or creative visual techniques that enhance its appeal?
+Are the visual elements harmonious and balanced?
+Do any elements feel out of place or clash with the overall design?
+4. Text Overlay (Clarity, Emotional Connection, Readability)
+Is the text overlay easily readable?
+Is there sufficient contrast between the text and the background?
+Are font size, style, and color appropriate for readability?
+Does the text complement the image?
+Does it enhance the emotional connection with the audience?
+Is the messaging clear, concise, and impactful?
+Is the text aligned with the brand's identity?
+Does it maintain consistency with the brand’s tone and voice?
+5. Contrast and Clarity
+Is there adequate contrast between different elements of the image?
+How well do the foreground and background elements distinguish themselves?
+Does the contrast help highlight the key message or subject?
+Is the image clear and sharp?
+Are all important details easy to distinguish?
+Does the image suffer from any blurriness or pixelation?
+6. Visual Hierarchy
+Is there a clear visual hierarchy guiding the viewer’s eye?
+Are the most important elements (e.g., brand name, product, call to action) placed prominently?
+How effectively does the hierarchy direct attention from one element to the next?
+Are key elements ordered in terms of importance?
+Does the visual flow help reinforce the intended message?
+7. Negative Space
+Is negative space used effectively to balance the composition?
+Does the negative space help focus attention on the key elements?
+Is there enough negative space to avoid clutter without making the image feel empty?
+Does the use of negative space enhance the overall clarity of the message?
+How does it contribute to the image’s visual hierarchy and readability?
+8. Color Psychology
+Are the colors used in the image appropriate for the message and target audience?
+Do the colors evoke the intended emotional response (e.g., trust, excitement, calm)?
+Are any colors potentially off-putting or conflicting for the audience?
+How well do the colors align with the brand’s color palette?
+Are they consistent with the brand’s identity and overall messaging?
+Does the color scheme contribute to or detract from brand recognition?
+9. Depth and Texture
+Does the image have a sense of depth and texture?
+Are shadows, gradients, or layering techniques used effectively to create a three-dimensional feel?
+How does the depth or texture contribute to the realism and engagement of the image?
+Is the texture or depth distracting or enhancing?
+Does it add value to the visual appeal, or does it complicate the message?
+10. Brand Consistency
+Is the image consistent with the brand’s visual identity?
+Are color schemes, fonts, and overall style in line with the brand guidelines?
+Does the image reinforce the brand’s core values and messaging?
+Does the image maintain a coherent connection to previous branding efforts?
+Is there a risk of confusing the audience with a departure from established brand aesthetics?
+11. Psychological Triggers
+Does the image use any psychological triggers effectively?
+Are elements like scarcity, social proof, or authority present to encourage a desired action?
+How well do these triggers align with the target audience’s motivations and behaviors?
+Are the psychological triggers subtle or overt?
+Does the image risk appearing manipulative, or is the influence balanced and respectful?
+12. Emotional Connection
+How strong is the emotional connection between the image and the target audience?
+Does the image resonate with the audience’s values, desires, or pain points?
+Is the connection likely to inspire action or loyalty?
+Is the emotional connection authentic?
+Does it feel genuine, or is there a risk of the audience perceiving it as forced or inauthentic?
+13. Suitable Effect Techniques
+Are any special effects or filters used in the image?
+Do they enhance the overall message and visual appeal?
+Are the effects aligned with the brand’s identity and the image’s purpose?
+Do these effects support the key message and theme?
+Is there a risk of the effects distracting from or diluting the message?
+14. Key Message and Subject
+Is the key message of the image clear and easily understood at a glance?
+Is the message prominent, or does it get lost in other elements?
+How well does the image communicate its purpose or call to action?
+Is the subject of the image (product, service, idea) highlighted appropriately?
+Does the subject stand out as the main focus?
+Is there a clear connection between the subject and the intended message?
+"""
+        try:
+            if is_image:
+                image = Image.open(io.BytesIO(uploaded_file.read()))
+                response = model.generate_content([prompt, image])
+            else:
+                with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
+                    tmp.write(uploaded_file.read())
+                    tmp_path = tmp.name
+
+                frames = extract_frames(tmp_path)
+                if frames is None or not frames:  # Check if frames were extracted successfully
+                    st.error("No frames were extracted from the video. Please check the video format.")
+                    return None
+
+                response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
+
+            if response.candidates:
+                raw_response = response.candidates[0].content.parts[0].text.strip()
+                st.write("Image Analysis 2 Table ::")
+                st.markdown(raw_response, unsafe_allow_html=True)  # Assuming the response is in HTML table format
+            else:
+                st.error("Unexpected response structure from the model.")
+            return None
+        except Exception as e:
+            st.error(f"Failed to read or process the media: {e}")
+            return None
+        
     def flash_analysis(uploaded_file, is_image=True):
         prompt = f"""
         Imagine you are a visual content analyst reviewing a marketing asset ({'image' if is_image else 'video'}) for a client. Your goal is to provide a detailed, objective description that captures essential information relevant to marketing decisions.
@@ -1670,7 +2024,9 @@ with st.sidebar:
         emotional_resonance_button=st.button("Emotional Resonance")
         emotional_analysis_button=st.button("Emotional Analysis")
         Emotional_Appraisal_Models_button=st.button("Emotional Appraisal Models")
-        Image_Analysis_button=st.button("Image Analysis")        
+        Image_Analysis_button=st.button("Image Analysis")
+        Image_Analysis_2_button = st.button("Image Analysis 2")
+        Image_Analysis_2_table_button = st.button("Image Analysis 2 table")                
 
     with tabs[1]:  # Detailed
         behavioural_principles_button = st.button("Behaviour Principles")
@@ -1678,6 +2034,8 @@ with st.sidebar:
         overall_analysis_button = st.button("Overall Marketing Analysis")
         Story_Telling_Analysis_button = st.button("Story Telling Analysis")
         text_analysis_button = st.button("Text Analysis")
+        text_analysis_2_button = st.button("Text Analysis 2")
+        text_analysis_2_table_button = st.button("Text Analysis 2 - table")
 
     with tabs[2]:  # Headlines
         headline_analysis_button = st.button("Headline Analysis")
@@ -1786,6 +2144,30 @@ for uploaded_file in uploaded_files:
                 if result:
                     st.write("## Text Analysis Results:")
                     st.markdown(result)
+        elif text_analysis_2_button:
+            with st.spinner("Performing Text Analysis 2..."):
+                result = Text_Analysis_2(uploaded_file, is_image)
+                if result:
+                    st.write("## Text Analysis 2 Results:")
+                    st.markdown(result)
+        elif text_analysis_2_table_button:
+            with st.spinner("Performing Text Analysis 2 - Table Button..."):
+                result = Text_Analysis_2_table(uploaded_file, is_image)
+                if result:
+                    st.write("## Text Analysis 2 - Table Results:")
+                    st.markdown(result)
+        elif Image_Analysis_2_button:
+            with st.spinner("Performing Image Analysis 2..."):
+                result = Image_Analysis_2(uploaded_file, is_image)
+                if result:
+                    st.write("## TImage Analysis 2 Results:")
+                    st.markdown(result)
+        elif Image_Analysis_2_table_button:
+            with st.spinner("Performing Image Analysis 2 table..."):
+                result = Image_Analysis_2_table(uploaded_file, is_image)
+                if result:
+                    st.write("## Image Analysis 2 table Results:")
+                    st.markdown(result)                    
         elif headline_analysis_button:
             with st.spinner("Performing headline analysis..."):
                 result = headline_analysis(uploaded_file, is_image)
