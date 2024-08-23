@@ -175,7 +175,7 @@ Analyze the provided image for marketing effectiveness. First, provide detailed 
             "2. Attention: Evaluate the order of content consumption in the uploaded image. Start by identifying and analyzing the headline for its prominence and position. Next, evaluate any additional text for visibility and reader engagement sequence. Assess the positioning of images in relation to the text, followed by an examination of interactive elements such as buttons. Discuss the order in which the content is consumed (e.g., headline first, then text, or image then text then button, etc.). Determine if the content prioritizes important information, and draws and holds attention effectively.\n"
             "3. Purpose and Value: Is the purpose and value clear within 3 seconds? Is the content product or customer-centric?\n"
             "4. Clarity: Evaluate the clarity of the design elements. Are the visuals and text easy to understand?\n"
-            "5. Creative Score: Assess the creativity of the design. Does it stand out and capture attention through innovative elements?\n"
+            "5. Creativity Score: Assess the creativity of the design. Does it stand out and capture attention through innovative elements?\n"
             "6. First Impressions: Analyze the initial impact of the design. Does it create a strong positive first impression?\n"
             "7. Headline Review: Evaluate the headline for clarity, conciseness, customer centricity, SEO keyword integration, emotional appeal, uniqueness, urgency, benefit to the reader, audience targeting, length, use of numbers/lists, brand consistency, and power words.\n"
             "8. Headline keywords and emotional appeal: Does the headline incorporate keywords and evoke an emotional response?\n"
