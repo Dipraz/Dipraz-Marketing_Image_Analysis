@@ -4,14 +4,14 @@ import json
 import base64
 import tempfile
 import re
+import ssl
 import cv2
 import imageio
 import xml.etree.ElementTree as ET
 from threading import Thread
 from dotenv import load_dotenv
-from fastapi import FastAPI, File, UploadFile, HTTPException, Request, status
-from fastapi.responses import HTMLResponse, RedirectResponse
-from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
+from flask import Flask, request, jsonify, send_file, redirect, url_for
+from flask_cors import CORS
 from PIL import Image
 import google.generativeai as genai
 
@@ -21,14 +21,11 @@ load_dotenv()
 # Get the API key and credentials file from environment variables
 api_key = os.getenv('GOOGLE_API_KEY')
 credentials_path = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
-azure_connection_string = os.getenv('AZURE_STORAGE_CONNECTION_STRING')
-azure_container_name = os.getenv('AZURE_CONTAINER_NAME')
 
 # Check if credentials_path is set
 if credentials_path is None:
     raise Exception("GOOGLE_APPLICATION_CREDENTIALS environment variable not set. Please check your .env file.")
 else:
-    # Set the Google application credentials
     os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = credentials_path
 
 # Configure the Generative AI API key
@@ -49,14 +46,22 @@ model = genai.GenerativeModel(
     generation_config=generation_config,
 )
 
-app = FastAPI()
+app = Flask(__name__)
+CORS(app)  # Enable CORS for all routes
+app.config['UPLOAD_FOLDER'] = 'uploads/'
+app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'};
+
+def allowed_file(filename):
+    """Check if the file extension is allowed."""
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
 
 def resize_image(image, max_size=(300, 250)):
+    """Resize image to a maximum size."""
     image.thumbnail(max_size)
     return image
 
 def extract_frames(video_file_path, num_frames=5):
-    """Extracts frames from a video file using OpenCV."""
+    """Extract frames from a video file using OpenCV."""
     cap = cv2.VideoCapture(video_file_path)
     if not cap.isOpened():
         raise Exception(f"Failed to open video file {video_file_path}. Check if the file is corrupt or format is unsupported.")
@@ -71,7 +76,6 @@ def extract_frames(video_file_path, num_frames=5):
         if not ret:
             break
     
-        # Convert color space and create a PIL Image from bytes
         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         pil_image = Image.fromarray(frame_rgb)
         frames.append(pil_image)
@@ -80,26 +84,22 @@ def extract_frames(video_file_path, num_frames=5):
     if len(frames) == 0:
         raise Exception("No frames were extracted, possibly due to an error in reading the video.")
     return frames
-
-def download_blob_to_bytes(blob_name):
-    """Download a blob from Azure Storage and return its byte content."""
-    try:
-        blob_service_client = BlobServiceClient.from_connection_string(azure_connection_string)
-        blob_client = blob_service_client.get_blob_client(container=azure_container_name, blob=blob_name)
-
-        download_stream = blob_client.download_blob()
-        blob_bytes = download_stream.readall()
-        return blob_bytes
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to download blob from Azure: {e}")
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static'),
+                               'favicon.ico', mimetype='image/vnd.microsoft.icon')
+@app.route('/analyze_multiple', methods=['POST'])
+def analyze_multiple():
+    uploaded_file = request.files.get('uploaded_file')
+    if not uploaded_file or not allowed_file(uploaded_file.filename):
+        return jsonify({"error": "Invalid file type or no file uploaded"}), 400
     
-@app.post("/analyze_multiple")
-async def analyze_multiple(uploaded_file: UploadFile = File(...), is_image: bool = True):
-    # List of analysis functions to execute in parallel
+    is_image = request.form.get('is_image', 'true').lower() == 'true'
+
     analysis_functions = [
         analyze_media,
         overall_analysis,
-        Story_Telling_Analysis,
+        story_telling_analysis,
         emotional_resonance,
         emotional_analysis,
         Emotional_Appraisal_Models,
@@ -115,39 +115,32 @@ async def analyze_multiple(uploaded_file: UploadFile = File(...), is_image: bool
         supporting_headline_detailed_analysis,
         main_headline_analysis,
         image_headline_analysis,
-        image_headline_analysis,
         supporting_headline_analysis,
         meta_profile,
         linkedin_profile,
         x_profile,
-        Image_Analysis,
-        Image_Analysis_2,
-        Image_Analysis_2_table
+        image_analysis,
+        image_analysis_2,
+        image_analysis_2_table
     ]
-    # Maximum number of threads for parallel processing
-    MAX_THREADS = 3  # Adjust as needed based on your system and workload
 
-    # Create a ThreadPoolExecutor
-    with ThreadPoolExecutor(max_workers=MAX_THREADS) as executor:
-        # Submit analysis functions to the executor
-        futures = [executor.submit(func, uploaded_file, is_image) for func in analysis_functions]
+    results = {}
+    for func in analysis_functions:
+        try:
+            result = func(uploaded_file, is_image)
+            results.update(result)
+        except Exception as e:
+            results[func.__name__] = {"error": str(e)}
 
-        # Collect results as they become available
-        results = {}
-        for future in as_completed(futures):
-            try:
-                result = future.result()
-                # Assuming each analysis function returns a dictionary with a unique key
-                results.update(result) 
-            except Exception as e:
-                # Handle exceptions gracefully, perhaps log the error and return a partial response
-                print(f"Error during analysis: {e}")
-                results[func.__name__] = {"error": str(e)}
+    return jsonify(results)
 
-    return results
-
-@app.post("/analyze_media")
-async def analyze_media(uploaded_file: UploadFile = File(...), is_image: bool = True):
+@app.route('/analyze_media', methods=['POST'])
+def analyze_media():
+    uploaded_file = request.files.get('uploaded_file')
+    if not uploaded_file or not allowed_file(uploaded_file.filename):
+        return jsonify({"error": "Invalid file type or no file uploaded"}), 400
+    
+    is_image = request.form.get('is_image', 'true').lower() == 'true'
     prompt = (
         "Analyze the media (image or video frame) for various marketing aspects, ensuring consistent results for each aspect. "
         "Respond in single words or short phrases separated by commas for each attribute: text amount (High or Low), "
@@ -157,35 +150,49 @@ async def analyze_media(uploaded_file: UploadFile = File(...), is_image: bool = 
     )
     try:
         if is_image:
-            image = Image.open(io.BytesIO(await uploaded_file.read()))
+            image = Image.open(io.BytesIO(uploaded_file.read()))
             response = model.generate_content([prompt, image])
         else:
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
-                tmp.write(await uploaded_file.read())
+                tmp.write(uploaded_file.read())
                 tmp_path = tmp.name
-    
+
             frames = extract_frames(tmp_path)
             if frames is None or not frames:
                 raise Exception("No frames were extracted from the video. Please check the video format.")
-    
-            response = model.generate_content([prompt, frames[0]])  # Analyzing the first frame
-    
+
+            response = model.generate_content([prompt, frames[0]])
+
         attributes = ["text_amount", "color_usage", "visual_cues", "emotion", "focus", "customer_centric", "credibility", "user_interaction", "cta_presence", "cta_clarity"]
         if response.candidates:
             raw_response = response.candidates[0].content.parts[0].text.strip()
             values = raw_response.split(',')
             if len(attributes) == len(values):
                 structured_response = {attr: val.strip() for attr, val in zip(attributes, values)}
-                return structured_response
+                return jsonify(structured_response)
             else:
-                raise HTTPException(status_code=500, detail="Unexpected response structure from the model.")
+                return jsonify({"error": "Unexpected response structure from the model."}), 500
         else:
-            raise HTTPException(status_code=500, detail="Model did not provide a response.")
+            return jsonify({"error": "Model did not provide a response."}), 500
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to read or process the media: {e}")
+        return jsonify({"error": str(e)}), 500
 
-@app.post("/overall_analysis")
-async def overall_analysis(uploaded_file: UploadFile = File(...), is_image: bool = True):
+@app.route("/overall_analysis", methods=["GET", "POST"])
+def overall_analysis():
+    # Get the uploaded file from the request
+    uploaded_file = request.files.get('uploaded_file')
+
+    # Debugging: Check if the file was received and print details
+    if uploaded_file:
+        print(f"Received file: {uploaded_file.filename}")
+    else:
+        print("No file received.")
+
+    # Check if the file is uploaded and has a valid extension
+    if not uploaded_file or not allowed_file(uploaded_file.filename):
+        return jsonify({"error": "Invalid file type or no file uploaded"}), 400
+
+    is_image = request.form.get('is_image', 'true').lower() == 'true'
     prompt = """
 Analyze the provided image for marketing effectiveness. First, provide detailed responses for the following:\n"
             "\n"
@@ -219,29 +226,34 @@ Analyze the provided image for marketing effectiveness. First, provide detailed 
         """
     try:
         if is_image:
-            image = Image.open(io.BytesIO(await uploaded_file.read()))
+            image = Image.open(io.BytesIO(uploaded_file.read()))
             response = model.generate_content([prompt, image])
         else:
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
-                tmp.write(await uploaded_file.read())
+                tmp.write(uploaded_file.read())
                 tmp_path = tmp.name
     
             frames = extract_frames(tmp_path)
-            if frames is None or not frames:  # Check if frames were extracted successfully
+            if frames is None or not frames:
                 raise Exception("No frames were extracted from the video. Please check the video format.")
     
             response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
     
         if response.candidates:
             raw_response = response.candidates[0].content.parts[0].text.strip()
-            return HTMLResponse(content=raw_response)
+            return jsonify({"content": raw_response})
         else:
-            raise HTTPException(status_code=500, detail="Unexpected response structure from the model.")
+            return jsonify({"error": "Unexpected response structure from the model."}), 500
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to read or process the media: {e}")
+        return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
-@app.post("/Story_Telling_Analysis")
-async def Story_Telling_Analysis(uploaded_file: UploadFile = File(...), is_image: bool = True):
+@app.route("/story_telling_analysis", methods=["POST"])
+def story_telling_analysis():
+    uploaded_file = request.files.get('uploaded_file')
+    if not uploaded_file or not allowed_file(uploaded_file.filename):
+        return jsonify({"error": "Invalid file type or no file uploaded"}), 400
+
+    is_image = request.form.get('is_image', 'true').lower() == 'true'
     prompt = """
 Storytelling has a significant impact on creative, enriching the content and enhancing its effectiveness in various ways. Here are some key impacts of storytelling on static creative:
 
@@ -291,31 +303,37 @@ User-Generated Content: Share stories from actual customers.
 Example: Customer photos with quotes about their experiences tell authentic stories that resonate with new customers.
 
 Evaluate the content using the 7 principles above. Score each element from 1-5, in increments of o.5. Please provide the information in a table, with: element, Score , evaluation, How it could be improved. at the end, please provide a summary of your recommendations.
-        """
+    """
     try:
         if is_image:
-            image = Image.open(io.BytesIO(await uploaded_file.read()))
+            image = Image.open(io.BytesIO(uploaded_file.read()))
             response = model.generate_content([prompt, image])
         else:
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
-                tmp.write(await uploaded_file.read())
+                tmp.write(uploaded_file.read())
                 tmp_path = tmp.name
     
             frames = extract_frames(tmp_path)
-            if frames is None or not frames:  # Check if frames were extracted successfully
+            if frames is None or not frames:
                 raise Exception("No frames were extracted from the video. Please check the video format.")
     
             response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
     
         if response.candidates:
             raw_response = response.candidates[0].content.parts[0].text.strip()
-            return HTMLResponse(content=raw_response)
+            return jsonify({"content": raw_response})
         else:
-            raise HTTPException(status_code=500, detail="Unexpected response structure from the model.")
+            return jsonify({"error": "Unexpected response structure from the model."}), 500
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to read or process the media: {e}")
-@app.post("/emotional_resonance")
-async def emotional_resonance(uploaded_file: UploadFile = File(...), is_image: bool = True):
+        return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
+
+@app.route("/emotional_resonance", methods=["POST"])
+def emotional_resonance():
+    uploaded_file = request.files.get('uploaded_file')
+    if not uploaded_file or not allowed_file(uploaded_file.filename):
+        return jsonify({"error": "Invalid file type or no file uploaded"}), 400
+
+    is_image = request.form.get('is_image', 'true').lower() == 'true'
     prompt = """
 If the content is non-english, translate the content to English. Using the following model, please evaluate the content. Please also suggest improvements.
 
@@ -342,28 +360,34 @@ Evaluation: Does the content explicitly encourage engagement, and have the means
     """
     try:
         if is_image:
-            image = Image.open(io.BytesIO(await uploaded_file.read()))
+            image = Image.open(io.BytesIO(uploaded_file.read()))
             response = model.generate_content([prompt, image])
         else:
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
-                tmp.write(await uploaded_file.read())
+                tmp.write(uploaded_file.read())
                 tmp_path = tmp.name
     
             frames = extract_frames(tmp_path)
-            if frames is None or not frames:  # Check if frames were extracted successfully
+            if frames is None or not frames:
                 raise Exception("No frames were extracted from the video. Please check the video format.")
     
             response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
     
         if response.candidates:
             raw_response = response.candidates[0].content.parts[0].text.strip()
-            return HTMLResponse(content=raw_response)
+            return jsonify({"content": raw_response})
         else:
-            raise HTTPException(status_code=500, detail="Unexpected response structure from the model.")
+            return jsonify({"error": "Unexpected response structure from the model."}), 500
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to read or process the media: {e}")
-@app.post("/emotional_analysis")
-async def emotional_analysis(uploaded_file: UploadFile = File(...), is_image: bool = True):
+        return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
+
+@app.route("/emotional_analysis", methods=["POST"])
+def emotional_analysis():
+    uploaded_file = request.files.get('uploaded_file')
+    if not uploaded_file or not allowed_file(uploaded_file.filename):
+        return jsonify({"error": "Invalid file type or no file uploaded"}), 400
+
+    is_image = request.form.get('is_image', 'true').lower() == 'true'
     prompt = """
 Using the following list of emotional resonance responses, assess whether the marketing content does or does not apply each. present the information in a table with columns: Name, Applies (None, some, A Lot), Definition, how it is applied, how it could be implemented. These are the principles to assess:
 
@@ -417,28 +441,34 @@ Application: Inspiring hope and optimism about the future through positive and u
     """
     try:
         if is_image:
-            image = Image.open(io.BytesIO(await uploaded_file.read()))
+            image = Image.open(io.BytesIO(uploaded_file.read()))
             response = model.generate_content([prompt, image])
         else:
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
-                tmp.write(await uploaded_file.read())
+                tmp.write(uploaded_file.read())
                 tmp_path = tmp.name
-    
+
             frames = extract_frames(tmp_path)
-            if frames is None or not frames:  # Check if frames were extracted successfully
+            if frames is None or not frames:
                 raise Exception("No frames were extracted from the video. Please check the video format.")
-    
+
             response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
-    
+
         if response.candidates:
             raw_response = response.candidates[0].content.parts[0].text.strip()
-            return HTMLResponse(content=raw_response)
+            return jsonify({"content": raw_response})
         else:
-            raise HTTPException(status_code=500, detail="Unexpected response structure from the model.")
+            return jsonify({"error": "Unexpected response structure from the model."}), 500
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to read or process the media: {e}")
-@app.post("/Emotional_Appraisal_Models")
-async def Emotional_Appraisal_Models(uploaded_file: UploadFile = File(...), is_image: bool = True):
+        return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
+
+@app.route("/Emotional_Appraisal_Models", methods=["POST"])
+def Emotional_Appraisal_Models():
+    uploaded_file = request.files.get('uploaded_file')
+    if not uploaded_file or not allowed_file(uploaded_file.filename):
+        return jsonify({"error": "Invalid file type or no file uploaded"}), 400
+
+    is_image = request.form.get('is_image', 'true').lower() == 'true'
     prompt = """
 Firstly, translate any non-english text to english. Using the following emotional appraisal models, please evaluate the content. Please suggest possible  improvements against each model evaluation:
 
@@ -510,28 +540,34 @@ Builds Trust and Credibility: Ensure messages are consistent, predictable, and a
     """
     try:
         if is_image:
-            image = Image.open(io.BytesIO(await uploaded_file.read()))
+            image = Image.open(io.BytesIO(uploaded_file.read()))
             response = model.generate_content([prompt, image])
         else:
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
-                tmp.write(await uploaded_file.read())
+                tmp.write(uploaded_file.read())
                 tmp_path = tmp.name
-    
+
             frames = extract_frames(tmp_path)
-            if frames is None or not frames:  # Check if frames were extracted successfully
+            if frames is None or not frames:
                 raise Exception("No frames were extracted from the video. Please check the video format.")
-    
+
             response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
-    
+
         if response.candidates:
             raw_response = response.candidates[0].content.parts[0].text.strip()
-            return HTMLResponse(content=raw_response)
+            return jsonify({"content": raw_response})
         else:
-            raise HTTPException(status_code=500, detail="Unexpected response structure from the model.")
+            return jsonify({"error": "Unexpected response structure from the model."}), 500
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to read or process the media: {e}")
-@app.post("/behavioural_principles")
-async def behavioural_principles(uploaded_file: UploadFile = File(...), is_image: bool = True):
+        return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
+
+@app.route("/behavioural_principles", methods=["POST"])
+def behavioural_principles():
+    uploaded_file = request.files.get('uploaded_file')
+    if not uploaded_file or not allowed_file(uploaded_file.filename):
+        return jsonify({"error": "Invalid file type or no file uploaded"}), 400
+
+    is_image = request.form.get('is_image', 'true').lower() == 'true'
     prompt = """
 Using the following Behavioral Science principles, assess whether the marketing content does or does not apply each principle. Present the information in a table with columns: 'Applies the Principle (None, Some, A Lot)', 'Principle (Description)', 'Explanation', and 'How it could be implemented'. These are the principles to assess:
 
@@ -578,28 +614,34 @@ Using the following Behavioral Science principles, assess whether the marketing 
     """
     try:
         if is_image:
-            image = Image.open(io.BytesIO(await uploaded_file.read()))
+            image = Image.open(io.BytesIO(uploaded_file.read()))
             response = model.generate_content([prompt, image])
         else:
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
-                tmp.write(await uploaded_file.read())
+                tmp.write(uploaded_file.read())
                 tmp_path = tmp.name
-    
+
             frames = extract_frames(tmp_path)
-            if frames is None or not frames:  # Check if frames were extracted successfully
+            if frames is None or not frames:
                 raise Exception("No frames were extracted from the video. Please check the video format.")
-    
+
             response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
-    
+
         if response.candidates:
             raw_response = response.candidates[0].content.parts[0].text.strip()
-            return HTMLResponse(content=raw_response)
+            return jsonify({"content": raw_response})
         else:
-            raise HTTPException(status_code=500, detail="Unexpected response structure from the model.")
+            return jsonify({"error": "Unexpected response structure from the model."}), 500
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to read or process the media: {e}") 
-@app.post("/nlp_principles_analysis")
-async def nlp_principles_analysis(uploaded_file: UploadFile = File(...), is_image: bool = True):
+        return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
+
+@app.route("/nlp_principles_analysis", methods=["POST"])
+def nlp_principles_analysis():
+    uploaded_file = request.files.get('uploaded_file')
+    if not uploaded_file or not allowed_file(uploaded_file.filename):
+        return jsonify({"error": "Invalid file type or no file uploaded"}), 400
+
+    is_image = request.form.get('is_image', 'true').lower() == 'true'
     prompt = """
 Using the following Neuro-Linguistic Programming (NLP) techniques, assess whether the marketing content does or does not apply each principle. present the information in a table with columns: Applies the principle (None, some, A Lot), Principle (Description), Explanation, how it could be implemented. These are the principles to assess:
 
@@ -669,28 +711,34 @@ By utilizing these NLP techniques, you can create static marketing content that 
     """
     try:
         if is_image:
-            image = Image.open(io.BytesIO(await uploaded_file.read()))
+            image = Image.open(io.BytesIO(uploaded_file.read()))
             response = model.generate_content([prompt, image])
         else:
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
-                tmp.write(await uploaded_file.read())
+                tmp.write(uploaded_file.read())
                 tmp_path = tmp.name
-    
+
             frames = extract_frames(tmp_path)
-            if frames is None or not frames:  # Check if frames were extracted successfully
+            if frames is None or not frames:
                 raise Exception("No frames were extracted from the video. Please check the video format.")
-    
+
             response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
-    
+
         if response.candidates:
             raw_response = response.candidates[0].content.parts[0].text.strip()
-            return HTMLResponse(content=raw_response)
+            return jsonify({"content": raw_response})
         else:
-            raise HTTPException(status_code=500, detail="Unexpected response structure from the model.")
+            return jsonify({"error": "Unexpected response structure from the model."}), 500
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to read or process the media: {e}")
-@app.post("/text_analysis")
-async def text_analysis(uploaded_file: UploadFile = File(...), is_image: bool = True):
+        return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
+
+@app.route("/text_analysis", methods=["POST"])
+def text_analysis():
+    uploaded_file = request.files.get('uploaded_file')
+    if not uploaded_file or not allowed_file(uploaded_file.filename):
+        return jsonify({"error": "Invalid file type or no file uploaded"}), 400
+
+    is_image = request.form.get('is_image', 'true').lower() == 'true'
     prompt = """
 As a UX design and marketing analysis consultant, you are tasked with reviewing the text content of a marketing asset (image or video, excluding the headline) for a client. Your goal is to provide a comprehensive analysis of the text's effectiveness and offer actionable recommendations for improvement, making sure that all responses are provided in English.
 **Important:** Please provide all your analysis and recommendations in English, regardless of the language used in the original marketing asset.
@@ -733,28 +781,34 @@ Evaluate the extracted text based on the following criteria. For each aspect, pr
     """
     try:
         if is_image:
-            image = Image.open(io.BytesIO(await uploaded_file.read()))
+            image = Image.open(io.BytesIO(uploaded_file.read()))
             response = model.generate_content([prompt, image])
         else:
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
-                tmp.write(await uploaded_file.read())
+                tmp.write(uploaded_file.read())
                 tmp_path = tmp.name
-    
+
             frames = extract_frames(tmp_path)
-            if frames is None or not frames:  # Check if frames were extracted successfully
+            if frames is None or not frames:
                 raise Exception("No frames were extracted from the video. Please check the video format.")
-    
+
             response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
-    
+
         if response.candidates:
             raw_response = response.candidates[0].content.parts[0].text.strip()
-            return HTMLResponse(content=raw_response)
+            return jsonify({"content": raw_response})
         else:
-            raise HTTPException(status_code=500, detail="Unexpected response structure from the model.")
+            return jsonify({"error": "Unexpected response structure from the model."}), 500
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to read or process the media: {e}")    
-@app.post("/Text_Analysis_2")
-async def Text_Analysis_2(uploaded_file: UploadFile = File(...), is_image: bool = True):
+        return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
+
+@app.route("/Text_Analysis_2", methods=["POST"])
+def Text_Analysis_2():
+    uploaded_file = request.files.get('uploaded_file')
+    if not uploaded_file or not allowed_file(uploaded_file.filename):
+        return jsonify({"error": "Invalid file type or no file uploaded"}), 400
+
+    is_image = request.form.get('is_image', 'true').lower() == 'true'
     prompt = """
 If the content is non-english, translate the content to English. PLease evaluate the image against these principles:
 
@@ -785,28 +839,34 @@ Ethical Considerations: Analyze the content for any potential ethical issues, su
     """
     try:
         if is_image:
-            image = Image.open(io.BytesIO(await uploaded_file.read()))
+            image = Image.open(io.BytesIO(uploaded_file.read()))
             response = model.generate_content([prompt, image])
         else:
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
-                tmp.write(await uploaded_file.read())
+                tmp.write(uploaded_file.read())
                 tmp_path = tmp.name
-    
+
             frames = extract_frames(tmp_path)
-            if frames is None or not frames:  # Check if frames were extracted successfully
+            if frames is None or not frames:
                 raise Exception("No frames were extracted from the video. Please check the video format.")
-    
+
             response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
-    
+
         if response.candidates:
             raw_response = response.candidates[0].content.parts[0].text.strip()
-            return HTMLResponse(content=raw_response)
+            return jsonify({"content": raw_response})
         else:
-            raise HTTPException(status_code=500, detail="Unexpected response structure from the model.")
+            return jsonify({"error": "Unexpected response structure from the model."}), 500
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to read or process the media: {e}")           
-@app.post("/Text_Analysis_2_table")
-async def Text_Analysis_2_table(uploaded_file: UploadFile = File(...), is_image: bool = True):
+        return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
+
+@app.route("/Text_Analysis_2_table", methods=["POST"])
+def Text_Analysis_2_table():
+    uploaded_file = request.files.get('uploaded_file')
+    if not uploaded_file or not allowed_file(uploaded_file.filename):
+        return jsonify({"error": "Invalid file type or no file uploaded"}), 400
+
+    is_image = request.form.get('is_image', 'true').lower() == 'true'
     prompt = """
 If the content is non-english, translate the content to English. PLease evaluate the image against these principles in a table with a score for each element and sub element, from 1-5, in increments of 0.5. Please also include columns for analysis and  recommendations:
 
@@ -834,32 +894,37 @@ Aesthetic Quality: Evaluate the aesthetic elements of visual content, considerin
 8. Compliance and Ethical Analysis
 Regulatory Compliance: Ensure that the content complies with advertising regulations and industry standards.
 Ethical Considerations: Analyze the content for any potential ethical issues, such as misleading claims, cultural insensitivity, or inappropriate content.
-"""
+    """
     try:
         if is_image:
-            image = Image.open(io.BytesIO(await uploaded_file.read()))
+            image = Image.open(io.BytesIO(uploaded_file.read()))
             response = model.generate_content([prompt, image])
         else:
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
-                tmp.write(await uploaded_file.read())
+                tmp.write(uploaded_file.read())
                 tmp_path = tmp.name
 
             frames = extract_frames(tmp_path)
-            if frames is None or not frames:  # Check if frames were extracted successfully
+            if frames is None or not frames:
                 raise Exception("No frames were extracted from the video. Please check the video format.")
 
             response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
 
         if response.candidates:
             raw_response = response.candidates[0].content.parts[0].text.strip()
-            return HTMLResponse(content=raw_response)
+            return jsonify({"content": raw_response})
         else:
-            raise HTTPException(status_code=500, detail="Unexpected response structure from the model.")
+            return jsonify({"error": "Unexpected response structure from the model."}), 500
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to read or process the media: {e}")
+        return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
-@app.post("/headline_analysis")
-async def headline_analysis(uploaded_file: UploadFile = File(...), is_image: bool = True):
+@app.route("/headline_analysis", methods=["POST"])
+def headline_analysis():
+    uploaded_file = request.files.get('uploaded_file')
+    if not uploaded_file or not allowed_file(uploaded_file.filename):
+        return jsonify({"error": "Invalid file type or no file uploaded"}), 400
+
+    is_image = request.form.get('is_image', 'true').lower() == 'true'
     prompt = f"""
 Imagine you are a marketing consultant reviewing the headline text of a marketing asset ({'image' if is_image else 'video'}) for a client. Your task is to assess the various headline's effectiveness based on various linguistic and marketing criteria.
 
@@ -924,28 +989,34 @@ The criteria to assess are:
     """
     try:
         if is_image:
-            image = Image.open(io.BytesIO(await uploaded_file.read()))
+            image = Image.open(io.BytesIO(uploaded_file.read()))
             response = model.generate_content([prompt, image])
         else:
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
-                tmp.write(await uploaded_file.read())
+                tmp.write(uploaded_file.read())
                 tmp_path = tmp.name
 
             frames = extract_frames(tmp_path)
-            if frames is None or not frames:  # Check if frames were extracted successfully
+            if frames is None or not frames:
                 raise Exception("No frames were extracted from the video. Please check the video format.")
 
             response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
 
         if response.candidates:
             raw_response = response.candidates[0].content.parts[0].text.strip()
-            return HTMLResponse(content=raw_response)
+            return jsonify({"content": raw_response})
         else:
-            raise HTTPException(status_code=500, detail="Unexpected response structure from the model.")
+            return jsonify({"error": "Unexpected response structure from the model."}), 500
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to read or process the media: {e}")
-@app.post("/headline_detailed_analysis")
-async def headline_detailed_analysis(uploaded_file: UploadFile = File(...), is_image: bool = True):
+        return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
+
+@app.route("/headline_detailed_analysis", methods=["POST"])
+def headline_detailed_analysis():
+    uploaded_file = request.files.get('uploaded_file')
+    if not uploaded_file or not allowed_file(uploaded_file.filename):
+        return jsonify({"error": "Invalid file type or no file uploaded"}), 400
+
+    is_image = request.form.get('is_image', 'true').lower() == 'true'
     prompt = """
 **Part 1A: Main Headline Optimization Analysis**
 "Analyze the provided image content alongside the main headline text to assess the headline's effectiveness. Evaluate each of the following criteria, provide an explanation based on the synergy between the image and the headline, and offer recommendations for improvement. Present your results in a table format with columns labeled: Criterion, Assessment, Explanation, Recommendation."
@@ -985,31 +1056,37 @@ The criteria to assess are:
 6. **Emotional words:** Number of words conveying emotion (e.g., positive, negative, neutral).
 7. **Sentiment:** Overall sentiment: positive, negative, or neutral.
 8. **Reading Grade Level:** Estimated grade level required to understand the headline.        
-        """
+    """
     try:
         if is_image:
-            image = Image.open(io.BytesIO(uploaded_file.file.read()))
+            image = Image.open(io.BytesIO(uploaded_file.read()))
             response = model.generate_content([prompt, image])
         else:
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
-                tmp.write(uploaded_file.file.read())
+                tmp.write(uploaded_file.read())
                 tmp_path = tmp.name
 
             frames = extract_frames(tmp_path)
-            if frames is None or not frames:  # Check if frames were extracted successfully
-                raise HTTPException(status_code=400, detail="No frames were extracted from the video. Please check the video format.")
+            if frames is None or not frames:
+                raise Exception("No frames were extracted from the video. Please check the video format.")
 
             response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
 
         if response.candidates:
-            return {"results": response.candidates[0].content.parts[0].text.strip()}
+            raw_response = response.candidates[0].content.parts[0].text.strip()
+            return jsonify({"content": raw_response})
         else:
-            raise HTTPException(status_code=500, detail="Unexpected response structure from the model.")
+            return jsonify({"error": "Unexpected response structure from the model."}), 500
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to read or process the media: {e}")
+        return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
-@app.post("/main_headline_detailed_analysis")
-async def main_headline_detailed_analysis(uploaded_file: UploadFile = File(...), is_image: bool = True):
+@app.route("/main_headline_detailed_analysis", methods=["POST"])
+def main_headline_detailed_analysis():
+    uploaded_file = request.files.get('uploaded_file')
+    if not uploaded_file or not allowed_file(uploaded_file.filename):
+        return jsonify({"error": "Invalid file type or no file uploaded"}), 400
+
+    is_image = request.form.get('is_image', 'true').lower() == 'true'
     prompt =  f"""
 Imagine you are a marketing consultant reviewing the main headline text of a marketing asset ({'image' if is_image else 'video'}) for a client.
 Your task is to assess the main headline's effectiveness based on various linguistic and marketing criteria.
@@ -1050,28 +1127,34 @@ Provide three alternative headlines for the main headline, along with a brief ex
     """
     try:
         if is_image:
-            image = Image.open(io.BytesIO(uploaded_file.file.read()))
+            image = Image.open(io.BytesIO(uploaded_file.read()))
             response = model.generate_content([prompt, image])
         else:
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
-                tmp.write(uploaded_file.file.read())
+                tmp.write(uploaded_file.read())
                 tmp_path = tmp.name
 
             frames = extract_frames(tmp_path)
-            if frames is None or not frames:  # Check if frames were extracted successfully
-                raise HTTPException(status_code=400, detail="No frames were extracted from the video. Please check the video format.")
+            if frames is None or not frames:
+                raise Exception("No frames were extracted from the video. Please check the video format.")
 
             response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
 
         if response.candidates:
-            return {"results": response.candidates[0].content.parts[0].text.strip()}
+            raw_response = response.candidates[0].content.parts[0].text.strip()
+            return jsonify({"content": raw_response})
         else:
-            raise HTTPException(status_code=500, detail="Unexpected response structure from the model.")
+            return jsonify({"error": "Unexpected response structure from the model."}), 500
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to read or process the media: {e}")
+        return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
-@app.post("/image_headline_detailed_analysis")
-async def image_headline_detailed_analysis(uploaded_file: UploadFile = File(...), is_image: bool = True):
+@app.route("/image_headline_detailed_analysis", methods=["POST"])
+def image_headline_detailed_analysis():
+    uploaded_file = request.files.get('uploaded_file')
+    if not uploaded_file or not allowed_file(uploaded_file.filename):
+        return jsonify({"error": "Invalid file type or no file uploaded"}), 400
+
+    is_image = request.form.get('is_image', 'true').lower() == 'true'
     prompt = f"""
 Imagine you are a marketing consultant reviewing the image headline text of a marketing asset ({'image' if is_image else 'video'}) for a client.
 Your task is to assess the image headline's effectiveness based on various linguistic and marketing criteria.
@@ -1112,28 +1195,34 @@ Provide three alternative headlines for the image headline, along with a brief e
     """
     try:
         if is_image:
-            image = Image.open(io.BytesIO(uploaded_file.file.read()))
+            image = Image.open(io.BytesIO(uploaded_file.read()))
             response = model.generate_content([prompt, image])
         else:
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
-                tmp.write(uploaded_file.file.read())
+                tmp.write(uploaded_file.read())
                 tmp_path = tmp.name
 
             frames = extract_frames(tmp_path)
-            if frames is None or not frames:  # Check if frames were extracted successfully
-                raise HTTPException(status_code=400, detail="No frames were extracted from the video. Please check the video format.")
+            if frames is None or not frames:
+                raise Exception("No frames were extracted from the video. Please check the video format.")
 
             response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
 
         if response.candidates:
-            return {"results": response.candidates[0].content.parts[0].text.strip()}
+            raw_response = response.candidates[0].content.parts[0].text.strip()
+            return jsonify({"content": raw_response})
         else:
-            raise HTTPException(status_code=500, detail="Unexpected response structure from the model.")
+            return jsonify({"error": "Unexpected response structure from the model."}), 500
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to read or process the media: {e}")
+        return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
-@app.post("/supporting_headline_detailed_analysis")
-async def supporting_headline_detailed_analysis(uploaded_file: UploadFile = File(...), is_image: bool = True):
+@app.route("/supporting_headline_detailed_analysis", methods=["POST"])
+def supporting_headline_detailed_analysis():
+    uploaded_file = request.files.get('uploaded_file')
+    if not uploaded_file or not allowed_file(uploaded_file.filename):
+        return jsonify({"error": "Invalid file type or no file uploaded"}), 400
+
+    is_image = request.form.get('is_image', 'true').lower() == 'true'
     prompt = f"""
 Imagine you are a marketing consultant reviewing the supporting headline text of a marketing asset ({'image' if is_image else 'video'}) for a client.
 Your task is to assess the supporting headline's effectiveness based on various linguistic and marketing criteria.
@@ -1174,28 +1263,34 @@ Provide three alternative headlines for the supporting headline, along with a br
     """
     try:
         if is_image:
-            image = Image.open(io.BytesIO(uploaded_file.file.read()))
+            image = Image.open(io.BytesIO(uploaded_file.read()))
             response = model.generate_content([prompt, image])
         else:
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
-                tmp.write(uploaded_file.file.read())
+                tmp.write(uploaded_file.read())
                 tmp_path = tmp.name
 
             frames = extract_frames(tmp_path)
-            if frames is None or not frames:  # Check if frames were extracted successfully
-                raise HTTPException(status_code=400, detail="No frames were extracted from the video. Please check the video format.")
+            if frames is None or not frames:
+                raise Exception("No frames were extracted from the video. Please check the video format.")
 
             response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
 
         if response.candidates:
-            return {"results": response.candidates[0].content.parts[0].text.strip()}
+            raw_response = response.candidates[0].content.parts[0].text.strip()
+            return jsonify({"content": raw_response})
         else:
-            raise HTTPException(status_code=500, detail="Unexpected response structure from the model.")
+            return jsonify({"error": "Unexpected response structure from the model."}), 500
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to read or process the media: {e}")
+        return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
-@app.post("/main_headline_analysis")
-async def main_headline_analysis(uploaded_file: UploadFile = File(...), is_image: bool = True):
+@app.route("/main_headline_analysis", methods=["POST"])
+def main_headline_analysis():
+    uploaded_file = request.files.get('uploaded_file')
+    if not uploaded_file or not allowed_file(uploaded_file.filename):
+        return jsonify({"error": "Invalid file type or no file uploaded"}), 400
+
+    is_image = request.form.get('is_image', 'true').lower() == 'true'
     prompt = """
 Imagine you are a marketing consultant reviewing the main headline text of a marketing asset ({'image' if is_image else 'video'}) for a client.
 Your task is to assess the main headline's effectiveness based on various linguistic and marketing criteria.
@@ -1221,28 +1316,34 @@ Your task is to assess the main headline's effectiveness based on various lingui
     """
     try:
         if is_image:
-            image = Image.open(io.BytesIO(uploaded_file.file.read()))
+            image = Image.open(io.BytesIO(uploaded_file.read()))
             response = model.generate_content([prompt, image])
         else:
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
-                tmp.write(uploaded_file.file.read())
+                tmp.write(uploaded_file.read())
                 tmp_path = tmp.name
 
             frames = extract_frames(tmp_path)
             if frames is None or not frames:  # Check if frames were extracted successfully
-                raise HTTPException(status_code=400, detail="No frames were extracted from the video. Please check the video format.")
+                return jsonify({"error": "No frames were extracted from the video. Please check the video format."}), 400
 
             response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
 
         if response.candidates:
-            return {"results": response.candidates[0].content.parts[0].text.strip()}
+            return jsonify({"results": response.candidates[0].content.parts[0].text.strip()})
         else:
-            raise HTTPException(status_code=500, detail="Unexpected response structure from the model.")
+            return jsonify({"error": "Unexpected response structure from the model."}), 500
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to read or process the media: {e}")
+        return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
-@app.post("/image_headline_analysis")
-async def image_headline_analysis(uploaded_file: UploadFile = File(...), is_image: bool = True):
+
+@app.route("/image_headline_analysis", methods=["POST"])
+def image_headline_analysis():
+    uploaded_file = request.files.get('uploaded_file')
+    if not uploaded_file or not allowed_file(uploaded_file.filename):
+        return jsonify({"error": "Invalid file type or no file uploaded"}), 400
+
+    is_image = request.form.get('is_image', 'true').lower() == 'true'
     prompt = """
 Imagine you are a marketing consultant reviewing the image headline text of a marketing asset ({'image' if is_image else 'video'}) for a client.
 Your task is to assess the image headline's effectiveness based on various linguistic and marketing criteria.
@@ -1268,28 +1369,34 @@ Your task is to assess the image headline's effectiveness based on various lingu
     """
     try:
         if is_image:
-            image = Image.open(io.BytesIO(uploaded_file.file.read()))
+            image = Image.open(io.BytesIO(uploaded_file.read()))
             response = model.generate_content([prompt, image])
         else:
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
-                tmp.write(uploaded_file.file.read())
+                tmp.write(uploaded_file.read())
                 tmp_path = tmp.name
 
             frames = extract_frames(tmp_path)
             if frames is None or not frames:  # Check if frames were extracted successfully
-                raise HTTPException(status_code=400, detail="No frames were extracted from the video. Please check the video format.")
+                return jsonify({"error": "No frames were extracted from the video. Please check the video format."}), 400
 
             response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
 
         if response.candidates:
-            return {"results": response.candidates[0].content.parts[0].text.strip()}
+            return jsonify({"results": response.candidates[0].content.parts[0].text.strip()})
         else:
-            raise HTTPException(status_code=500, detail="Unexpected response structure from the model.")
+            return jsonify({"error": "Unexpected response structure from the model."}), 500
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to read or process the media: {e}")
+        return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
-@app.post("/supporting_headline_analysis")
-async def supporting_headline_analysis(uploaded_file: UploadFile = File(...), is_image: bool = True):
+
+@app.route("/supporting_headline_analysis", methods=["POST"])
+def supporting_headline_analysis():
+    uploaded_file = request.files.get('uploaded_file')
+    if not uploaded_file or not allowed_file(uploaded_file.filename):
+        return jsonify({"error": "Invalid file type or no file uploaded"}), 400
+
+    is_image = request.form.get('is_image', 'true').lower() == 'true'
     prompt = """
     Review anyImagine you are a marketing consultant reviewing the supporting headline text of a marketing asset ({'image' if is_image else 'video'}) for a client.
     Your task is to assess the supporting headline's effectiveness based on various linguistic and marketing criteria. supporting headlines in the provided image or video frame as a marketing consultant.
@@ -1314,651 +1421,693 @@ async def supporting_headline_analysis(uploaded_file: UploadFile = File(...), is
     """
     try:
         if is_image:
-            image = Image.open(io.BytesIO(uploaded_file.file.read()))
+            image = Image.open(io.BytesIO(uploaded_file.read()))
             response = model.generate_content([prompt, image])
         else:
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
-                tmp.write(uploaded_file.file.read())
+                tmp.write(uploaded_file.read())
                 tmp_path = tmp.name
 
             frames = extract_frames(tmp_path)
             if frames is None or not frames:  # Check if frames were extracted successfully
-                raise HTTPException(status_code=400, detail="No frames were extracted from the video. Please check the video format.")
+                return jsonify({"error": "No frames were extracted from the video. Please check the video format."}), 400
 
             response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
 
         if response.candidates:
-            return {"results": response.candidates[0].content.parts[0].text.strip()}
+            return jsonify({"results": response.candidates[0].content.parts[0].text.strip()})
         else:
-            raise HTTPException(status_code=500, detail="Unexpected response structure from the model.")
+            return jsonify({"error": "Unexpected response structure from the model."}), 500
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to read or process the media: {e}")
+        return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
-@app.post("/flash_analysis")
-async def flash_analysis(uploaded_file: UploadFile = File(...), is_image: bool = True):
+
+@app.route("/flash_analysis", methods=["POST"])
+def flash_analysis():
+    uploaded_file = request.files.get('uploaded_file')
+    if not uploaded_file or not allowed_file(uploaded_file.filename):
+        return jsonify({"error": "Invalid file type or no file uploaded"}), 400
+
+    is_image = request.form.get('is_image', 'true').lower() == 'true'
     prompt = f"""
-        Imagine you are a visual content analyst reviewing a marketing asset ({'image' if is_image else 'video'}) for a client. Your goal is to provide a detailed, objective description that captures essential information relevant to marketing decisions.
+    Imagine you are a visual content analyst reviewing a marketing asset ({'image' if is_image else 'video'}) for a client. Your goal is to provide a detailed, objective description that captures essential information relevant to marketing decisions.
 
-        Instructions:
+    Instructions:
 
-        1. Detailed Description:
-            - For images:
-                - Describe the prominent visual elements (objects, people, animals, settings).
-                - Note the dominant colors and their overall effect.
-                - Mention any text, its content, font style, size, and placement.
-                - Describe the composition and layout of the elements.
-            - For videos:
-                - Describe the key scenes, actions, and characters.
-                - Note the visual style, color palette, and editing techniques.
-                - Mention any text overlays, captions, or speech, transcribing if possible.
-                - Identify the background music or sound effects, if present.
+    1. Detailed Description:
+        - For images:
+            - Describe the prominent visual elements (objects, people, animals, settings).
+            - Note the dominant colors and their overall effect.
+            - Mention any text, its content, font style, size, and placement.
+            - Describe the composition and layout of the elements.
+        - For videos:
+            - Describe the key scenes, actions, and characters.
+            - Note the visual style, color palette, and editing techniques.
+            - Mention any text overlays, captions, or speech, transcribing if possible.
+            - Identify the background music or sound effects, if present.
 
-        2. Cultural References and Symbolism:
-            - Identify any cultural references, symbols, or visual metaphors that could be significant to the target audience.
-            - Explain how these elements might be interpreted or resonate with the audience.
+    2. Cultural References and Symbolism:
+        - Identify any cultural references, symbols, or visual metaphors that could be significant to the target audience.
+        - Explain how these elements might be interpreted or resonate with the audience.
 
-        3. Marketing Implications:
-            - Briefly summarize the potential marketing implications based on the visual and textual elements.
-            - Consider how the asset might appeal to different demographics or interests.
-            - Mention any potential positive or negative associations it may evoke.
+    3. Marketing Implications:
+        - Briefly summarize the potential marketing implications based on the visual and textual elements.
+        - Consider how the asset might appeal to different demographics or interests.
+        - Mention any potential positive or negative associations it may evoke.
 
-        4. Additional Notes:
-            - If analyzing a video, focus on the most representative frame(s) for the initial description.
-            - Mention any significant changes or variations in visuals or text throughout the video.
+    4. Additional Notes:
+        - If analyzing a video, focus on the most representative frame(s) for the initial description.
+        - Mention any significant changes or variations in visuals or text throughout the video.
 
-        Please ensure your description is:
+    Please ensure your description is:
 
-        - Objective: Focus on factual details and avoid subjective interpretations or opinions.
-        - Detailed: Provide enough information for the client to understand the asset's visual and textual content.
-        - Marketing-Oriented: Highlight elements that are relevant to marketing strategy and decision-making.
-        - Consistent: Provide similar descriptions for the same asset, regardless of how many times you analyze it.
-        """
+    - Objective: Focus on factual details and avoid subjective interpretations or opinions.
+    - Detailed: Provide enough information for the client to understand the asset's visual and textual content.
+    - Marketing-Oriented: Highlight elements that are relevant to marketing strategy and decision-making.
+    - Consistent: Provide similar descriptions for the same asset, regardless of how many times you analyze it.
+    """
     try:
         if is_image:
-            image = Image.open(io.BytesIO(await uploaded_file.read()))
+            image = Image.open(io.BytesIO(uploaded_file.read()))
             response = model.generate_content([prompt, image])
         else:
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
-                tmp.write(await uploaded_file.read())
+                tmp.write(uploaded_file.read())
                 tmp_path = tmp.name
 
             frames = extract_frames(tmp_path)
             if frames is None or not frames:  # Check if frames were extracted successfully
-                raise Exception("No frames were extracted from the video. Please check the video format.")
+                return jsonify({"error": "No frames were extracted from the video. Please check the video format."}), 400
 
             response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
 
         if response.candidates:
             raw_response = response.candidates[0].content.parts[0].text.strip()
-            return HTMLResponse(content=raw_response)
+            return Response(raw_response, content_type="text/html")
         else:
-            raise HTTPException(status_code=500, detail="Unexpected response structure from the model.")
+            return jsonify({"error": "Unexpected response structure from the model."}), 500
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to read or process the media: {e}")
+        return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
-@app.post("/custom_prompt_analysis")
-async def custom_prompt_analysis(uploaded_file: UploadFile = File(...), is_image: bool = True, custom_prompt: str = ""):
-    if not custom_prompt:
-        raise HTTPException(status_code=400, detail="Custom prompt is required.")
+
+@app.route("/custom_prompt_analysis", methods=["POST"])
+def custom_prompt_analysis():
+    uploaded_file = request.files.get('uploaded_file')
+    if not uploaded_file or not allowed_file(uploaded_file.filename):
+        return jsonify({"error": "Invalid file type or no file uploaded"}), 400
+
+    is_image = request.form.get('is_image', 'true').lower() == 'true'
+    custom_prompt = request.form.get('custom_prompt')
     
+    if not custom_prompt:
+        return jsonify({"error": "Custom prompt is required."}), 400
+
     try:
         if is_image:
-            image = Image.open(io.BytesIO(uploaded_file.file.read()))
+            image = Image.open(io.BytesIO(uploaded_file.read()))
+            response = model.generate_content([custom_prompt, image])
         else:
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
-                tmp.write(uploaded_file.file.read())
+                tmp.write(uploaded_file.read())
                 tmp_path = tmp.name
                 frames = extract_frames(tmp_path)
                 if not frames:
-                    raise HTTPException(status_code=400, detail="No frames extracted from video")
+                    return jsonify({"error": "No frames extracted from video"}), 400
                 image = frames[0]  # Use the first frame for analysis
 
-        response = model.generate_content([custom_prompt, image])
-
         if response.candidates and len(response.candidates[0].content.parts) > 0:
-            return HTMLResponse(content=response.candidates[0].content.parts[0].text.strip())
+            return Response(response.candidates[0].content.parts[0].text.strip(), content_type="text/html")
         else:
-            raise HTTPException(status_code=500, detail="Model did not provide a valid response or the response structure was unexpected.")
+            return jsonify({"error": "Unexpected response structure from the model."}), 500
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to read or process the media: {e}")
+        return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
-@app.post("/meta_profile")
-async def meta_profile(uploaded_file: UploadFile = File(...), is_image: bool = True):
+
+@app.route("/meta_profile", methods=["POST"])
+def meta_profile():
+    uploaded_file = request.files.get('uploaded_file')
+    if not uploaded_file or not allowed_file(uploaded_file.filename):
+        return jsonify({"error": "Invalid file type or no file uploaded"}), 400
+
+    is_image = request.form.get('is_image', 'true').lower() == 'true'
     prompt = f"""
-Based on the following targeting elements for Facebook, please describe 4 persona types
-that are most likely to respond to the add. Please present these in a table (Persona Type,
-Description). Once you have identified these, create 4 personas (including names) who
-would be likely to purchase this product, and describe how you would expect them to react
-to it detailing the characteristics. Present each persona with a table (Persona Type,
-Description, Analysis) of the characteristics and analysis. Please include each of the
-characteristic that can be selected in the Facebook targeting, and what you would select.
+    Based on the following targeting elements for Facebook, please describe 4 persona types
+    that are most likely to respond to the add. Please present these in a table (Persona Type,
+    Description). Once you have identified these, create 4 personas (including names) who
+    would be likely to purchase this product, and describe how you would expect them to react
+    to it detailing the characteristics. Present each persona with a table (Persona Type,
+    Description, Analysis) of the characteristics and analysis. Please include each of the
+    characteristic that can be selected in the Facebook targeting, and what you would select.
 
-Location: Target users based on countries, states, cities, or even specific addresses and zip
-codes.
-Age: Select the age range of the audience.
-Gender: Target ads specifically to men, women, or all genders.
-Languages: Target users based on the languages they speak.
-Interests: Based on user activities, liked pages, and closely related topics. This includes
-interests in entertainment, fitness, hobbies, and more.
+    Location: Target users based on countries, states, cities, or even specific addresses and zip
+    codes.
+    Age: Select the age range of the audience.
+    Gender: Target ads specifically to men, women, or all genders.
+    Languages: Target users based on the languages they speak.
+    Interests: Based on user activities, liked pages, and closely related topics. This includes
+    interests in entertainment, fitness, hobbies, and more.
 
-Behaviors: Includes user behavior based on device usage, travel patterns, purchase
-behavior, and more.
-Purchase Behavior: Target users who have made purchases in specific categories.
-Device Usage: Target based on the devices used to access Facebook, like mobiles, tablets,
-or desktops.
-Connections to Your Pages, Apps, or Events: Target users who have already interacted with
-your business on Facebook or exclude them to find new audiences.
-Target users based on important life events like anniversaries, birthdays, recently moved,
-newly engaged, or having a baby.
-Education Level: Target users based on their educational background.
-Education Fields of Study: Target users based on their educational background.
-Job Title: Target professionals based on their job information.
-Job Title Industries: Target professionals based on their job information.
-"""
+    Behaviors: Includes user behavior based on device usage, travel patterns, purchase
+    behavior, and more.
+    Purchase Behavior: Target users who have made purchases in specific categories.
+    Device Usage: Target based on the devices used to access Facebook, like mobiles, tablets,
+    or desktops.
+    Connections to Your Pages, Apps, or Events: Target users who have already interacted with
+    your business on Facebook or exclude them to find new audiences.
+    Target users based on important life events like anniversaries, birthdays, recently moved,
+    newly engaged, or having a baby.
+    Education Level: Target users based on their educational background.
+    Education Fields of Study: Target users based on their educational background.
+    Job Title: Target professionals based on their job information.
+    Job Title Industries: Target professionals based on their job information.
+    """
     try:
         if is_image:
-            image = Image.open(io.BytesIO(await uploaded_file.read()))
+            image = Image.open(io.BytesIO(uploaded_file.read()))
             response = model.generate_content([prompt, image])
         else:
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
-                tmp.write(await uploaded_file.read())
+                tmp.write(uploaded_file.read())
                 tmp_path = tmp.name
 
             frames = extract_frames(tmp_path)
             if frames is None or not frames:  # Check if frames were extracted successfully
-                raise Exception("No frames were extracted from the video. Please check the video format.")
+                return jsonify({"error": "No frames were extracted from the video. Please check the video format."}), 400
 
             response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
 
         if response.candidates:
             raw_response = response.candidates[0].content.parts[0].text.strip()
-            return HTMLResponse(content=raw_response)
+            return Response(raw_response, content_type="text/html")
         else:
-            raise HTTPException(status_code=500, detail="Unexpected response structure from the model.")
+            return jsonify({"error": "Unexpected response structure from the model."}), 500
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to read or process the media: {e}")
+        return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
-@app.post("/linkedin_profile")
-async def linkedin_profile(uploaded_file: UploadFile = File(...), is_image: bool = True):
+
+@app.route("/linkedin_profile", methods=["POST"])
+def linkedin_profile():
+    uploaded_file = request.files.get('uploaded_file')
+    if not uploaded_file or not allowed_file(uploaded_file.filename):
+        return jsonify({"error": "Invalid file type or no file uploaded"}), 400
+
+    is_image = request.form.get('is_image', 'true').lower() == 'true'
     prompt = f"""
-Based on the following targeting elements for Linkedin, please describe 4 persona types that
-are most likely to respond to the add. Please present these in a table (Persona Type,
-Description). Once you have identified these, create 4 personas (including names) who
-would be likely to purchase this product, and describe how you would expect them to react
-to it detailing the characteristics. Present each persona with a table (Persona Type,
-Description, Analysis) of the characteristics and analysis. Please include each of the
-characteristic that can be selected in the Linkedin targeting, and what you would select.
+    Based on the following targeting elements for Linkedin, please describe 4 persona types that
+    are most likely to respond to the add. Please present these in a table (Persona Type,
+    Description). Once you have identified these, create 4 personas (including names) who
+    would be likely to purchase this product, and describe how you would expect them to react
+    to it detailing the characteristics. Present each persona with a table (Persona Type,
+    Description, Analysis) of the characteristics and analysis. Please include each of the
+    characteristic that can be selected in the Linkedin targeting, and what you would select.
 
-Location: Country, city, or region.
-Age: Though LinkedIn does not directly allow age and gender targeting, these can be
-inferred through other demographic details.
-Gender: Though LinkedIn does not directly allow age and gender targeting, these can be
-inferred through other demographic details.
-Company Industry: Reach professionals in particular industries.
-Company Size: Target companies based on the number of employees.
-Job Functions: Target users with specific job functions within companies.
-Job Seniority: From entry-level to senior executives and managers.
-Job Titles: Specific job titles, reaching users with particular roles.
-Years of Experience: Reach users based on how long they’ve been in the professional
-workforce.
-Schools: Alumni of specific educational institutions.
-Degrees: Users who hold specific degrees.
-Fields of Study: Users who studied specific subjects.
-Skills: Users who have listed specific skills on their profiles.
-Member Groups: Target members of LinkedIn groups related to professional interests.
-Interests: Based on content users interact with or their listed interests.
-Traits: Includes aspects like member traits, which can reflect user activities and behaviors on
-LinkedIn.
-"""
+    Location: Country, city, or region.
+    Age: Though LinkedIn does not directly allow age and gender targeting, these can be
+    inferred through other demographic details.
+    Gender: Though LinkedIn does not directly allow age and gender targeting, these can be
+    inferred through other demographic details.
+    Company Industry: Reach professionals in particular industries.
+    Company Size: Target companies based on the number of employees.
+    Job Functions: Target users with specific job functions within companies.
+    Job Seniority: From entry-level to senior executives and managers.
+    Job Titles: Specific job titles, reaching users with particular roles.
+    Years of Experience: Reach users based on how long they’ve been in the professional
+    workforce.
+    Schools: Alumni of specific educational institutions.
+    Degrees: Users who hold specific degrees.
+    Fields of Study: Users who studied specific subjects.
+    Skills: Users who have listed specific skills on their profiles.
+    Member Groups: Target members of LinkedIn groups related to professional interests.
+    Interests: Based on content users interact with or their listed interests.
+    Traits: Includes aspects like member traits, which can reflect user activities and behaviors on
+    LinkedIn.
+    """
     try:
         if is_image:
-            image = Image.open(io.BytesIO(await uploaded_file.read()))
+            image = Image.open(io.BytesIO(uploaded_file.read()))
             response = model.generate_content([prompt, image])
         else:
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
-                tmp.write(await uploaded_file.read())
+                tmp.write(uploaded_file.read())
                 tmp_path = tmp.name
 
             frames = extract_frames(tmp_path)
             if frames is None or not frames:  # Check if frames were extracted successfully
-                raise Exception("No frames were extracted from the video. Please check the video format.")
+                return jsonify({"error": "No frames were extracted from the video. Please check the video format."}), 400
 
             response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
 
         if response.candidates:
             raw_response = response.candidates[0].content.parts[0].text.strip()
-            return HTMLResponse(content=raw_response)
+            return Response(raw_response, content_type="text/html")
         else:
-            raise HTTPException(status_code=500, detail="Unexpected response structure from the model.")
+            return jsonify({"error": "Unexpected response structure from the model."}), 500
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to read or process the media: {e}")
+        return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
-@app.post("/x_profile")
-async def x_profile(uploaded_file: UploadFile = File(...), is_image: bool = True):
+
+@app.route("/x_profile", methods=["POST"])
+def x_profile():
+    uploaded_file = request.files.get('uploaded_file')
+    if not uploaded_file or not allowed_file(uploaded_file.filename):
+        return jsonify({"error": "Invalid file type or no file uploaded"}), 400
+
+    is_image = request.form.get('is_image', 'true').lower() == 'true'
     prompt = f"""
-Based on the following targeting elements for X, please describe 4 persona types that are
-most likely to respond to the ad. Please present these in a table (Persona Type,
-Description). Once you have identified these, create 4 personas (including names) who
-would be likely to purchase this product, and describe how you would expect them to react
-to it detailing the characteristics. Present each persona with a table (Persona Type,
-Description, Analysis) of the characteristics and analysis. Please include each of the
-characteristics that can be selected in the X targeting, and what you would select.
+    Based on the following targeting elements for X, please describe 4 persona types that are
+    most likely to respond to the ad. Please present these in a table (Persona Type,
+    Description). Once you have identified these, create 4 personas (including names) who
+    would be likely to purchase this product, and describe how you would expect them to react
+    to it detailing the characteristics. Present each persona with a table (Persona Type,
+    Description, Analysis) of the characteristics and analysis. Please include each of the
+    characteristics that can be selected in the X targeting, and what you would select.
 
-Location: Target users by country, region, or metro area. More granular targeting, such as
-city or postal code is also available.
-Gender: You can select audiences based on gender.
-Language: Target users based on the language they speak.
-Interests: Target users based on their interests, which are inferred from their activities and
-the topics they engage with on X.
-Events: Target ads around specific events, both global and local, that generate significant
-engagement on the platform.
-Behaviors: Target based on user behaviors and actions, such as what they tweet or engage
-with.
-Keywords: Target users based on keywords in their tweets or tweets they engage with. This
-can be particularly useful for capturing intent and interest in real-time.
-Topics: Engage users who are part of conversations around predefined or custom topics.
-Device: Target users based on the devices or operating systems they use to access X.
+    Location: Target users by country, region, or metro area. More granular targeting, such as
+    city or postal code is also available.
+    Gender: You can select audiences based on gender.
+    Language: Target users based on the language they speak.
+    Interests: Target users based on their interests, which are inferred from their activities and
+    the topics they engage with on X.
+    Events: Target ads around specific events, both global and local, that generate significant
+    engagement on the platform.
+    Behaviors: Target based on user behaviors and actions, such as what they tweet or engage
+    with.
+    Keywords: Target users based on keywords in their tweets or tweets they engage with. This
+    can be particularly useful for capturing intent and interest in real-time.
+    Topics: Engage users who are part of conversations around predefined or custom topics.
+    Device: Target users based on the devices or operating systems they use to access X.
 
-Carrier: Target users based on their mobile carrier, which can be useful for mobile-specific
-campaigns.
-Geography: Targeting based on user location can be fine-tuned to match the cultural context
-and regional norms. 
-"""
+    Carrier: Target users based on their mobile carrier, which can be useful for mobile-specific
+    campaigns.
+    Geography: Targeting based on user location can be fine-tuned to match the cultural context
+    and regional norms. 
+    """
     try:
         if is_image:
-            image = Image.open(io.BytesIO(await uploaded_file.read()))
+            image = Image.open(io.BytesIO(uploaded_file.read()))
             response = model.generate_content([prompt, image])
         else:
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
-                tmp.write(await uploaded_file.read())
+                tmp.write(uploaded_file.read())
                 tmp_path = tmp.name
 
             frames = extract_frames(tmp_path)
             if frames is None or not frames:  # Check if frames were extracted successfully
-                raise Exception("No frames were extracted from the video. Please check the video format.")
+                return jsonify({"error": "No frames were extracted from the video. Please check the video format."}), 400
 
             response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
 
         if response.candidates:
             raw_response = response.candidates[0].content.parts[0].text.strip()
-            return HTMLResponse(content=raw_response)
+            return Response(raw_response, content_type="text/html")
         else:
-            raise HTTPException(status_code=500, detail="Unexpected response structure from the model.")
+            return jsonify({"error": "Unexpected response structure from the model."}), 500
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to read or process the media: {e}")
-@app.post("/Image_Analysis")
-async def Image_Analysis(uploaded_file: UploadFile = File(...), is_image: bool = True):
+        return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
+
+
+@app.route("/Image_Analysis", methods=["POST"])
+def image_analysis():
+    uploaded_file = request.files.get('uploaded_file')
+    if not uploaded_file or not allowed_file(uploaded_file.filename):
+        return jsonify({"error": "Invalid file type or no file uploaded"}), 400
+
+    is_image = request.form.get('is_image', 'true').lower() == 'true'
     prompt = f"""
-For each aspect listed below, provide a score from 1 to 5 in increments of 0.5 (1 being low, 5 being high) and an explanation for each aspect, along with suggestions for improvement. The results should be presented in a table format with the columns: Aspect, Score, Explanation, and Improvement. After the table, provide an explanation with suggestions for overall improvement. Here are the aspects to consider:
+    For each aspect listed below, provide a score from 1 to 5 in increments of 0.5 (1 being low, 5 being high) and an explanation for each aspect, along with suggestions for improvement. The results should be presented in a table format with the columns: Aspect, Score, Explanation, and Improvement. After the table, provide an explanation with suggestions for overall improvement. Here are the aspects to consider:
 
-Visual Appeal
-Impact: Attracts attention and conveys emotions.
-Analysis: Assess color scheme, composition, clarity, and aesthetic quality.
-Application: Ensure the image is clear, visually appealing, and professionally designed.
+    Visual Appeal
+    Impact: Attracts attention and conveys emotions.
+    Analysis: Assess color scheme, composition, clarity, and aesthetic quality.
+    Application: Ensure the image is clear, visually appealing, and professionally designed.
 
-Relevance
-Impact: Resonates with the target audience.
-Analysis: Determine if the image matches audience preferences, context, and brand alignment.
-Application: Align the image with the audience’s interests and brand values.
+    Relevance
+    Impact: Resonates with the target audience.
+    Analysis: Determine if the image matches audience preferences, context, and brand alignment.
+    Application: Align the image with the audience’s interests and brand values.
 
-Emotional Impact
-Impact: Evokes desired emotions.
-Analysis: Analyze the emotional resonance of the image.
-Application: Use storytelling and relatable scenarios to connect emotionally with the audience.
+    Emotional Impact
+    Impact: Evokes desired emotions.
+    Analysis: Analyze the emotional resonance of the image.
+    Application: Use storytelling and relatable scenarios to connect emotionally with the audience.
 
-Message Clarity
-Impact: Communicates the intended message effectively.
-Analysis: Ensure the main subject is clear and the image is not cluttered.
-Application: Focus on the key message and keep the design simple and straightforward.
+    Message Clarity
+    Impact: Communicates the intended message effectively.
+    Analysis: Ensure the main subject is clear and the image is not cluttered.
+    Application: Focus on the key message and keep the design simple and straightforward.
 
-Engagement Potential
-Impact: Captures and retains audience attention.
-Analysis: Evaluate attention-grabbing aspects and interaction potential.
-Application: Use compelling visuals and narratives to encourage interaction.
+    Engagement Potential
+    Impact: Captures and retains audience attention.
+    Analysis: Evaluate attention-grabbing aspects and interaction potential.
+    Application: Use compelling visuals and narratives to encourage interaction.
 
-Brand Recognition
-Impact: Enhances brand recall and association.
-Analysis: Check for visible and well-integrated brand elements.
-Application: Use brand colors, logos, and consistent style to reinforce brand identity.
+    Brand Recognition
+    Impact: Enhances brand recall and association.
+    Analysis: Check for visible and well-integrated brand elements.
+    Application: Use brand colors, logos, and consistent style to reinforce brand identity.
 
-Cultural Sensitivity
-Impact: Respects and represents cultural norms and diversity.
-Analysis: Assess inclusivity, cultural appropriateness, and global appeal.
-Application: Ensure the image is inclusive and culturally sensitive.
+    Cultural Sensitivity
+    Impact: Respects and represents cultural norms and diversity.
+    Analysis: Assess inclusivity, cultural appropriateness, and global appeal.
+    Application: Ensure the image is inclusive and culturally sensitive.
 
-Technical Quality
-Impact: Maintains high resolution and professional editing.
-Analysis: Evaluate resolution, lighting, and post-processing quality.
-Application: Use high-resolution images with proper lighting and professional editing.
+    Technical Quality
+    Impact: Maintains high resolution and professional editing.
+    Analysis: Evaluate resolution, lighting, and post-processing quality.
+    Application: Use high-resolution images with proper lighting and professional editing.
 
-Color
-Impact: Influences mood, perception, and attention.
-Analysis: Analyze the psychological impact of the colors used.
-Application: Use colors purposefully to evoke desired emotions and enhance brand recognition.
+    Color
+    Impact: Influences mood, perception, and attention.
+    Analysis: Analyze the psychological impact of the colors used.
+    Application: Use colors purposefully to evoke desired emotions and enhance brand recognition.
 
-Typography
-Impact: Affects readability and engagement.
-Analysis: Assess font choice, size, placement, and readability.
-Application: Ensure typography complements the image and enhances readability.
+    Typography
+    Impact: Affects readability and engagement.
+    Analysis: Assess font choice, size, placement, and readability.
+    Application: Ensure typography complements the image and enhances readability.
 
-Symbolism
-Impact: Conveys complex ideas quickly.
-Analysis: Examine the use of symbols and icons.
-Application: Use universally recognized symbols that align with the ad’s message.
+    Symbolism
+    Impact: Conveys complex ideas quickly.
+    Analysis: Examine the use of symbols and icons.
+    Application: Use universally recognized symbols that align with the ad’s message.
 
-Contrast
-Impact: Highlights important elements and improves visibility.
-Analysis: Check the contrast between different elements.
-Application: Use contrast to draw attention to key parts of the image.
+    Contrast
+    Impact: Highlights important elements and improves visibility.
+    Analysis: Check the contrast between different elements.
+    Application: Use contrast to draw attention to key parts of the image.
 
-Layout Balance
-Impact: Ensures the image is visually balanced and pleasing to the eye.
-Analysis: Assess the distribution of elements within the image to ensure they are evenly balanced.
-Application: Arrange elements so that the visual weight is evenly distributed, avoiding clutter and ensuring harmony.
+    Layout Balance
+    Impact: Ensures the image is visually balanced and pleasing to the eye.
+    Analysis: Assess the distribution of elements within the image to ensure they are evenly balanced.
+    Application: Arrange elements so that the visual weight is evenly distributed, avoiding clutter and ensuring harmony.
 
-Hierarchy
-Impact: Guides the viewer’s eye through the most important elements first.
-Analysis: Evaluate the visual hierarchy to ensure the most important elements stand out.
-Application: Use size, color, and placement to create a clear visual hierarchy, directing attention to key messages or elements.
-"""
+    Hierarchy
+    Impact: Guides the viewer’s eye through the most important elements first.
+    Analysis: Evaluate the visual hierarchy to ensure the most important elements stand out.
+    Application: Use size, color, and placement to create a clear visual hierarchy, directing attention to key messages or elements.
+    """
     try:
         if is_image:
-            image = Image.open(io.BytesIO(await uploaded_file.read()))
+            image = Image.open(io.BytesIO(uploaded_file.read()))
             response = model.generate_content([prompt, image])
         else:
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
-                tmp.write(await uploaded_file.read())
+                tmp.write(uploaded_file.read())
                 tmp_path = tmp.name
 
             frames = extract_frames(tmp_path)
             if frames is None or not frames:  # Check if frames were extracted successfully
-                raise Exception("No frames were extracted from the video. Please check the video format.")
+                return jsonify({"error": "No frames were extracted from the video. Please check the video format."}), 400
 
             response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
 
         if response.candidates:
             raw_response = response.candidates[0].content.parts[0].text.strip()
-            return HTMLResponse(content=raw_response)
+            return Response(raw_response, content_type="text/html")
         else:
-            raise HTTPException(status_code=500, detail="Unexpected response structure from the model.")
+            return jsonify({"error": "Unexpected response structure from the model."}), 500
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to read or process the media: {e}")
-@app.post("/Image_Analysis_2")
-async def Image_Analysis_2(uploaded_file: UploadFile = File(...), is_image: bool = True):
-    prompt = f"""
-If the content is non-english, translate the content to English. PLease evaluate the image against these principles:
+        return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
-1. Emotional Appeal
-Does the image evoke a strong emotional response?
-What specific emotions are triggered (e.g., happiness, nostalgia, excitement, urgency)?
-How might these emotions influence the viewer's perception of the brand or product?
-How well does the image align with the intended emotional tone of the campaign?
-Does the emotional tone match the target audience's expectations and values?
-2. Eye Attraction
-Does the image grab attention immediately?
-Which elements (color, subject, composition) are most effective in drawing the viewer’s attention?
-Is there anything in the image that distracts from the main focal point?
-Is there a clear focal point in the image that naturally draws the viewer's eye?
-How effectively does the focal point communicate the key message or subject?
-3. Visual Appeal
-How aesthetically pleasing is the image overall?
-Are the elements of balance, symmetry, and composition well-executed?
-Does the image use any unique or creative visual techniques that enhance its appeal?
-Are the visual elements harmonious and balanced?
-Do any elements feel out of place or clash with the overall design?
-4. Text Overlay (Clarity, Emotional Connection, Readability)
-Is the text overlay easily readable?
-Is there sufficient contrast between the text and the background?
-Are font size, style, and color appropriate for readability?
-Does the text complement the image?
-Does it enhance the emotional connection with the audience?
-Is the messaging clear, concise, and impactful?
-Is the text aligned with the brand's identity?
-Does it maintain consistency with the brand’s tone and voice?
-5. Contrast and Clarity
-Is there adequate contrast between different elements of the image?
-How well do the foreground and background elements distinguish themselves?
-Does the contrast help highlight the key message or subject?
-Is the image clear and sharp?
-Are all important details easy to distinguish?
-Does the image suffer from any blurriness or pixelation?
-6. Visual Hierarchy
-Is there a clear visual hierarchy guiding the viewer’s eye?
-Are the most important elements (e.g., brand name, product, call to action) placed prominently?
-How effectively does the hierarchy direct attention from one element to the next?
-Are key elements ordered in terms of importance?
-Does the visual flow help reinforce the intended message?
-7. Negative Space
-Is negative space used effectively to balance the composition?
-Does the negative space help focus attention on the key elements?
-Is there enough negative space to avoid clutter without making the image feel empty?
-Does the use of negative space enhance the overall clarity of the message?
-How does it contribute to the image’s visual hierarchy and readability?
-8. Color Psychology
-Are the colors used in the image appropriate for the message and target audience?
-Do the colors evoke the intended emotional response (e.g., trust, excitement, calm)?
-Are any colors potentially off-putting or conflicting for the audience?
-How well do the colors align with the brand’s color palette?
-Are they consistent with the brand’s identity and overall messaging?
-Does the color scheme contribute to or detract from brand recognition?
-9. Depth and Texture
-Does the image have a sense of depth and texture?
-Are shadows, gradients, or layering techniques used effectively to create a three-dimensional feel?
-How does the depth or texture contribute to the realism and engagement of the image?
-Is the texture or depth distracting or enhancing?
-Does it add value to the visual appeal, or does it complicate the message?
-10. Brand Consistency
-Is the image consistent with the brand’s visual identity?
-Are color schemes, fonts, and overall style in line with the brand guidelines?
-Does the image reinforce the brand’s core values and messaging?
-Does the image maintain a coherent connection to previous branding efforts?
-Is there a risk of confusing the audience with a departure from established brand aesthetics?
-11. Psychological Triggers
-Does the image use any psychological triggers effectively?
-Are elements like scarcity, social proof, or authority present to encourage a desired action?
-How well do these triggers align with the target audience’s motivations and behaviors?
-Are the psychological triggers subtle or overt?
-Does the image risk appearing manipulative, or is the influence balanced and respectful?
-12. Emotional Connection
-How strong is the emotional connection between the image and the target audience?
-Does the image resonate with the audience’s values, desires, or pain points?
-Is the connection likely to inspire action or loyalty?
-Is the emotional connection authentic?
-Does it feel genuine, or is there a risk of the audience perceiving it as forced or inauthentic?
-13. Suitable Effect Techniques
-Are any special effects or filters used in the image?
-Do they enhance the overall message and visual appeal?
-Are the effects aligned with the brand’s identity and the image’s purpose?
-Do these effects support the key message and theme?
-Is there a risk of the effects distracting from or diluting the message?
-14. Key Message and Subject
-Is the key message of the image clear and easily understood at a glance?
-Is the message prominent, or does it get lost in other elements?
-How well does the image communicate its purpose or call to action?
-Is the subject of the image (product, service, idea) highlighted appropriately?
-Does the subject stand out as the main focus?
-Is there a clear connection between the subject and the intended message?
-"""
+
+@app.route("/Image_Analysis_2", methods=["POST"])
+def image_analysis_2():
+    uploaded_file = request.files.get('uploaded_file')
+    if not uploaded_file or not allowed_file(uploaded_file.filename):
+        return jsonify({"error": "Invalid file type or no file uploaded"}), 400
+
+    is_image = request.form.get('is_image', 'true').lower() == 'true'
+    prompt = f"""
+    If the content is non-english, translate the content to English. Please evaluate the image against these principles:
+
+    1. Emotional Appeal
+    Does the image evoke a strong emotional response?
+    What specific emotions are triggered (e.g., happiness, nostalgia, excitement, urgency)?
+    How might these emotions influence the viewer's perception of the brand or product?
+    How well does the image align with the intended emotional tone of the campaign?
+    Does the emotional tone match the target audience's expectations and values?
+
+    2. Eye Attraction
+    Does the image grab attention immediately?
+    Which elements (color, subject, composition) are most effective in drawing the viewer’s attention?
+    Is there anything in the image that distracts from the main focal point?
+    Is there a clear focal point in the image that naturally draws the viewer's eye?
+    How effectively does the focal point communicate the key message or subject?
+
+    3. Visual Appeal
+    How aesthetically pleasing is the image overall?
+    Are the elements of balance, symmetry, and composition well-executed?
+    Does the image use any unique or creative visual techniques that enhance its appeal?
+    Are the visual elements harmonious and balanced?
+    Do any elements feel out of place or clash with the overall design?
+
+    4. Text Overlay (Clarity, Emotional Connection, Readability)
+    Is the text overlay easily readable?
+    Is there sufficient contrast between the text and the background?
+    Are font size, style, and color appropriate for readability?
+    Does the text complement the image?
+    Does it enhance the emotional connection with the audience?
+    Is the messaging clear, concise, and impactful?
+    Is the text aligned with the brand's identity?
+    Does it maintain consistency with the brand’s tone and voice?
+
+    5. Contrast and Clarity
+    Is there adequate contrast between different elements of the image?
+    How well do the foreground and background elements distinguish themselves?
+    Does the contrast help highlight the key message or subject?
+    Is the image clear and sharp?
+    Are all important details easy to distinguish?
+    Does the image suffer from any blurriness or pixelation?
+
+    6. Visual Hierarchy
+    Is there a clear visual hierarchy guiding the viewer’s eye?
+    Are the most important elements (e.g., brand name, product, call to action) placed prominently?
+    How effectively does the hierarchy direct attention from one element to the next?
+    Are key elements ordered in terms of importance?
+    Does the visual flow help reinforce the intended message?
+
+    7. Negative Space
+    Is negative space used effectively to balance the composition?
+    Does the negative space help focus attention on the key elements?
+    Is there enough negative space to avoid clutter without making the image feel empty?
+    Does the use of negative space enhance the overall clarity of the message?
+    How does it contribute to the image’s visual hierarchy and readability?
+
+    8. Color Psychology
+    Are the colors used in the image appropriate for the message and target audience?
+    Do the colors evoke the intended emotional response (e.g., trust, excitement, calm)?
+    Are any colors potentially off-putting or conflicting for the audience?
+    How well do the colors align with the brand’s color palette?
+    Are they consistent with the brand’s identity and overall messaging?
+    Does the color scheme contribute to or detract from brand recognition?
+
+    9. Depth and Texture
+    Does the image have a sense of depth and texture?
+    Are shadows, gradients, or layering techniques used effectively to create a three-dimensional feel?
+    How does the depth or texture contribute to the realism and engagement of the image?
+    Is the texture or depth distracting or enhancing?
+    Does it add value to the visual appeal, or does it complicate the message?
+
+    10. Brand Consistency
+    Is the image consistent with the brand’s visual identity?
+    Are color schemes, fonts, and overall style in line with the brand guidelines?
+    Does the image reinforce the brand’s core values and messaging?
+    Does the image maintain a coherent connection to previous branding efforts?
+    Is there a risk of confusing the audience with a departure from established brand aesthetics?
+
+    11. Psychological Triggers
+    Does the image use any psychological triggers effectively?
+    Are elements like scarcity, social proof, or authority present to encourage a desired action?
+    How well do these triggers align with the target audience’s motivations and behaviors?
+    Are the psychological triggers subtle or overt?
+    Does the image risk appearing manipulative, or is the influence balanced and respectful?
+
+    12. Emotional Connection
+    How strong is the emotional connection between the image and the target audience?
+    Does the image resonate with the audience’s values, desires, or pain points?
+    Is the connection likely to inspire action or loyalty?
+    Is the emotional connection authentic?
+    Does it feel genuine, or is there a risk of the audience perceiving it as forced or inauthentic?
+
+    13. Suitable Effect Techniques
+    Are any special effects or filters used in the image?
+    Do they enhance the overall message and visual appeal?
+    Are the effects aligned with the brand’s identity and the image’s purpose?
+    Do these effects support the key message and theme?
+    Is there a risk of the effects distracting from or diluting the message?
+
+    14. Key Message and Subject
+    Is the key message of the image clear and easily understood at a glance?
+    Is the message prominent, or does it get lost in other elements?
+    How well does the image communicate its purpose or call to action?
+    Is the subject of the image (product, service, idea) highlighted appropriately?
+    Does the subject stand out as the main focus?
+    Is there a clear connection between the subject and the intended message?
+    """
     try:
         if is_image:
-            image = Image.open(io.BytesIO(await uploaded_file.read()))
+            image = Image.open(io.BytesIO(uploaded_file.read()))
             response = model.generate_content([prompt, image])
         else:
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
-                tmp.write(await uploaded_file.read())
+                tmp.write(uploaded_file.read())
                 tmp_path = tmp.name
 
             frames = extract_frames(tmp_path)
             if frames is None or not frames:  # Check if frames were extracted successfully
-                raise Exception("No frames were extracted from the video. Please check the video format.")
+                return jsonify({"error": "No frames were extracted from the video. Please check the video format."}), 400
 
             response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
 
         if response.candidates:
             raw_response = response.candidates[0].content.parts[0].text.strip()
-            return HTMLResponse(content=raw_response)
+            return Response(raw_response, content_type="text/html")
         else:
-            raise HTTPException(status_code=500, detail="Unexpected response structure from the model.")
+            return jsonify({"error": "Unexpected response structure from the model."}), 500
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to read or process the media: {e}")
-@app.post("/Image_Analysis_2_table")
-async def Image_Analysis_2_table(uploaded_file: UploadFile = File(...), is_image: bool = True):
-    prompt = f"""
-If the content is non-english, translate the content to English. PLease evaluate the image against these principles in a table with a score for each element, from 1-5, in increments of 0.5. Please also include columns for analysis and  recommendations:
+        return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
-1. Emotional Appeal
-Does the image evoke a strong emotional response?
-What specific emotions are triggered (e.g., happiness, nostalgia, excitement, urgency)?
-How might these emotions influence the viewer's perception of the brand or product?
-How well does the image align with the intended emotional tone of the campaign?
-Does the emotional tone match the target audience's expectations and values?
-2. Eye Attraction
-Does the image grab attention immediately?
-Which elements (color, subject, composition) are most effective in drawing the viewer’s attention?
-Is there anything in the image that distracts from the main focal point?
-Is there a clear focal point in the image that naturally draws the viewer's eye?
-How effectively does the focal point communicate the key message or subject?
-3. Visual Appeal
-How aesthetically pleasing is the image overall?
-Are the elements of balance, symmetry, and composition well-executed?
-Does the image use any unique or creative visual techniques that enhance its appeal?
-Are the visual elements harmonious and balanced?
-Do any elements feel out of place or clash with the overall design?
-4. Text Overlay (Clarity, Emotional Connection, Readability)
-Is the text overlay easily readable?
-Is there sufficient contrast between the text and the background?
-Are font size, style, and color appropriate for readability?
-Does the text complement the image?
-Does it enhance the emotional connection with the audience?
-Is the messaging clear, concise, and impactful?
-Is the text aligned with the brand's identity?
-Does it maintain consistency with the brand’s tone and voice?
-5. Contrast and Clarity
-Is there adequate contrast between different elements of the image?
-How well do the foreground and background elements distinguish themselves?
-Does the contrast help highlight the key message or subject?
-Is the image clear and sharp?
-Are all important details easy to distinguish?
-Does the image suffer from any blurriness or pixelation?
-6. Visual Hierarchy
-Is there a clear visual hierarchy guiding the viewer’s eye?
-Are the most important elements (e.g., brand name, product, call to action) placed prominently?
-How effectively does the hierarchy direct attention from one element to the next?
-Are key elements ordered in terms of importance?
-Does the visual flow help reinforce the intended message?
-7. Negative Space
-Is negative space used effectively to balance the composition?
-Does the negative space help focus attention on the key elements?
-Is there enough negative space to avoid clutter without making the image feel empty?
-Does the use of negative space enhance the overall clarity of the message?
-How does it contribute to the image’s visual hierarchy and readability?
-8. Color Psychology
-Are the colors used in the image appropriate for the message and target audience?
-Do the colors evoke the intended emotional response (e.g., trust, excitement, calm)?
-Are any colors potentially off-putting or conflicting for the audience?
-How well do the colors align with the brand’s color palette?
-Are they consistent with the brand’s identity and overall messaging?
-Does the color scheme contribute to or detract from brand recognition?
-9. Depth and Texture
-Does the image have a sense of depth and texture?
-Are shadows, gradients, or layering techniques used effectively to create a three-dimensional feel?
-How does the depth or texture contribute to the realism and engagement of the image?
-Is the texture or depth distracting or enhancing?
-Does it add value to the visual appeal, or does it complicate the message?
-10. Brand Consistency
-Is the image consistent with the brand’s visual identity?
-Are color schemes, fonts, and overall style in line with the brand guidelines?
-Does the image reinforce the brand’s core values and messaging?
-Does the image maintain a coherent connection to previous branding efforts?
-Is there a risk of confusing the audience with a departure from established brand aesthetics?
-11. Psychological Triggers
-Does the image use any psychological triggers effectively?
-Are elements like scarcity, social proof, or authority present to encourage a desired action?
-How well do these triggers align with the target audience’s motivations and behaviors?
-Are the psychological triggers subtle or overt?
-Does the image risk appearing manipulative, or is the influence balanced and respectful?
-12. Emotional Connection
-How strong is the emotional connection between the image and the target audience?
-Does the image resonate with the audience’s values, desires, or pain points?
-Is the connection likely to inspire action or loyalty?
-Is the emotional connection authentic?
-Does it feel genuine, or is there a risk of the audience perceiving it as forced or inauthentic?
-13. Suitable Effect Techniques
-Are any special effects or filters used in the image?
-Do they enhance the overall message and visual appeal?
-Are the effects aligned with the brand’s identity and the image’s purpose?
-Do these effects support the key message and theme?
-Is there a risk of the effects distracting from or diluting the message?
-14. Key Message and Subject
-Is the key message of the image clear and easily understood at a glance?
-Is the message prominent, or does it get lost in other elements?
-How well does the image communicate its purpose or call to action?
-Is the subject of the image (product, service, idea) highlighted appropriately?
-Does the subject stand out as the main focus?
-Is there a clear connection between the subject and the intended message?
-"""
+
+@app.route("/Image_Analysis_2_table", methods=['GET', 'POST'])
+def image_analysis_2_table():
+    uploaded_file = request.files.get('uploaded_file')
+    if not uploaded_file or not allowed_file(uploaded_file.filename):
+        return jsonify({"error": "Invalid file type or no file uploaded"}), 400
+
+    is_image = request.form.get('is_image', 'true').lower() == 'true'
+    prompt = f"""
+    If the content is non-english, translate the content to English. Please evaluate the image against these principles in a table with a score for each element, from 1-5, in increments of 0.5. Please also include columns for analysis and  recommendations:
+
+    1. Emotional Appeal
+    Does the image evoke a strong emotional response?
+    What specific emotions are triggered (e.g., happiness, nostalgia, excitement, urgency)?
+    How might these emotions influence the viewer's perception of the brand or product?
+    How well does the image align with the intended emotional tone of the campaign?
+    Does the emotional tone match the target audience's expectations and values?
+
+    2. Eye Attraction
+    Does the image grab attention immediately?
+    Which elements (color, subject, composition) are most effective in drawing the viewer’s attention?
+    Is there anything in the image that distracts from the main focal point?
+    Is there a clear focal point in the image that naturally draws the viewer's eye?
+    How effectively does the focal point communicate the key message or subject?
+
+    3. Visual Appeal
+    How aesthetically pleasing is the image overall?
+    Are the elements of balance, symmetry, and composition well-executed?
+    Does the image use any unique or creative visual techniques that enhance its appeal?
+    Are the visual elements harmonious and balanced?
+    Do any elements feel out of place or clash with the overall design?
+
+    4. Text Overlay (Clarity, Emotional Connection, Readability)
+    Is the text overlay easily readable?
+    Is there sufficient contrast between the text and the background?
+    Are font size, style, and color appropriate for readability?
+    Does the text complement the image?
+    Does it enhance the emotional connection with the audience?
+    Is the messaging clear, concise, and impactful?
+    Is the text aligned with the brand's identity?
+    Does it maintain consistency with the brand’s tone and voice?
+
+    5. Contrast and Clarity
+    Is there adequate contrast between different elements of the image?
+    How well do the foreground and background elements distinguish themselves?
+    Does the contrast help highlight the key message or subject?
+    Is the image clear and sharp?
+    Are all important details easy to distinguish?
+    Does the image suffer from any blurriness or pixelation?
+
+    6. Visual Hierarchy
+    Is there a clear visual hierarchy guiding the viewer’s eye?
+    Are the most important elements (e.g., brand name, product, call to action) placed prominently?
+    How effectively does the hierarchy direct attention from one element to the next?
+    Are key elements ordered in terms of importance?
+    Does the visual flow help reinforce the intended message?
+
+    7. Negative Space
+    Is negative space used effectively to balance the composition?
+    Does the negative space help focus attention on the key elements?
+    Is there enough negative space to avoid clutter without making the image feel empty?
+    Does the use of negative space enhance the overall clarity of the message?
+    How does it contribute to the image’s visual hierarchy and readability?
+
+    8. Color Psychology
+    Are the colors used in the image appropriate for the message and target audience?
+    Do the colors evoke the intended emotional response (e.g., trust, excitement, calm)?
+    Are any colors potentially off-putting or conflicting for the audience?
+    How well do the colors align with the brand’s color palette?
+    Are they consistent with the brand’s identity and overall messaging?
+    Does the color scheme contribute to or detract from brand recognition?
+
+    9. Depth and Texture
+    Does the image have a sense of depth and texture?
+    Are shadows, gradients, or layering techniques used effectively to create a three-dimensional feel?
+    How does the depth or texture contribute to the realism and engagement of the image?
+    Is the texture or depth distracting or enhancing?
+    Does it add value to the visual appeal, or does it complicate the message?
+
+    10. Brand Consistency
+    Is the image consistent with the brand’s visual identity?
+    Are color schemes, fonts, and overall style in line with the brand guidelines?
+    Does the image reinforce the brand’s core values and messaging?
+    Does the image maintain a coherent connection to previous branding efforts?
+    Is there a risk of confusing the audience with a departure from established brand aesthetics?
+
+    11. Psychological Triggers
+    Does the image use any psychological triggers effectively?
+    Are elements like scarcity, social proof, or authority present to encourage a desired action?
+    How well do these triggers align with the target audience’s motivations and behaviors?
+    Are the psychological triggers subtle or overt?
+    Does the image risk appearing manipulative, or is the influence balanced and respectful?
+
+    12. Emotional Connection
+    How strong is the emotional connection between the image and the target audience?
+    Does the image resonate with the audience’s values, desires, or pain points?
+    Is the connection likely to inspire action or loyalty?
+    Is the emotional connection authentic?
+    Does it feel genuine, or is there a risk of the audience perceiving it as forced or inauthentic?
+
+    13. Suitable Effect Techniques
+    Are any special effects or filters used in the image?
+    Do they enhance the overall message and visual appeal?
+    Are the effects aligned with the brand’s identity and the image’s purpose?
+    Do these effects support the key message and theme?
+    Is there a risk of the effects distracting from or diluting the message?
+
+    14. Key Message and Subject
+    Is the key message of the image clear and easily understood at a glance?
+    Is the message prominent, or does it get lost in other elements?
+    How well does the image communicate its purpose or call to action?
+    Is the subject of the image (product, service, idea) highlighted appropriately?
+    Does the subject stand out as the main focus?
+    Is there a clear connection between the subject and the intended message?
+    """
     try:
         if is_image:
-            image = Image.open(io.BytesIO(await uploaded_file.read()))
+            image = Image.open(io.BytesIO(uploaded_file.read()))
             response = model.generate_content([prompt, image])
         else:
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
-                tmp.write(await uploaded_file.read())
+                tmp.write(uploaded_file.read())
                 tmp_path = tmp.name
 
             frames = extract_frames(tmp_path)
             if frames is None or not frames:  # Check if frames were extracted successfully
-                raise Exception("No frames were extracted from the video. Please check the video format.")
+                return jsonify({"error": "No frames were extracted from the video. Please check the video format."}), 400
 
             response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
 
         if response.candidates:
             raw_response = response.candidates[0].content.parts[0].text.strip()
-            return HTMLResponse(content=raw_response)
+            return Response(raw_response, content_type="text/html")
         else:
-            raise HTTPException(status_code=500, detail="Unexpected response structure from the model.")
+            return jsonify({"error": "Unexpected response structure from the model."}), 500
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to read or process the media: {e}")
+        return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
-@app.middleware("http")
-async def redirect_http_to_https(request: Request, call_next):
-    if request.url.scheme == "http":
-        url = request.url.replace(scheme="https", host="yourdomain.com")
-        return RedirectResponse(url.url, status_code=status.HTTP_307_TEMPORARY_REDIRECT)
-    response = await call_next(request)
-    return response
-
-def convert_to_json(results):
-    return json.dumps(results, indent=4)
-
-def convert_to_xml(results):
-    root = ET.Element("Results")
-    for key, value in results.items():
-        item = ET.SubElement(root, key)
-        item.text = str(value)
-    return ET.tostring(root, encoding='unicode')
-
-def create_download_link(data, file_format, filename):
-    b64 = base64.b64encode(data.encode()).decode()
-    return f'<a href="data:file/{file_format};base64,{b64}" download="{filename}">Download {file_format.upper()}</a>'
-
-@app.get("/")
+@app.route("/", methods=["GET"])
 def read_root():
-    return {"Hello": "Welcome to AI analysis"}
+    return {"message": "Welcome to the AI analysis Flask app!"}
 
-if __name__ == "__main__":
-    def run_https():
-        uvicorn.run("app:app", host="0.0.0.0", port=8443, ssl_keyfile="key.pem", ssl_certfile="cert.pem")
-
-    def run_http():
-        uvicorn.run("app:app", host="0.0.0.0", port=80)
-
-    # Running threads for HTTP and HTTPS
-    thread_https = Thread(target=run_https)
-    thread_http = Thread(target=run_http)
-
-    thread_https.start()
-    thread_http.start()
-
-    thread_https.join()
-    thread_http.join()
+if __name__ == '__main__':
+    app.run(debug=True)
