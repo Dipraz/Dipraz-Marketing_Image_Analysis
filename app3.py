@@ -8,6 +8,7 @@ import ssl
 import cv2
 import imageio
 import xml.etree.ElementTree as ET
+from flask_talisman import Talisman
 from threading import Thread
 from dotenv import load_dotenv
 from flask import Flask, request, jsonify, send_file, redirect, url_for
@@ -49,7 +50,7 @@ model = genai.GenerativeModel(
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
 app.config['UPLOAD_FOLDER'] = 'uploads/'
-app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'};
+app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
 
 def allowed_file(filename):
     """Check if the file extension is allowed."""
@@ -84,10 +85,17 @@ def extract_frames(video_file_path, num_frames=5):
     if len(frames) == 0:
         raise Exception("No frames were extracted, possibly due to an error in reading the video.")
     return frames
+
+@app.before_request
+def enforce_https_in_production():
+    if not request.is_secure and not app.debug:
+        url = request.url.replace("http://", "https://", 1)
+        return redirect(url, code=301)
 @app.route('/favicon.ico')
 def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static'),
                                'favicon.ico', mimetype='image/vnd.microsoft.icon')
+    
 @app.route('/analyze_multiple', methods=['POST'])
 def analyze_multiple():
     uploaded_file = request.files.get('uploaded_file')
@@ -141,17 +149,13 @@ def analyze_media():
         return jsonify({"error": "Invalid file type or no file uploaded"}), 400
     
     is_image = request.form.get('is_image', 'true').lower() == 'true'
-    prompt = (
-        "Analyze the media (image or video frame) for various marketing aspects, ensuring consistent results for each aspect. "
-        "Respond in single words or short phrases separated by commas for each attribute: text amount (High or Low), "
-        "Color usage (Effective or Not effective), visual cues (Present or Absent), emotion (Positive or Negative), "
-        "Focus (Central message or Scattered), customer-centric (Yes or No), credibility (High or Low), "
-        "User interaction (High, Moderate, or Low), CTA presence (Yes or No), CTA clarity (Clear or Unclear)."
-    )
+    prompt = "Your analysis prompt here"
+
     try:
+        responses = []
         if is_image:
             image = Image.open(io.BytesIO(uploaded_file.read()))
-            response = model.generate_content([prompt, image])
+            responses = [model.generate_content([prompt, image]) for _ in range(3)]  # Send three requests
         else:
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
                 tmp.write(uploaded_file.read())
@@ -160,26 +164,17 @@ def analyze_media():
             frames = extract_frames(tmp_path)
             if frames is None or not frames:
                 raise Exception("No frames were extracted from the video. Please check the video format.")
+            
+            responses = [model.generate_content([prompt, frames[0]]) for _ in range(3)]  # Send three requests
 
-            response = model.generate_content([prompt, frames[0]])
-
-        attributes = ["text_amount", "color_usage", "visual_cues", "emotion", "focus", "customer_centric", "credibility", "user_interaction", "cta_presence", "cta_clarity"]
-        if response.candidates:
-            raw_response = response.candidates[0].content.parts[0].text.strip()
-            values = raw_response.split(',')
-            if len(attributes) == len(values):
-                structured_response = {attr: val.strip() for attr, val in zip(attributes, values)}
-                return jsonify(structured_response)
-            else:
-                return jsonify({"error": "Unexpected response structure from the model."}), 500
-        else:
-            return jsonify({"error": "Model did not provide a response."}), 500
+        # Merge responses
+        merged_response = " ".join([resp.candidates[0].content.parts[0].text.strip() for resp in responses])
+        return jsonify({"content": merged_response})
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
 @app.route("/overall_analysis", methods=["GET", "POST"])
 def overall_analysis():
-    # Get the uploaded file from the request
     uploaded_file = request.files.get('uploaded_file')
 
     # Debugging: Check if the file was received and print details
@@ -188,7 +183,6 @@ def overall_analysis():
     else:
         print("No file received.")
 
-    # Check if the file is uploaded and has a valid extension
     if not uploaded_file or not allowed_file(uploaded_file.filename):
         return jsonify({"error": "Invalid file type or no file uploaded"}), 400
 
@@ -225,31 +219,38 @@ Analyze the provided image for marketing effectiveness. First, provide detailed 
             "20. Content Investment: Blocks containing paragraphs of text will not be consumed by busy users and would require time to read – this is negative, as the users will not spend the time. Is the amount of content presented kept short and clear?\n"
         """
     try:
+        responses = []
         if is_image:
             image = Image.open(io.BytesIO(uploaded_file.read()))
-            response = model.generate_content([prompt, image])
+            responses = [model.generate_content([prompt, image]) for _ in range(3)]  # Send three requests
         else:
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
                 tmp.write(uploaded_file.read())
                 tmp_path = tmp.name
-    
+
             frames = extract_frames(tmp_path)
             if frames is None or not frames:
                 raise Exception("No frames were extracted from the video. Please check the video format.")
-    
-            response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
-    
-        if response.candidates:
-            raw_response = response.candidates[0].content.parts[0].text.strip()
-            return jsonify({"content": raw_response})
-        else:
-            return jsonify({"error": "Unexpected response structure from the model."}), 500
+            
+            responses = [model.generate_content([prompt, frames[0]]) for _ in range(3)]  # Send three requests
+
+        # Merge responses
+        merged_response = " ".join([resp.candidates[0].content.parts[0].text.strip() for resp in responses])
+        return jsonify({"content": merged_response})
     except Exception as e:
+        print(f"Error occurred: {str(e)}")
         return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
 @app.route("/story_telling_analysis", methods=["POST"])
 def story_telling_analysis():
     uploaded_file = request.files.get('uploaded_file')
+
+    # Debugging: Check if the file was received and print details
+    if uploaded_file:
+        print(f"Received file: {uploaded_file.filename}")
+    else:
+        print("No file received.")
+
     if not uploaded_file or not allowed_file(uploaded_file.filename):
         return jsonify({"error": "Invalid file type or no file uploaded"}), 400
 
@@ -305,31 +306,37 @@ Example: Customer photos with quotes about their experiences tell authentic stor
 Evaluate the content using the 7 principles above. Score each element from 1-5, in increments of o.5. Please provide the information in a table, with: element, Score , evaluation, How it could be improved. at the end, please provide a summary of your recommendations.
     """
     try:
+        responses = []
         if is_image:
             image = Image.open(io.BytesIO(uploaded_file.read()))
-            response = model.generate_content([prompt, image])
+            responses = [model.generate_content([prompt, image]) for _ in range(3)]  # Send three requests
         else:
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
                 tmp.write(uploaded_file.read())
                 tmp_path = tmp.name
-    
+
             frames = extract_frames(tmp_path)
             if frames is None or not frames:
                 raise Exception("No frames were extracted from the video. Please check the video format.")
-    
-            response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
-    
-        if response.candidates:
-            raw_response = response.candidates[0].content.parts[0].text.strip()
-            return jsonify({"content": raw_response})
-        else:
-            return jsonify({"error": "Unexpected response structure from the model."}), 500
-    except Exception as e:
-        return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
+            
+            responses = [model.generate_content([prompt, frames[0]]) for _ in range(3)]  # Send three requests
 
+        # Merge responses
+        merged_response = " ".join([resp.candidates[0].content.parts[0].text.strip() for resp in responses])
+        return jsonify({"content": merged_response})
+    except Exception as e:
+        print(f"Error occurred: {str(e)}")
+        return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 @app.route("/emotional_resonance", methods=["POST"])
 def emotional_resonance():
     uploaded_file = request.files.get('uploaded_file')
+
+    # Debugging: Check if the file was received and print details
+    if uploaded_file:
+        print(f"Received file: {uploaded_file.filename}")
+    else:
+        print("No file received.")
+
     if not uploaded_file or not allowed_file(uploaded_file.filename):
         return jsonify({"error": "Invalid file type or no file uploaded"}), 400
 
@@ -359,31 +366,40 @@ Criteria: The content encourages audience engagement (likes, shares, comments, e
 Evaluation: Does the content explicitly encourage engagement, and have the means for users to share, like, comment etc.
     """
     try:
+        responses = []
         if is_image:
             image = Image.open(io.BytesIO(uploaded_file.read()))
-            response = model.generate_content([prompt, image])
+            responses = [model.generate_content([prompt, image]) for _ in range(3)]  # Send three requests
         else:
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
                 tmp.write(uploaded_file.read())
                 tmp_path = tmp.name
-    
+
             frames = extract_frames(tmp_path)
             if frames is None or not frames:
                 raise Exception("No frames were extracted from the video. Please check the video format.")
-    
-            response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
-    
-        if response.candidates:
-            raw_response = response.candidates[0].content.parts[0].text.strip()
-            return jsonify({"content": raw_response})
-        else:
-            return jsonify({"error": "Unexpected response structure from the model."}), 500
+            
+            responses = [model.generate_content([prompt, frames[0]]) for _ in range(3)]  # Send three requests
+
+        # Merge responses
+        merged_response = " ".join([resp.candidates[0].content.parts[0].text.strip() for resp in responses])
+        return jsonify({"content": merged_response})
     except Exception as e:
+        print(f"Error occurred: {str(e)}")
         return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
 @app.route("/emotional_analysis", methods=["POST"])
 def emotional_analysis():
+    # Get the uploaded file from the request
     uploaded_file = request.files.get('uploaded_file')
+
+    # Debugging: Check if the file was received and print details
+    if uploaded_file:
+        print(f"Received file: {uploaded_file.filename}")
+    else:
+        print("No file received.")
+
+    # Check if the file is uploaded and has a valid extension
     if not uploaded_file or not allowed_file(uploaded_file.filename):
         return jsonify({"error": "Invalid file type or no file uploaded"}), 400
 
@@ -440,9 +456,10 @@ Definition: A feeling of expectation and desire for a particular thing to happen
 Application: Inspiring hope and optimism about the future through positive and uplifting messages.
     """
     try:
+        responses = []
         if is_image:
             image = Image.open(io.BytesIO(uploaded_file.read()))
-            response = model.generate_content([prompt, image])
+            responses = [model.generate_content([prompt, image]) for _ in range(3)]  # Send three requests
         else:
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
                 tmp.write(uploaded_file.read())
@@ -451,20 +468,28 @@ Application: Inspiring hope and optimism about the future through positive and u
             frames = extract_frames(tmp_path)
             if frames is None or not frames:
                 raise Exception("No frames were extracted from the video. Please check the video format.")
+            
+            responses = [model.generate_content([prompt, frames[0]]) for _ in range(3)]  # Send three requests
 
-            response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
-
-        if response.candidates:
-            raw_response = response.candidates[0].content.parts[0].text.strip()
-            return jsonify({"content": raw_response})
-        else:
-            return jsonify({"error": "Unexpected response structure from the model."}), 500
+        # Merge responses
+        merged_response = " ".join([resp.candidates[0].content.parts[0].text.strip() for resp in responses])
+        return jsonify({"content": merged_response})
     except Exception as e:
+        print(f"Error occurred: {str(e)}")
         return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
 @app.route("/Emotional_Appraisal_Models", methods=["POST"])
 def Emotional_Appraisal_Models():
+    # Get the uploaded file from the request
     uploaded_file = request.files.get('uploaded_file')
+
+    # Debugging: Check if the file was received and print details
+    if uploaded_file:
+        print(f"Received file: {uploaded_file.filename}")
+    else:
+        print("No file received.")
+
+    # Check if the file is uploaded and has a valid extension
     if not uploaded_file or not allowed_file(uploaded_file.filename):
         return jsonify({"error": "Invalid file type or no file uploaded"}), 400
 
@@ -539,9 +564,10 @@ Enhances Perceived Control: Empower consumers by highlighting how products or se
 Builds Trust and Credibility: Ensure messages are consistent, predictable, and align with social norms to build trust.
     """
     try:
+        responses = []
         if is_image:
             image = Image.open(io.BytesIO(uploaded_file.read()))
-            response = model.generate_content([prompt, image])
+            responses = [model.generate_content([prompt, image]) for _ in range(3)]  # Send three requests
         else:
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
                 tmp.write(uploaded_file.read())
@@ -550,20 +576,28 @@ Builds Trust and Credibility: Ensure messages are consistent, predictable, and a
             frames = extract_frames(tmp_path)
             if frames is None or not frames:
                 raise Exception("No frames were extracted from the video. Please check the video format.")
+            
+            responses = [model.generate_content([prompt, frames[0]]) for _ in range(3)]  # Send three requests
 
-            response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
-
-        if response.candidates:
-            raw_response = response.candidates[0].content.parts[0].text.strip()
-            return jsonify({"content": raw_response})
-        else:
-            return jsonify({"error": "Unexpected response structure from the model."}), 500
+        # Merge responses
+        merged_response = " ".join([resp.candidates[0].content.parts[0].text.strip() for resp in responses])
+        return jsonify({"content": merged_response})
     except Exception as e:
+        print(f"Error occurred: {str(e)}")
         return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
 @app.route("/behavioural_principles", methods=["POST"])
 def behavioural_principles():
+    # Get the uploaded file from the request
     uploaded_file = request.files.get('uploaded_file')
+
+    # Debugging: Check if the file was received and print details
+    if uploaded_file:
+        print(f"Received file: {uploaded_file.filename}")
+    else:
+        print("No file received.")
+
+    # Check if the file is uploaded and has a valid extension
     if not uploaded_file or not allowed_file(uploaded_file.filename):
         return jsonify({"error": "Invalid file type or no file uploaded"}), 400
 
@@ -613,9 +647,10 @@ Using the following Behavioral Science principles, assess whether the marketing 
         Example: Simplifying choices by offering curated selections or recommended products.
     """
     try:
+        responses = []
         if is_image:
             image = Image.open(io.BytesIO(uploaded_file.read()))
-            response = model.generate_content([prompt, image])
+            responses = [model.generate_content([prompt, image]) for _ in range(3)]  # Send three requests
         else:
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
                 tmp.write(uploaded_file.read())
@@ -624,20 +659,28 @@ Using the following Behavioral Science principles, assess whether the marketing 
             frames = extract_frames(tmp_path)
             if frames is None or not frames:
                 raise Exception("No frames were extracted from the video. Please check the video format.")
+            
+            responses = [model.generate_content([prompt, frames[0]]) for _ in range(3)]  # Send three requests
 
-            response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
-
-        if response.candidates:
-            raw_response = response.candidates[0].content.parts[0].text.strip()
-            return jsonify({"content": raw_response})
-        else:
-            return jsonify({"error": "Unexpected response structure from the model."}), 500
+        # Merge responses
+        merged_response = " ".join([resp.candidates[0].content.parts[0].text.strip() for resp in responses])
+        return jsonify({"content": merged_response})
     except Exception as e:
+        print(f"Error occurred: {str(e)}")
         return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
 @app.route("/nlp_principles_analysis", methods=["POST"])
 def nlp_principles_analysis():
+    # Get the uploaded file from the request
     uploaded_file = request.files.get('uploaded_file')
+
+    # Debugging: Check if the file was received and print details
+    if uploaded_file:
+        print(f"Received file: {uploaded_file.filename}")
+    else:
+        print("No file received.")
+
+    # Check if the file is uploaded and has a valid extension
     if not uploaded_file or not allowed_file(uploaded_file.filename):
         return jsonify({"error": "Invalid file type or no file uploaded"}), 400
 
@@ -710,9 +753,10 @@ Example: Challenge limiting beliefs with testimonials or case studies that show 
 By utilizing these NLP techniques, you can create static marketing content that is more engaging, persuasive, and effective in achieving your marketing goals.
     """
     try:
+        responses = []
         if is_image:
             image = Image.open(io.BytesIO(uploaded_file.read()))
-            response = model.generate_content([prompt, image])
+            responses = [model.generate_content([prompt, image]) for _ in range(3)]  # Send three requests
         else:
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
                 tmp.write(uploaded_file.read())
@@ -721,20 +765,28 @@ By utilizing these NLP techniques, you can create static marketing content that 
             frames = extract_frames(tmp_path)
             if frames is None or not frames:
                 raise Exception("No frames were extracted from the video. Please check the video format.")
+            
+            responses = [model.generate_content([prompt, frames[0]]) for _ in range(3)]  # Send three requests
 
-            response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
-
-        if response.candidates:
-            raw_response = response.candidates[0].content.parts[0].text.strip()
-            return jsonify({"content": raw_response})
-        else:
-            return jsonify({"error": "Unexpected response structure from the model."}), 500
+        # Merge responses
+        merged_response = " ".join([resp.candidates[0].content.parts[0].text.strip() for resp in responses])
+        return jsonify({"content": merged_response})
     except Exception as e:
+        print(f"Error occurred: {str(e)}")
         return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
 @app.route("/text_analysis", methods=["POST"])
 def text_analysis():
+    # Get the uploaded file from the request
     uploaded_file = request.files.get('uploaded_file')
+
+    # Debugging: Check if the file was received and print details
+    if uploaded_file:
+        print(f"Received file: {uploaded_file.filename}")
+    else:
+        print("No file received.")
+
+    # Check if the file is uploaded and has a valid extension
     if not uploaded_file or not allowed_file(uploaded_file.filename):
         return jsonify({"error": "Invalid file type or no file uploaded"}), 400
 
@@ -780,9 +832,10 @@ Evaluate the extracted text based on the following criteria. For each aspect, pr
 | Target Audience Relevance  |       | Determine if the text's language, tone, and style are appropriate and appealing to the intended audience.  | Suggest adjustments to better align with the audience's interests and needs.                      |
     """
     try:
+        responses = []
         if is_image:
             image = Image.open(io.BytesIO(uploaded_file.read()))
-            response = model.generate_content([prompt, image])
+            responses = [model.generate_content([prompt, image]) for _ in range(3)]  # Send three requests
         else:
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
                 tmp.write(uploaded_file.read())
@@ -791,20 +844,28 @@ Evaluate the extracted text based on the following criteria. For each aspect, pr
             frames = extract_frames(tmp_path)
             if frames is None or not frames:
                 raise Exception("No frames were extracted from the video. Please check the video format.")
+            
+            responses = [model.generate_content([prompt, frames[0]]) for _ in range(3)]  # Send three requests
 
-            response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
-
-        if response.candidates:
-            raw_response = response.candidates[0].content.parts[0].text.strip()
-            return jsonify({"content": raw_response})
-        else:
-            return jsonify({"error": "Unexpected response structure from the model."}), 500
+        # Merge responses
+        merged_response = " ".join([resp.candidates[0].content.parts[0].text.strip() for resp in responses])
+        return jsonify({"content": merged_response})
     except Exception as e:
+        print(f"Error occurred: {str(e)}")
         return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
 @app.route("/Text_Analysis_2", methods=["POST"])
 def Text_Analysis_2():
+    # Get the uploaded file from the request
     uploaded_file = request.files.get('uploaded_file')
+
+    # Debugging: Check if the file was received and print details
+    if uploaded_file:
+        print(f"Received file: {uploaded_file.filename}")
+    else:
+        print("No file received.")
+
+    # Check if the file is uploaded and has a valid extension
     if not uploaded_file or not allowed_file(uploaded_file.filename):
         return jsonify({"error": "Invalid file type or no file uploaded"}), 400
 
@@ -838,9 +899,10 @@ Regulatory Compliance: Ensure that the content complies with advertising regulat
 Ethical Considerations: Analyze the content for any potential ethical issues, such as misleading claims, cultural insensitivity, or inappropriate content.
     """
     try:
+        responses = []
         if is_image:
             image = Image.open(io.BytesIO(uploaded_file.read()))
-            response = model.generate_content([prompt, image])
+            responses = [model.generate_content([prompt, image]) for _ in range(3)]  # Send three requests
         else:
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
                 tmp.write(uploaded_file.read())
@@ -849,20 +911,28 @@ Ethical Considerations: Analyze the content for any potential ethical issues, su
             frames = extract_frames(tmp_path)
             if frames is None or not frames:
                 raise Exception("No frames were extracted from the video. Please check the video format.")
+            
+            responses = [model.generate_content([prompt, frames[0]]) for _ in range(3)]  # Send three requests
 
-            response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
-
-        if response.candidates:
-            raw_response = response.candidates[0].content.parts[0].text.strip()
-            return jsonify({"content": raw_response})
-        else:
-            return jsonify({"error": "Unexpected response structure from the model."}), 500
+        # Merge responses
+        merged_response = " ".join([resp.candidates[0].content.parts[0].text.strip() for resp in responses])
+        return jsonify({"content": merged_response})
     except Exception as e:
+        print(f"Error occurred: {str(e)}")
         return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
 @app.route("/Text_Analysis_2_table", methods=["POST"])
 def Text_Analysis_2_table():
+    # Get the uploaded file from the request
     uploaded_file = request.files.get('uploaded_file')
+
+    # Debugging: Check if the file was received and print details
+    if uploaded_file:
+        print(f"Received file: {uploaded_file.filename}")
+    else:
+        print("No file received.")
+
+    # Check if the file is uploaded and has a valid extension
     if not uploaded_file or not allowed_file(uploaded_file.filename):
         return jsonify({"error": "Invalid file type or no file uploaded"}), 400
 
@@ -896,9 +966,10 @@ Regulatory Compliance: Ensure that the content complies with advertising regulat
 Ethical Considerations: Analyze the content for any potential ethical issues, such as misleading claims, cultural insensitivity, or inappropriate content.
     """
     try:
+        responses = []
         if is_image:
             image = Image.open(io.BytesIO(uploaded_file.read()))
-            response = model.generate_content([prompt, image])
+            responses = [model.generate_content([prompt, image]) for _ in range(3)]  # Send three requests
         else:
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
                 tmp.write(uploaded_file.read())
@@ -907,20 +978,28 @@ Ethical Considerations: Analyze the content for any potential ethical issues, su
             frames = extract_frames(tmp_path)
             if frames is None or not frames:
                 raise Exception("No frames were extracted from the video. Please check the video format.")
+            
+            responses = [model.generate_content([prompt, frames[0]]) for _ in range(3)]  # Send three requests
 
-            response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
-
-        if response.candidates:
-            raw_response = response.candidates[0].content.parts[0].text.strip()
-            return jsonify({"content": raw_response})
-        else:
-            return jsonify({"error": "Unexpected response structure from the model."}), 500
+        # Merge responses
+        merged_response = " ".join([resp.candidates[0].content.parts[0].text.strip() for resp in responses])
+        return jsonify({"content": merged_response})
     except Exception as e:
+        print(f"Error occurred: {str(e)}")
         return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
 @app.route("/headline_analysis", methods=["POST"])
 def headline_analysis():
+    # Get the uploaded file from the request
     uploaded_file = request.files.get('uploaded_file')
+
+    # Debugging: Check if the file was received and print details
+    if uploaded_file:
+        print(f"Received file: {uploaded_file.filename}")
+    else:
+        print("No file received.")
+
+    # Check if the file is uploaded and has a valid extension
     if not uploaded_file or not allowed_file(uploaded_file.filename):
         return jsonify({"error": "Invalid file type or no file uploaded"}), 400
 
@@ -988,9 +1067,10 @@ The criteria to assess are:
 "Provide three improved headlines for EACH of the headline types that better align with the image content. Explain why you have selected these. Present your results in a table format with columns labeled: Headline Type (Main/Image/Supporting), Headline Recommendation, Explanation. This table must contain 9 rows."
     """
     try:
+        responses = []
         if is_image:
             image = Image.open(io.BytesIO(uploaded_file.read()))
-            response = model.generate_content([prompt, image])
+            responses = [model.generate_content([prompt, image]) for _ in range(3)]  # Send three requests
         else:
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
                 tmp.write(uploaded_file.read())
@@ -999,20 +1079,28 @@ The criteria to assess are:
             frames = extract_frames(tmp_path)
             if frames is None or not frames:
                 raise Exception("No frames were extracted from the video. Please check the video format.")
+            
+            responses = [model.generate_content([prompt, frames[0]]) for _ in range(3)]  # Send three requests
 
-            response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
-
-        if response.candidates:
-            raw_response = response.candidates[0].content.parts[0].text.strip()
-            return jsonify({"content": raw_response})
-        else:
-            return jsonify({"error": "Unexpected response structure from the model."}), 500
+        # Merge responses
+        merged_response = " ".join([resp.candidates[0].content.parts[0].text.strip() for resp in responses])
+        return jsonify({"content": merged_response})
     except Exception as e:
+        print(f"Error occurred: {str(e)}")
         return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
 @app.route("/headline_detailed_analysis", methods=["POST"])
 def headline_detailed_analysis():
+    # Get the uploaded file from the request
     uploaded_file = request.files.get('uploaded_file')
+
+    # Debugging: Check if the file was received and print details
+    if uploaded_file:
+        print(f"Received file: {uploaded_file.filename}")
+    else:
+        print("No file received.")
+
+    # Check if the file is uploaded and has a valid extension
     if not uploaded_file or not allowed_file(uploaded_file.filename):
         return jsonify({"error": "Invalid file type or no file uploaded"}), 400
 
@@ -1058,9 +1146,10 @@ The criteria to assess are:
 8. **Reading Grade Level:** Estimated grade level required to understand the headline.        
     """
     try:
+        responses = []
         if is_image:
             image = Image.open(io.BytesIO(uploaded_file.read()))
-            response = model.generate_content([prompt, image])
+            responses = [model.generate_content([prompt, image]) for _ in range(3)]  # Send three requests
         else:
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
                 tmp.write(uploaded_file.read())
@@ -1069,20 +1158,28 @@ The criteria to assess are:
             frames = extract_frames(tmp_path)
             if frames is None or not frames:
                 raise Exception("No frames were extracted from the video. Please check the video format.")
+            
+            responses = [model.generate_content([prompt, frames[0]]) for _ in range(3)]  # Send three requests
 
-            response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
-
-        if response.candidates:
-            raw_response = response.candidates[0].content.parts[0].text.strip()
-            return jsonify({"content": raw_response})
-        else:
-            return jsonify({"error": "Unexpected response structure from the model."}), 500
+        # Merge responses
+        merged_response = " ".join([resp.candidates[0].content.parts[0].text.strip() for resp in responses])
+        return jsonify({"content": merged_response})
     except Exception as e:
+        print(f"Error occurred: {str(e)}")
         return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
 @app.route("/main_headline_detailed_analysis", methods=["POST"])
 def main_headline_detailed_analysis():
+    # Get the uploaded file from the request
     uploaded_file = request.files.get('uploaded_file')
+
+    # Debugging: Check if the file was received and print details
+    if uploaded_file:
+        print(f"Received file: {uploaded_file.filename}")
+    else:
+        print("No file received.")
+
+    # Check if the file is uploaded and has a valid extension
     if not uploaded_file or not allowed_file(uploaded_file.filename):
         return jsonify({"error": "Invalid file type or no file uploaded"}), 400
 
@@ -1126,9 +1223,10 @@ Provide three alternative headlines for the main headline, along with a brief ex
 * **Option 3:** [Headline] - [Explanation]
     """
     try:
+        responses = []
         if is_image:
             image = Image.open(io.BytesIO(uploaded_file.read()))
-            response = model.generate_content([prompt, image])
+            responses = [model.generate_content([prompt, image]) for _ in range(3)]  # Send three requests
         else:
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
                 tmp.write(uploaded_file.read())
@@ -1137,20 +1235,28 @@ Provide three alternative headlines for the main headline, along with a brief ex
             frames = extract_frames(tmp_path)
             if frames is None or not frames:
                 raise Exception("No frames were extracted from the video. Please check the video format.")
+            
+            responses = [model.generate_content([prompt, frames[0]]) for _ in range(3)]  # Send three requests
 
-            response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
-
-        if response.candidates:
-            raw_response = response.candidates[0].content.parts[0].text.strip()
-            return jsonify({"content": raw_response})
-        else:
-            return jsonify({"error": "Unexpected response structure from the model."}), 500
+        # Merge responses
+        merged_response = " ".join([resp.candidates[0].content.parts[0].text.strip() for resp in responses])
+        return jsonify({"content": merged_response})
     except Exception as e:
+        print(f"Error occurred: {str(e)}")
         return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
 @app.route("/image_headline_detailed_analysis", methods=["POST"])
 def image_headline_detailed_analysis():
+    # Get the uploaded file from the request
     uploaded_file = request.files.get('uploaded_file')
+
+    # Debugging: Check if the file was received and print details
+    if uploaded_file:
+        print(f"Received file: {uploaded_file.filename}")
+    else:
+        print("No file received.")
+
+    # Check if the file is uploaded and has a valid extension
     if not uploaded_file or not allowed_file(uploaded_file.filename):
         return jsonify({"error": "Invalid file type or no file uploaded"}), 400
 
@@ -1194,9 +1300,10 @@ Provide three alternative headlines for the image headline, along with a brief e
 * **Option 3:** [Headline] - [Explanation]
     """
     try:
+        responses = []
         if is_image:
             image = Image.open(io.BytesIO(uploaded_file.read()))
-            response = model.generate_content([prompt, image])
+            responses = [model.generate_content([prompt, image]) for _ in range(3)]  # Send three requests
         else:
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
                 tmp.write(uploaded_file.read())
@@ -1205,20 +1312,28 @@ Provide three alternative headlines for the image headline, along with a brief e
             frames = extract_frames(tmp_path)
             if frames is None or not frames:
                 raise Exception("No frames were extracted from the video. Please check the video format.")
+            
+            responses = [model.generate_content([prompt, frames[0]]) for _ in range(3)]  # Send three requests
 
-            response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
-
-        if response.candidates:
-            raw_response = response.candidates[0].content.parts[0].text.strip()
-            return jsonify({"content": raw_response})
-        else:
-            return jsonify({"error": "Unexpected response structure from the model."}), 500
+        # Merge responses
+        merged_response = " ".join([resp.candidates[0].content.parts[0].text.strip() for resp in responses])
+        return jsonify({"content": merged_response})
     except Exception as e:
+        print(f"Error occurred: {str(e)}")
         return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
 @app.route("/supporting_headline_detailed_analysis", methods=["POST"])
 def supporting_headline_detailed_analysis():
+    # Get the uploaded file from the request
     uploaded_file = request.files.get('uploaded_file')
+
+    # Debugging: Check if the file was received and print details
+    if uploaded_file:
+        print(f"Received file: {uploaded_file.filename}")
+    else:
+        print("No file received.")
+
+    # Check if the file is uploaded and has a valid extension
     if not uploaded_file or not allowed_file(uploaded_file.filename):
         return jsonify({"error": "Invalid file type or no file uploaded"}), 400
 
@@ -1262,9 +1377,10 @@ Provide three alternative headlines for the supporting headline, along with a br
 * **Option 3:** [Headline] - [Explanation]
     """
     try:
+        responses = []
         if is_image:
             image = Image.open(io.BytesIO(uploaded_file.read()))
-            response = model.generate_content([prompt, image])
+            responses = [model.generate_content([prompt, image]) for _ in range(3)]  # Send three requests
         else:
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
                 tmp.write(uploaded_file.read())
@@ -1273,20 +1389,28 @@ Provide three alternative headlines for the supporting headline, along with a br
             frames = extract_frames(tmp_path)
             if frames is None or not frames:
                 raise Exception("No frames were extracted from the video. Please check the video format.")
+            
+            responses = [model.generate_content([prompt, frames[0]]) for _ in range(3)]  # Send three requests
 
-            response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
-
-        if response.candidates:
-            raw_response = response.candidates[0].content.parts[0].text.strip()
-            return jsonify({"content": raw_response})
-        else:
-            return jsonify({"error": "Unexpected response structure from the model."}), 500
+        # Merge responses
+        merged_response = " ".join([resp.candidates[0].content.parts[0].text.strip() for resp in responses])
+        return jsonify({"content": merged_response})
     except Exception as e:
+        print(f"Error occurred: {str(e)}")
         return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
 @app.route("/main_headline_analysis", methods=["POST"])
 def main_headline_analysis():
+    # Get the uploaded file from the request
     uploaded_file = request.files.get('uploaded_file')
+
+    # Debugging: Check if the file was received and print details
+    if uploaded_file:
+        print(f"Received file: {uploaded_file.filename}")
+    else:
+        print("No file received.")
+
+    # Check if the file is uploaded and has a valid extension
     if not uploaded_file or not allowed_file(uploaded_file.filename):
         return jsonify({"error": "Invalid file type or no file uploaded"}), 400
 
@@ -1315,31 +1439,41 @@ Your task is to assess the main headline's effectiveness based on various lingui
     Provide suggestions for improving the main headline considering the overall analysis.
     """
     try:
+        responses = []
         if is_image:
             image = Image.open(io.BytesIO(uploaded_file.read()))
-            response = model.generate_content([prompt, image])
+            responses = [model.generate_content([prompt, image]) for _ in range(3)]  # Send three requests
         else:
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
                 tmp.write(uploaded_file.read())
                 tmp_path = tmp.name
 
             frames = extract_frames(tmp_path)
-            if frames is None or not frames:  # Check if frames were extracted successfully
-                return jsonify({"error": "No frames were extracted from the video. Please check the video format."}), 400
+            if frames is None or not frames:
+                raise Exception("No frames were extracted from the video. Please check the video format.")
+            
+            responses = [model.generate_content([prompt, frames[0]]) for _ in range(3)]  # Send three requests
 
-            response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
-
-        if response.candidates:
-            return jsonify({"results": response.candidates[0].content.parts[0].text.strip()})
-        else:
-            return jsonify({"error": "Unexpected response structure from the model."}), 500
+        # Merge responses
+        merged_response = " ".join([resp.candidates[0].content.parts[0].text.strip() for resp in responses])
+        return jsonify({"content": merged_response})
     except Exception as e:
+        print(f"Error occurred: {str(e)}")
         return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
 
 @app.route("/image_headline_analysis", methods=["POST"])
 def image_headline_analysis():
+    # Get the uploaded file from the request
     uploaded_file = request.files.get('uploaded_file')
+
+    # Debugging: Check if the file was received and print details
+    if uploaded_file:
+        print(f"Received file: {uploaded_file.filename}")
+    else:
+        print("No file received.")
+
+    # Check if the file is uploaded and has a valid extension
     if not uploaded_file or not allowed_file(uploaded_file.filename):
         return jsonify({"error": "Invalid file type or no file uploaded"}), 400
 
@@ -1368,31 +1502,41 @@ Your task is to assess the image headline's effectiveness based on various lingu
     Suggest three improved headlines based on the analysis.
     """
     try:
+        responses = []
         if is_image:
             image = Image.open(io.BytesIO(uploaded_file.read()))
-            response = model.generate_content([prompt, image])
+            responses = [model.generate_content([prompt, image]) for _ in range(3)]  # Send three requests
         else:
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
                 tmp.write(uploaded_file.read())
                 tmp_path = tmp.name
 
             frames = extract_frames(tmp_path)
-            if frames is None or not frames:  # Check if frames were extracted successfully
-                return jsonify({"error": "No frames were extracted from the video. Please check the video format."}), 400
+            if frames is None or not frames:
+                raise Exception("No frames were extracted from the video. Please check the video format.")
+            
+            responses = [model.generate_content([prompt, frames[0]]) for _ in range(3)]  # Send three requests
 
-            response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
-
-        if response.candidates:
-            return jsonify({"results": response.candidates[0].content.parts[0].text.strip()})
-        else:
-            return jsonify({"error": "Unexpected response structure from the model."}), 500
+        # Merge responses
+        merged_response = " ".join([resp.candidates[0].content.parts[0].text.strip() for resp in responses])
+        return jsonify({"content": merged_response})
     except Exception as e:
+        print(f"Error occurred: {str(e)}")
         return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
 
 @app.route("/supporting_headline_analysis", methods=["POST"])
 def supporting_headline_analysis():
+    # Get the uploaded file from the request
     uploaded_file = request.files.get('uploaded_file')
+
+    # Debugging: Check if the file was received and print details
+    if uploaded_file:
+        print(f"Received file: {uploaded_file.filename}")
+    else:
+        print("No file received.")
+
+    # Check if the file is uploaded and has a valid extension
     if not uploaded_file or not allowed_file(uploaded_file.filename):
         return jsonify({"error": "Invalid file type or no file uploaded"}), 400
 
@@ -1420,31 +1564,41 @@ def supporting_headline_analysis():
     Offer alternative headlines that enhance effectiveness based on the detailed analysis.
     """
     try:
+        responses = []
         if is_image:
             image = Image.open(io.BytesIO(uploaded_file.read()))
-            response = model.generate_content([prompt, image])
+            responses = [model.generate_content([prompt, image]) for _ in range(3)]  # Send three requests
         else:
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
                 tmp.write(uploaded_file.read())
                 tmp_path = tmp.name
 
             frames = extract_frames(tmp_path)
-            if frames is None or not frames:  # Check if frames were extracted successfully
-                return jsonify({"error": "No frames were extracted from the video. Please check the video format."}), 400
+            if frames is None or not frames:
+                raise Exception("No frames were extracted from the video. Please check the video format.")
+            
+            responses = [model.generate_content([prompt, frames[0]]) for _ in range(3)]  # Send three requests
 
-            response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
-
-        if response.candidates:
-            return jsonify({"results": response.candidates[0].content.parts[0].text.strip()})
-        else:
-            return jsonify({"error": "Unexpected response structure from the model."}), 500
+        # Merge responses
+        merged_response = " ".join([resp.candidates[0].content.parts[0].text.strip() for resp in responses])
+        return jsonify({"content": merged_response})
     except Exception as e:
+        print(f"Error occurred: {str(e)}")
         return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
 
 @app.route("/flash_analysis", methods=["POST"])
 def flash_analysis():
+    # Get the uploaded file from the request
     uploaded_file = request.files.get('uploaded_file')
+
+    # Debugging: Check if the file was received and print details
+    if uploaded_file:
+        print(f"Received file: {uploaded_file.filename}")
+    else:
+        print("No file received.")
+
+    # Check if the file is uploaded and has a valid extension
     if not uploaded_file or not allowed_file(uploaded_file.filename):
         return jsonify({"error": "Invalid file type or no file uploaded"}), 400
 
@@ -1487,26 +1641,26 @@ def flash_analysis():
     - Consistent: Provide similar descriptions for the same asset, regardless of how many times you analyze it.
     """
     try:
+        responses = []
         if is_image:
             image = Image.open(io.BytesIO(uploaded_file.read()))
-            response = model.generate_content([prompt, image])
+            responses = [model.generate_content([prompt, image]) for _ in range(3)]  # Send three requests
         else:
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
                 tmp.write(uploaded_file.read())
                 tmp_path = tmp.name
 
             frames = extract_frames(tmp_path)
-            if frames is None or not frames:  # Check if frames were extracted successfully
-                return jsonify({"error": "No frames were extracted from the video. Please check the video format."}), 400
+            if frames is None or not frames:
+                raise Exception("No frames were extracted from the video. Please check the video format.")
+            
+            responses = [model.generate_content([prompt, frames[0]]) for _ in range(3)]  # Send three requests
 
-            response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
-
-        if response.candidates:
-            raw_response = response.candidates[0].content.parts[0].text.strip()
-            return Response(raw_response, content_type="text/html")
-        else:
-            return jsonify({"error": "Unexpected response structure from the model."}), 500
+        # Merge responses
+        merged_response = " ".join([resp.candidates[0].content.parts[0].text.strip() for resp in responses])
+        return jsonify({"content": merged_response})
     except Exception as e:
+        print(f"Error occurred: {str(e)}")
         return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
 
@@ -1545,7 +1699,16 @@ def custom_prompt_analysis():
 
 @app.route("/meta_profile", methods=["POST"])
 def meta_profile():
+    # Get the uploaded file from the request
     uploaded_file = request.files.get('uploaded_file')
+
+    # Debugging: Check if the file was received and print details
+    if uploaded_file:
+        print(f"Received file: {uploaded_file.filename}")
+    else:
+        print("No file received.")
+
+    # Check if the file is uploaded and has a valid extension
     if not uploaded_file or not allowed_file(uploaded_file.filename):
         return jsonify({"error": "Invalid file type or no file uploaded"}), 400
 
@@ -1582,32 +1745,41 @@ def meta_profile():
     Job Title Industries: Target professionals based on their job information.
     """
     try:
+        responses = []
         if is_image:
             image = Image.open(io.BytesIO(uploaded_file.read()))
-            response = model.generate_content([prompt, image])
+            responses = [model.generate_content([prompt, image]) for _ in range(3)]  # Send three requests
         else:
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
                 tmp.write(uploaded_file.read())
                 tmp_path = tmp.name
 
             frames = extract_frames(tmp_path)
-            if frames is None or not frames:  # Check if frames were extracted successfully
-                return jsonify({"error": "No frames were extracted from the video. Please check the video format."}), 400
+            if frames is None or not frames:
+                raise Exception("No frames were extracted from the video. Please check the video format.")
+            
+            responses = [model.generate_content([prompt, frames[0]]) for _ in range(3)]  # Send three requests
 
-            response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
-
-        if response.candidates:
-            raw_response = response.candidates[0].content.parts[0].text.strip()
-            return Response(raw_response, content_type="text/html")
-        else:
-            return jsonify({"error": "Unexpected response structure from the model."}), 500
+        # Merge responses
+        merged_response = " ".join([resp.candidates[0].content.parts[0].text.strip() for resp in responses])
+        return jsonify({"content": merged_response})
     except Exception as e:
+        print(f"Error occurred: {str(e)}")
         return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
 
 @app.route("/linkedin_profile", methods=["POST"])
 def linkedin_profile():
+    # Get the uploaded file from the request
     uploaded_file = request.files.get('uploaded_file')
+
+    # Debugging: Check if the file was received and print details
+    if uploaded_file:
+        print(f"Received file: {uploaded_file.filename}")
+    else:
+        print("No file received.")
+
+    # Check if the file is uploaded and has a valid extension
     if not uploaded_file or not allowed_file(uploaded_file.filename):
         return jsonify({"error": "Invalid file type or no file uploaded"}), 400
 
@@ -1643,32 +1815,41 @@ def linkedin_profile():
     LinkedIn.
     """
     try:
+        responses = []
         if is_image:
             image = Image.open(io.BytesIO(uploaded_file.read()))
-            response = model.generate_content([prompt, image])
+            responses = [model.generate_content([prompt, image]) for _ in range(3)]  # Send three requests
         else:
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
                 tmp.write(uploaded_file.read())
                 tmp_path = tmp.name
 
             frames = extract_frames(tmp_path)
-            if frames is None or not frames:  # Check if frames were extracted successfully
-                return jsonify({"error": "No frames were extracted from the video. Please check the video format."}), 400
+            if frames is None or not frames:
+                raise Exception("No frames were extracted from the video. Please check the video format.")
+            
+            responses = [model.generate_content([prompt, frames[0]]) for _ in range(3)]  # Send three requests
 
-            response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
-
-        if response.candidates:
-            raw_response = response.candidates[0].content.parts[0].text.strip()
-            return Response(raw_response, content_type="text/html")
-        else:
-            return jsonify({"error": "Unexpected response structure from the model."}), 500
+        # Merge responses
+        merged_response = " ".join([resp.candidates[0].content.parts[0].text.strip() for resp in responses])
+        return jsonify({"content": merged_response})
     except Exception as e:
+        print(f"Error occurred: {str(e)}")
         return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
 
 @app.route("/x_profile", methods=["POST"])
 def x_profile():
+    # Get the uploaded file from the request
     uploaded_file = request.files.get('uploaded_file')
+
+    # Debugging: Check if the file was received and print details
+    if uploaded_file:
+        print(f"Received file: {uploaded_file.filename}")
+    else:
+        print("No file received.")
+
+    # Check if the file is uploaded and has a valid extension
     if not uploaded_file or not allowed_file(uploaded_file.filename):
         return jsonify({"error": "Invalid file type or no file uploaded"}), 400
 
@@ -1703,32 +1884,41 @@ def x_profile():
     and regional norms. 
     """
     try:
+        responses = []
         if is_image:
             image = Image.open(io.BytesIO(uploaded_file.read()))
-            response = model.generate_content([prompt, image])
+            responses = [model.generate_content([prompt, image]) for _ in range(3)]  # Send three requests
         else:
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
                 tmp.write(uploaded_file.read())
                 tmp_path = tmp.name
 
             frames = extract_frames(tmp_path)
-            if frames is None or not frames:  # Check if frames were extracted successfully
-                return jsonify({"error": "No frames were extracted from the video. Please check the video format."}), 400
+            if frames is None or not frames:
+                raise Exception("No frames were extracted from the video. Please check the video format.")
+            
+            responses = [model.generate_content([prompt, frames[0]]) for _ in range(3)]  # Send three requests
 
-            response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
-
-        if response.candidates:
-            raw_response = response.candidates[0].content.parts[0].text.strip()
-            return Response(raw_response, content_type="text/html")
-        else:
-            return jsonify({"error": "Unexpected response structure from the model."}), 500
+        # Merge responses
+        merged_response = " ".join([resp.candidates[0].content.parts[0].text.strip() for resp in responses])
+        return jsonify({"content": merged_response})
     except Exception as e:
+        print(f"Error occurred: {str(e)}")
         return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
 
 @app.route("/Image_Analysis", methods=["POST"])
 def image_analysis():
+    # Get the uploaded file from the request
     uploaded_file = request.files.get('uploaded_file')
+
+    # Debugging: Check if the file was received and print details
+    if uploaded_file:
+        print(f"Received file: {uploaded_file.filename}")
+    else:
+        print("No file received.")
+
+    # Check if the file is uploaded and has a valid extension
     if not uploaded_file or not allowed_file(uploaded_file.filename):
         return jsonify({"error": "Invalid file type or no file uploaded"}), 400
 
@@ -1807,32 +1997,41 @@ def image_analysis():
     Application: Use size, color, and placement to create a clear visual hierarchy, directing attention to key messages or elements.
     """
     try:
+        responses = []
         if is_image:
             image = Image.open(io.BytesIO(uploaded_file.read()))
-            response = model.generate_content([prompt, image])
+            responses = [model.generate_content([prompt, image]) for _ in range(3)]  # Send three requests
         else:
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
                 tmp.write(uploaded_file.read())
                 tmp_path = tmp.name
 
             frames = extract_frames(tmp_path)
-            if frames is None or not frames:  # Check if frames were extracted successfully
-                return jsonify({"error": "No frames were extracted from the video. Please check the video format."}), 400
+            if frames is None or not frames:
+                raise Exception("No frames were extracted from the video. Please check the video format.")
+            
+            responses = [model.generate_content([prompt, frames[0]]) for _ in range(3)]  # Send three requests
 
-            response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
-
-        if response.candidates:
-            raw_response = response.candidates[0].content.parts[0].text.strip()
-            return Response(raw_response, content_type="text/html")
-        else:
-            return jsonify({"error": "Unexpected response structure from the model."}), 500
+        # Merge responses
+        merged_response = " ".join([resp.candidates[0].content.parts[0].text.strip() for resp in responses])
+        return jsonify({"content": merged_response})
     except Exception as e:
+        print(f"Error occurred: {str(e)}")
         return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
 
 @app.route("/Image_Analysis_2", methods=["POST"])
 def image_analysis_2():
+    # Get the uploaded file from the request
     uploaded_file = request.files.get('uploaded_file')
+
+    # Debugging: Check if the file was received and print details
+    if uploaded_file:
+        print(f"Received file: {uploaded_file.filename}")
+    else:
+        print("No file received.")
+
+    # Check if the file is uploaded and has a valid extension
     if not uploaded_file or not allowed_file(uploaded_file.filename):
         return jsonify({"error": "Invalid file type or no file uploaded"}), 400
 
@@ -1945,32 +2144,41 @@ def image_analysis_2():
     Is there a clear connection between the subject and the intended message?
     """
     try:
+        responses = []
         if is_image:
             image = Image.open(io.BytesIO(uploaded_file.read()))
-            response = model.generate_content([prompt, image])
+            responses = [model.generate_content([prompt, image]) for _ in range(3)]  # Send three requests
         else:
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
                 tmp.write(uploaded_file.read())
                 tmp_path = tmp.name
 
             frames = extract_frames(tmp_path)
-            if frames is None or not frames:  # Check if frames were extracted successfully
-                return jsonify({"error": "No frames were extracted from the video. Please check the video format."}), 400
+            if frames is None or not frames:
+                raise Exception("No frames were extracted from the video. Please check the video format.")
+            
+            responses = [model.generate_content([prompt, frames[0]]) for _ in range(3)]  # Send three requests
 
-            response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
-
-        if response.candidates:
-            raw_response = response.candidates[0].content.parts[0].text.strip()
-            return Response(raw_response, content_type="text/html")
-        else:
-            return jsonify({"error": "Unexpected response structure from the model."}), 500
+        # Merge responses
+        merged_response = " ".join([resp.candidates[0].content.parts[0].text.strip() for resp in responses])
+        return jsonify({"content": merged_response})
     except Exception as e:
+        print(f"Error occurred: {str(e)}")
         return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
 
 @app.route("/Image_Analysis_2_table", methods=['GET', 'POST'])
 def image_analysis_2_table():
+    # Get the uploaded file from the request
     uploaded_file = request.files.get('uploaded_file')
+
+    # Debugging: Check if the file was received and print details
+    if uploaded_file:
+        print(f"Received file: {uploaded_file.filename}")
+    else:
+        print("No file received.")
+
+    # Check if the file is uploaded and has a valid extension
     if not uploaded_file or not allowed_file(uploaded_file.filename):
         return jsonify({"error": "Invalid file type or no file uploaded"}), 400
 
@@ -2083,31 +2291,47 @@ def image_analysis_2_table():
     Is there a clear connection between the subject and the intended message?
     """
     try:
+        responses = []
         if is_image:
             image = Image.open(io.BytesIO(uploaded_file.read()))
-            response = model.generate_content([prompt, image])
+            responses = [model.generate_content([prompt, image]) for _ in range(3)]  # Send three requests
         else:
             with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
                 tmp.write(uploaded_file.read())
                 tmp_path = tmp.name
 
             frames = extract_frames(tmp_path)
-            if frames is None or not frames:  # Check if frames were extracted successfully
-                return jsonify({"error": "No frames were extracted from the video. Please check the video format."}), 400
+            if frames is None or not frames:
+                raise Exception("No frames were extracted from the video. Please check the video format.")
+            
+            responses = [model.generate_content([prompt, frames[0]]) for _ in range(3)]  # Send three requests
 
-            response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
-
-        if response.candidates:
-            raw_response = response.candidates[0].content.parts[0].text.strip()
-            return Response(raw_response, content_type="text/html")
-        else:
-            return jsonify({"error": "Unexpected response structure from the model."}), 500
+        # Merge responses
+        merged_response = " ".join([resp.candidates[0].content.parts[0].text.strip() for resp in responses])
+        return jsonify({"content": merged_response})
     except Exception as e:
+        print(f"Error occurred: {str(e)}")
         return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
 @app.route("/", methods=["GET"])
 def read_root():
     return {"message": "Welcome to the AI analysis Flask app!"}
 
-if __name__ == '__main__':
-    app.run(debug=True)
+@app.before_request
+def enforce_https_in_production():
+    if not request.is_secure:
+        if request.headers.get('X-Forwarded-Proto', 'http') != 'https':
+            url = request.url.replace("http://", "https://", 1)
+            return redirect(url, code=301)
+Talisman(app)        
+if __name__ == "__main__":
+    # Set up SSL context for HTTPS
+    context = ('cert.pem', 'key.pem')  # Path to your SSL certificate and key
+    http_thread = Thread(target=lambda: app.run(host='0.0.0.0', port=80))
+    https_thread = Thread(target=lambda: app.run(ssl_context=context, host='0.0.0.0', port=443))
+    
+    http_thread.start()
+    https_thread.start()
+    
+    http_thread.join()
+    https_thread.join()
