@@ -35,7 +35,7 @@ else:
         "top_p": 0.8,
         "top_k": 64,
         "max_output_tokens": 8192,
-        "response_mime_type": "text/plain",
+        "response_mime_type": "application/json",
     }
 
     # Initialize Generative AI model with generation configuration
