@@ -87,6 +87,19 @@ def extract_frames(video_file_path, num_frames=5):
         raise Exception("No frames were extracted, possibly due to an error in reading the video.")
     return frames
 
+def process_response(responses):
+    """Convert GenerateContentResponse objects to a JSON-serializable format."""
+    structured_responses = []
+    for response in responses:
+        if hasattr(response, 'to_dict'):
+            structured_responses.append(response.to_dict())
+        elif hasattr(response, 'content'):
+            structured_responses.append(response.content)
+        else:
+            structured_responses.append(str(response))
+    return structured_responses
+
+
 @app.before_request
 def enforce_https_in_production():
     if not request.is_secure and not app.debug:
@@ -164,22 +177,17 @@ def analyze_media():
     try:
         responses = []
         if uploaded_file:
-            # Handle file upload
             image = Image.open(io.BytesIO(uploaded_file.read()))
         elif image_url:
-            # Handle image URL
             response = requests.get(image_url)
             if response.status_code != 200:
                 return jsonify({"error": "Failed to fetch image from URL"}), 400
             image = Image.open(io.BytesIO(response.content))
 
-        # Process the image with your analysis
-        responses = [model.generate_content([prompt, image]) for _ in range(3)]  # Send three requests
-
-        # Extract JSON content from each response
-        json_responses = [resp.json() for resp in responses]  # Assuming each response object has a .json() method
-
-        return jsonify(json_responses)  # Return the JSON response
+        responses = [model.generate_content([prompt, image]) for _ in range(3)]
+        structured_responses = process_response(responses)
+        
+        return jsonify({"responses": structured_responses})
     except Exception as e:
         return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
@@ -228,22 +236,17 @@ Analyze the provided image for marketing effectiveness. First, provide detailed 
     try:
         responses = []
         if uploaded_file:
-            # Handle file upload
             image = Image.open(io.BytesIO(uploaded_file.read()))
         elif image_url:
-            # Handle image URL
             response = requests.get(image_url)
             if response.status_code != 200:
                 return jsonify({"error": "Failed to fetch image from URL"}), 400
             image = Image.open(io.BytesIO(response.content))
 
-        # Process the image with your analysis
-        responses = [model.generate_content([prompt, image]) for _ in range(3)]  # Send three requests
-
-        # Extract JSON content from each response
-        json_responses = [resp.json() for resp in responses]  # Assuming each response object has a .json() method
-
-        return jsonify(json_responses)  # Return the JSON response
+        responses = [model.generate_content([prompt, image]) for _ in range(3)]
+        structured_responses = process_response(responses)
+        
+        return jsonify({"responses": structured_responses})
     except Exception as e:
         return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
@@ -311,22 +314,17 @@ Evaluate the content using the 7 principles above. Score each element from 1-5, 
     try:
         responses = []
         if uploaded_file:
-            # Handle file upload
             image = Image.open(io.BytesIO(uploaded_file.read()))
         elif image_url:
-            # Handle image URL
             response = requests.get(image_url)
             if response.status_code != 200:
                 return jsonify({"error": "Failed to fetch image from URL"}), 400
             image = Image.open(io.BytesIO(response.content))
 
-        # Process the image with your analysis
-        responses = [model.generate_content([prompt, image]) for _ in range(3)]  # Send three requests
-
-        # Extract JSON content from each response
-        json_responses = [resp.json() for resp in responses]  # Assuming each response object has a .json() method
-
-        return jsonify(json_responses)  # Return the JSON response
+        responses = [model.generate_content([prompt, image]) for _ in range(3)]
+        structured_responses = process_response(responses)
+        
+        return jsonify({"responses": structured_responses})
     except Exception as e:
         return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
     
@@ -368,22 +366,17 @@ Evaluation: Does the content explicitly encourage engagement, and have the means
     try:
         responses = []
         if uploaded_file:
-            # Handle file upload
             image = Image.open(io.BytesIO(uploaded_file.read()))
         elif image_url:
-            # Handle image URL
             response = requests.get(image_url)
             if response.status_code != 200:
                 return jsonify({"error": "Failed to fetch image from URL"}), 400
             image = Image.open(io.BytesIO(response.content))
 
-        # Process the image with your analysis
-        responses = [model.generate_content([prompt, image]) for _ in range(3)]  # Send three requests
-
-        # Extract JSON content from each response
-        json_responses = [resp.json() for resp in responses]  # Assuming each response object has a .json() method
-
-        return jsonify(json_responses)  # Return the JSON response
+        responses = [model.generate_content([prompt, image]) for _ in range(3)]
+        structured_responses = process_response(responses)
+        
+        return jsonify({"responses": structured_responses})
     except Exception as e:
         return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
@@ -452,22 +445,17 @@ Application: Inspiring hope and optimism about the future through positive and u
     try:
         responses = []
         if uploaded_file:
-            # Handle file upload
             image = Image.open(io.BytesIO(uploaded_file.read()))
         elif image_url:
-            # Handle image URL
             response = requests.get(image_url)
             if response.status_code != 200:
                 return jsonify({"error": "Failed to fetch image from URL"}), 400
             image = Image.open(io.BytesIO(response.content))
 
-        # Process the image with your analysis
-        responses = [model.generate_content([prompt, image]) for _ in range(3)]  # Send three requests
-
-        # Extract JSON content from each response
-        json_responses = [resp.json() for resp in responses]  # Assuming each response object has a .json() method
-
-        return jsonify(json_responses)  # Return the JSON response
+        responses = [model.generate_content([prompt, image]) for _ in range(3)]
+        structured_responses = process_response(responses)
+        
+        return jsonify({"responses": structured_responses})
     except Exception as e:
         return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
@@ -554,22 +542,17 @@ Builds Trust and Credibility: Ensure messages are consistent, predictable, and a
     try:
         responses = []
         if uploaded_file:
-            # Handle file upload
             image = Image.open(io.BytesIO(uploaded_file.read()))
         elif image_url:
-            # Handle image URL
             response = requests.get(image_url)
             if response.status_code != 200:
                 return jsonify({"error": "Failed to fetch image from URL"}), 400
             image = Image.open(io.BytesIO(response.content))
 
-        # Process the image with your analysis
-        responses = [model.generate_content([prompt, image]) for _ in range(3)]  # Send three requests
-
-        # Extract JSON content from each response
-        json_responses = [resp.json() for resp in responses]  # Assuming each response object has a .json() method
-
-        return jsonify(json_responses)  # Return the JSON response
+        responses = [model.generate_content([prompt, image]) for _ in range(3)]
+        structured_responses = process_response(responses)
+        
+        return jsonify({"responses": structured_responses})
     except Exception as e:
         return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
@@ -631,25 +614,20 @@ Using the following Behavioral Science principles, assess whether the marketing 
     try:
         responses = []
         if uploaded_file:
-            # Handle file upload
             image = Image.open(io.BytesIO(uploaded_file.read()))
         elif image_url:
-            # Handle image URL
             response = requests.get(image_url)
             if response.status_code != 200:
                 return jsonify({"error": "Failed to fetch image from URL"}), 400
             image = Image.open(io.BytesIO(response.content))
 
-        # Process the image with your analysis
-        responses = [model.generate_content([prompt, image]) for _ in range(3)]  # Send three requests
-
-        # Extract JSON content from each response
-        json_responses = [resp.json() for resp in responses]  # Assuming each response object has a .json() method
-
-        return jsonify(json_responses)  # Return the JSON response
+        responses = [model.generate_content([prompt, image]) for _ in range(3)]
+        structured_responses = process_response(responses)
+        
+        return jsonify({"responses": structured_responses})
     except Exception as e:
         return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
-
+    
 @app.route("/nlp_principles_analysis", methods=["POST"])
 def nlp_principles_analysis():
     uploaded_file = request.files.get('uploaded_file')
@@ -731,22 +709,17 @@ By utilizing these NLP techniques, you can create static marketing content that 
     try:
         responses = []
         if uploaded_file:
-            # Handle file upload
             image = Image.open(io.BytesIO(uploaded_file.read()))
         elif image_url:
-            # Handle image URL
             response = requests.get(image_url)
             if response.status_code != 200:
                 return jsonify({"error": "Failed to fetch image from URL"}), 400
             image = Image.open(io.BytesIO(response.content))
 
-        # Process the image with your analysis
-        responses = [model.generate_content([prompt, image]) for _ in range(3)]  # Send three requests
-
-        # Extract JSON content from each response
-        json_responses = [resp.json() for resp in responses]  # Assuming each response object has a .json() method
-
-        return jsonify(json_responses)  # Return the JSON response
+        responses = [model.generate_content([prompt, image]) for _ in range(3)]
+        structured_responses = process_response(responses)
+        
+        return jsonify({"responses": structured_responses})
     except Exception as e:
         return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
@@ -804,22 +777,17 @@ Evaluate the extracted text based on the following criteria. For each aspect, pr
     try:
         responses = []
         if uploaded_file:
-            # Handle file upload
             image = Image.open(io.BytesIO(uploaded_file.read()))
         elif image_url:
-            # Handle image URL
             response = requests.get(image_url)
             if response.status_code != 200:
                 return jsonify({"error": "Failed to fetch image from URL"}), 400
             image = Image.open(io.BytesIO(response.content))
 
-        # Process the image with your analysis
-        responses = [model.generate_content([prompt, image]) for _ in range(3)]  # Send three requests
-
-        # Extract JSON content from each response
-        json_responses = [resp.json() for resp in responses]  # Assuming each response object has a .json() method
-
-        return jsonify(json_responses)  # Return the JSON response
+        responses = [model.generate_content([prompt, image]) for _ in range(3)]
+        structured_responses = process_response(responses)
+        
+        return jsonify({"responses": structured_responses})
     except Exception as e:
         return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
     
@@ -865,22 +833,17 @@ Ethical Considerations: Analyze the content for any potential ethical issues, su
     try:
         responses = []
         if uploaded_file:
-            # Handle file upload
             image = Image.open(io.BytesIO(uploaded_file.read()))
         elif image_url:
-            # Handle image URL
             response = requests.get(image_url)
             if response.status_code != 200:
                 return jsonify({"error": "Failed to fetch image from URL"}), 400
             image = Image.open(io.BytesIO(response.content))
 
-        # Process the image with your analysis
-        responses = [model.generate_content([prompt, image]) for _ in range(3)]  # Send three requests
-
-        # Extract JSON content from each response
-        json_responses = [resp.json() for resp in responses]  # Assuming each response object has a .json() method
-
-        return jsonify(json_responses)  # Return the JSON response
+        responses = [model.generate_content([prompt, image]) for _ in range(3)]
+        structured_responses = process_response(responses)
+        
+        return jsonify({"responses": structured_responses})
     except Exception as e:
         return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
     
@@ -926,22 +889,17 @@ Ethical Considerations: Analyze the content for any potential ethical issues, su
     try:
         responses = []
         if uploaded_file:
-            # Handle file upload
             image = Image.open(io.BytesIO(uploaded_file.read()))
         elif image_url:
-            # Handle image URL
             response = requests.get(image_url)
             if response.status_code != 200:
                 return jsonify({"error": "Failed to fetch image from URL"}), 400
             image = Image.open(io.BytesIO(response.content))
 
-        # Process the image with your analysis
-        responses = [model.generate_content([prompt, image]) for _ in range(3)]  # Send three requests
-
-        # Extract JSON content from each response
-        json_responses = [resp.json() for resp in responses]  # Assuming each response object has a .json() method
-
-        return jsonify(json_responses)  # Return the JSON response
+        responses = [model.generate_content([prompt, image]) for _ in range(3)]
+        structured_responses = process_response(responses)
+        
+        return jsonify({"responses": structured_responses})
     except Exception as e:
         return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
@@ -1021,22 +979,17 @@ The criteria to assess are:
     try:
         responses = []
         if uploaded_file:
-            # Handle file upload
             image = Image.open(io.BytesIO(uploaded_file.read()))
         elif image_url:
-            # Handle image URL
             response = requests.get(image_url)
             if response.status_code != 200:
                 return jsonify({"error": "Failed to fetch image from URL"}), 400
             image = Image.open(io.BytesIO(response.content))
 
-        # Process the image with your analysis
-        responses = [model.generate_content([prompt, image]) for _ in range(3)]  # Send three requests
-
-        # Extract JSON content from each response
-        json_responses = [resp.json() for resp in responses]  # Assuming each response object has a .json() method
-
-        return jsonify(json_responses)  # Return the JSON response
+        responses = [model.generate_content([prompt, image]) for _ in range(3)]
+        structured_responses = process_response(responses)
+        
+        return jsonify({"responses": structured_responses})
     except Exception as e:
         return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
@@ -1094,22 +1047,17 @@ The criteria to assess are:
     try:
         responses = []
         if uploaded_file:
-            # Handle file upload
             image = Image.open(io.BytesIO(uploaded_file.read()))
         elif image_url:
-            # Handle image URL
             response = requests.get(image_url)
             if response.status_code != 200:
                 return jsonify({"error": "Failed to fetch image from URL"}), 400
             image = Image.open(io.BytesIO(response.content))
 
-        # Process the image with your analysis
-        responses = [model.generate_content([prompt, image]) for _ in range(3)]  # Send three requests
-
-        # Extract JSON content from each response
-        json_responses = [resp.json() for resp in responses]  # Assuming each response object has a .json() method
-
-        return jsonify(json_responses)  # Return the JSON response
+        responses = [model.generate_content([prompt, image]) for _ in range(3)]
+        structured_responses = process_response(responses)
+        
+        return jsonify({"responses": structured_responses})
     except Exception as e:
         return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
@@ -1165,22 +1113,17 @@ Provide three alternative headlines for the main headline, along with a brief ex
     try:
         responses = []
         if uploaded_file:
-            # Handle file upload
             image = Image.open(io.BytesIO(uploaded_file.read()))
         elif image_url:
-            # Handle image URL
             response = requests.get(image_url)
             if response.status_code != 200:
                 return jsonify({"error": "Failed to fetch image from URL"}), 400
             image = Image.open(io.BytesIO(response.content))
 
-        # Process the image with your analysis
-        responses = [model.generate_content([prompt, image]) for _ in range(3)]  # Send three requests
-
-        # Extract JSON content from each response
-        json_responses = [resp.json() for resp in responses]  # Assuming each response object has a .json() method
-
-        return jsonify(json_responses)  # Return the JSON response
+        responses = [model.generate_content([prompt, image]) for _ in range(3)]
+        structured_responses = process_response(responses)
+        
+        return jsonify({"responses": structured_responses})
     except Exception as e:
         return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
@@ -1236,22 +1179,17 @@ Provide three alternative headlines for the image headline, along with a brief e
     try:
         responses = []
         if uploaded_file:
-            # Handle file upload
             image = Image.open(io.BytesIO(uploaded_file.read()))
         elif image_url:
-            # Handle image URL
             response = requests.get(image_url)
             if response.status_code != 200:
                 return jsonify({"error": "Failed to fetch image from URL"}), 400
             image = Image.open(io.BytesIO(response.content))
 
-        # Process the image with your analysis
-        responses = [model.generate_content([prompt, image]) for _ in range(3)]  # Send three requests
-
-        # Extract JSON content from each response
-        json_responses = [resp.json() for resp in responses]  # Assuming each response object has a .json() method
-
-        return jsonify(json_responses)  # Return the JSON response
+        responses = [model.generate_content([prompt, image]) for _ in range(3)]
+        structured_responses = process_response(responses)
+        
+        return jsonify({"responses": structured_responses})
     except Exception as e:
         return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
@@ -1307,22 +1245,17 @@ Provide three alternative headlines for the supporting headline, along with a br
     try:
         responses = []
         if uploaded_file:
-            # Handle file upload
             image = Image.open(io.BytesIO(uploaded_file.read()))
         elif image_url:
-            # Handle image URL
             response = requests.get(image_url)
             if response.status_code != 200:
                 return jsonify({"error": "Failed to fetch image from URL"}), 400
             image = Image.open(io.BytesIO(response.content))
 
-        # Process the image with your analysis
-        responses = [model.generate_content([prompt, image]) for _ in range(3)]  # Send three requests
-
-        # Extract JSON content from each response
-        json_responses = [resp.json() for resp in responses]  # Assuming each response object has a .json() method
-
-        return jsonify(json_responses)  # Return the JSON response
+        responses = [model.generate_content([prompt, image]) for _ in range(3)]
+        structured_responses = process_response(responses)
+        
+        return jsonify({"responses": structured_responses})
     except Exception as e:
         return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
     
@@ -1363,22 +1296,17 @@ Your task is to assess the main headline's effectiveness based on various lingui
     try:
         responses = []
         if uploaded_file:
-            # Handle file upload
             image = Image.open(io.BytesIO(uploaded_file.read()))
         elif image_url:
-            # Handle image URL
             response = requests.get(image_url)
             if response.status_code != 200:
                 return jsonify({"error": "Failed to fetch image from URL"}), 400
             image = Image.open(io.BytesIO(response.content))
 
-        # Process the image with your analysis
-        responses = [model.generate_content([prompt, image]) for _ in range(3)]  # Send three requests
-
-        # Extract JSON content from each response
-        json_responses = [resp.json() for resp in responses]  # Assuming each response object has a .json() method
-
-        return jsonify(json_responses)  # Return the JSON response
+        responses = [model.generate_content([prompt, image]) for _ in range(3)]
+        structured_responses = process_response(responses)
+        
+        return jsonify({"responses": structured_responses})
     except Exception as e:
         return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
@@ -1419,22 +1347,17 @@ Your task is to assess the image headline's effectiveness based on various lingu
     try:
         responses = []
         if uploaded_file:
-            # Handle file upload
             image = Image.open(io.BytesIO(uploaded_file.read()))
         elif image_url:
-            # Handle image URL
             response = requests.get(image_url)
             if response.status_code != 200:
                 return jsonify({"error": "Failed to fetch image from URL"}), 400
             image = Image.open(io.BytesIO(response.content))
 
-        # Process the image with your analysis
-        responses = [model.generate_content([prompt, image]) for _ in range(3)]  # Send three requests
-
-        # Extract JSON content from each response
-        json_responses = [resp.json() for resp in responses]  # Assuming each response object has a .json() method
-
-        return jsonify(json_responses)  # Return the JSON response
+        responses = [model.generate_content([prompt, image]) for _ in range(3)]
+        structured_responses = process_response(responses)
+        
+        return jsonify({"responses": structured_responses})
     except Exception as e:
         return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
@@ -1474,22 +1397,17 @@ def supporting_headline_analysis():
     try:
         responses = []
         if uploaded_file:
-            # Handle file upload
             image = Image.open(io.BytesIO(uploaded_file.read()))
         elif image_url:
-            # Handle image URL
             response = requests.get(image_url)
             if response.status_code != 200:
                 return jsonify({"error": "Failed to fetch image from URL"}), 400
             image = Image.open(io.BytesIO(response.content))
 
-        # Process the image with your analysis
-        responses = [model.generate_content([prompt, image]) for _ in range(3)]  # Send three requests
-
-        # Extract JSON content from each response
-        json_responses = [resp.json() for resp in responses]  # Assuming each response object has a .json() method
-
-        return jsonify(json_responses)  # Return the JSON response
+        responses = [model.generate_content([prompt, image]) for _ in range(3)]
+        structured_responses = process_response(responses)
+        
+        return jsonify({"responses": structured_responses})
     except Exception as e:
         return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
@@ -1543,24 +1461,18 @@ def flash_analysis():
     """
     try:
         responses = []
-        if is_image:
+        if uploaded_file:
             image = Image.open(io.BytesIO(uploaded_file.read()))
-            responses = [model.generate_content([prompt, image]) for _ in range(3)]  # Send three requests
-        else:
-            with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
-                tmp.write(uploaded_file.read())
-                tmp_path = tmp.name
+        elif image_url:
+            response = requests.get(image_url)
+            if response.status_code != 200:
+                return jsonify({"error": "Failed to fetch image from URL"}), 400
+            image = Image.open(io.BytesIO(response.content))
 
-            frames = extract_frames(tmp_path)
-            if frames is None or not frames:
-                raise Exception("No frames were extracted from the video. Please check the video format.")
-            
-            responses = [model.generate_content([prompt, frames[0]]) for _ in range(3)]  # Send three requests
-
-        # Extract JSON content from each response
-        json_responses = [resp.json() for resp in responses]  # Assuming each response object has a .json() method
-
-        return json_responses  # Directly return the JSON response
+        responses = [model.generate_content([prompt, image]) for _ in range(3)]
+        structured_responses = process_response(responses)
+        
+        return jsonify({"responses": structured_responses})
     except Exception as e:
         return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
@@ -1585,20 +1497,16 @@ def custom_prompt_analysis():
         responses = []
         if is_image:
             if uploaded_file:
-                # Handle file upload
                 image = Image.open(io.BytesIO(uploaded_file.read()))
             elif image_url:
-                # Handle image URL
                 response = requests.get(image_url)
                 if response.status_code != 200:
                     return jsonify({"error": "Failed to fetch image from URL"}), 400
                 image = Image.open(io.BytesIO(response.content))
             
-            # Generate content for the image
             responses = [model.generate_content([custom_prompt, image]) for _ in range(3)]
         else:
             if uploaded_file:
-                # Handle video file upload
                 with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
                     tmp.write(uploaded_file.read())
                     tmp_path = tmp.name
@@ -1607,13 +1515,20 @@ def custom_prompt_analysis():
                 if not frames:
                     raise Exception("No frames were extracted from the video. Please check the video format.")
                 
-                # Generate content for the first frame of the video
                 responses = [model.generate_content([custom_prompt, frames[0]]) for _ in range(3)]
             else:
                 return jsonify({"error": "Video analysis requires a file upload, not a URL"}), 400
 
-        # Assuming the model's generate_content method returns JSON responses
-        structured_responses = [parse_overall_analysis_response(response) for response in responses]
+        # Convert responses to a JSON-serializable format
+        structured_responses = []
+        for response in responses:
+            if hasattr(response, 'to_dict'):
+                structured_responses.append(response.to_dict())
+            elif hasattr(response, 'content'):
+                structured_responses.append(response.content)
+            else:
+                structured_responses.append(str(response))
+
         return jsonify({"responses": structured_responses})
     except Exception as e:
         return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
@@ -1663,22 +1578,17 @@ def meta_profile():
     try:
         responses = []
         if uploaded_file:
-            # Handle file upload
             image = Image.open(io.BytesIO(uploaded_file.read()))
         elif image_url:
-            # Handle image URL
             response = requests.get(image_url)
             if response.status_code != 200:
                 return jsonify({"error": "Failed to fetch image from URL"}), 400
             image = Image.open(io.BytesIO(response.content))
 
-        # Process the image with your analysis
-        responses = [model.generate_content([prompt, image]) for _ in range(3)]  # Send three requests
-
-        # Extract JSON content from each response
-        json_responses = [resp.json() for resp in responses]  # Assuming each response object has a .json() method
-
-        return jsonify(json_responses)  # Return the JSON response
+        responses = [model.generate_content([prompt, image]) for _ in range(3)]
+        structured_responses = process_response(responses)
+        
+        return jsonify({"responses": structured_responses})
     except Exception as e:
         return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
@@ -1726,22 +1636,17 @@ def linkedin_profile():
     try:
         responses = []
         if uploaded_file:
-            # Handle file upload
             image = Image.open(io.BytesIO(uploaded_file.read()))
         elif image_url:
-            # Handle image URL
             response = requests.get(image_url)
             if response.status_code != 200:
                 return jsonify({"error": "Failed to fetch image from URL"}), 400
             image = Image.open(io.BytesIO(response.content))
 
-        # Process the image with your analysis
-        responses = [model.generate_content([prompt, image]) for _ in range(3)]  # Send three requests
-
-        # Extract JSON content from each response
-        json_responses = [resp.json() for resp in responses]  # Assuming each response object has a .json() method
-
-        return jsonify(json_responses)  # Return the JSON response
+        responses = [model.generate_content([prompt, image]) for _ in range(3)]
+        structured_responses = process_response(responses)
+        
+        return jsonify({"responses": structured_responses})
     except Exception as e:
         return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
@@ -1788,22 +1693,17 @@ def x_profile():
     try:
         responses = []
         if uploaded_file:
-            # Handle file upload
             image = Image.open(io.BytesIO(uploaded_file.read()))
         elif image_url:
-            # Handle image URL
             response = requests.get(image_url)
             if response.status_code != 200:
                 return jsonify({"error": "Failed to fetch image from URL"}), 400
             image = Image.open(io.BytesIO(response.content))
 
-        # Process the image with your analysis
-        responses = [model.generate_content([prompt, image]) for _ in range(3)]  # Send three requests
-
-        # Extract JSON content from each response
-        json_responses = [resp.json() for resp in responses]  # Assuming each response object has a .json() method
-
-        return jsonify(json_responses)  # Return the JSON response
+        responses = [model.generate_content([prompt, image]) for _ in range(3)]
+        structured_responses = process_response(responses)
+        
+        return jsonify({"responses": structured_responses})
     except Exception as e:
         return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
@@ -1894,22 +1794,17 @@ def image_analysis():
     try:
         responses = []
         if uploaded_file:
-            # Handle file upload
             image = Image.open(io.BytesIO(uploaded_file.read()))
         elif image_url:
-            # Handle image URL
             response = requests.get(image_url)
             if response.status_code != 200:
                 return jsonify({"error": "Failed to fetch image from URL"}), 400
             image = Image.open(io.BytesIO(response.content))
 
-        # Process the image with your analysis
-        responses = [model.generate_content([prompt, image]) for _ in range(3)]  # Send three requests
-
-        # Extract JSON content from each response
-        json_responses = [resp.json() for resp in responses]  # Assuming each response object has a .json() method
-
-        return jsonify(json_responses)  # Return the JSON response
+        responses = [model.generate_content([prompt, image]) for _ in range(3)]
+        structured_responses = process_response(responses)
+        
+        return jsonify({"responses": structured_responses})
     except Exception as e:
         return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
@@ -2034,22 +1929,17 @@ def image_analysis_2():
     try:
         responses = []
         if uploaded_file:
-            # Handle file upload
             image = Image.open(io.BytesIO(uploaded_file.read()))
         elif image_url:
-            # Handle image URL
             response = requests.get(image_url)
             if response.status_code != 200:
                 return jsonify({"error": "Failed to fetch image from URL"}), 400
             image = Image.open(io.BytesIO(response.content))
 
-        # Process the image with your analysis
-        responses = [model.generate_content([prompt, image]) for _ in range(3)]  # Send three requests
-
-        # Extract JSON content from each response
-        json_responses = [resp.json() for resp in responses]  # Assuming each response object has a .json() method
-
-        return jsonify(json_responses)  # Return the JSON response
+        responses = [model.generate_content([prompt, image]) for _ in range(3)]
+        structured_responses = process_response(responses)
+        
+        return jsonify({"responses": structured_responses})
     except Exception as e:
         return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
@@ -2174,22 +2064,17 @@ def image_analysis_2_table():
     try:
         responses = []
         if uploaded_file:
-            # Handle file upload
             image = Image.open(io.BytesIO(uploaded_file.read()))
         elif image_url:
-            # Handle image URL
             response = requests.get(image_url)
             if response.status_code != 200:
                 return jsonify({"error": "Failed to fetch image from URL"}), 400
             image = Image.open(io.BytesIO(response.content))
 
-        # Process the image with your analysis
-        responses = [model.generate_content([prompt, image]) for _ in range(3)]  # Send three requests
-
-        # Extract JSON content from each response
-        json_responses = [resp.json() for resp in responses]  # Assuming each response object has a .json() method
-
-        return jsonify(json_responses)  # Return the JSON response
+        responses = [model.generate_content([prompt, image]) for _ in range(3)]
+        structured_responses = process_response(responses)
+        
+        return jsonify({"responses": structured_responses})
     except Exception as e:
         return jsonify({"error": f"Failed to read or process the media: {e}"}), 500
 
