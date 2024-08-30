@@ -183,7 +183,7 @@ Analyze the provided image for marketing effectiveness. First, provide detailed 
             "10. Engagement: Assess the engagement level of the user experience. Is the UX design captivating and satisfying to interact with?\n"
             "11. Trust: Assess the trustworthiness of the content based on visual and textual elements. Is the content brand or customer-centric (customer-centric content has a higher trustworthiness)? Assess the credibility, reliability, and intimacy conveyed by the content.\n"
             "12. Motivation: Assess the design's ability to motivate users. Does it align with user motivators and demonstrate authority or provide social proof?\n"
-            "13. Influence: Analyze the influence of the design. Does the asset effectively persuade viewers and lead them towards a desired action?\n"
+            "13. Influence: Analyze the influence of the design. Does the asset effectively persuade viewers and lead them toward a desired action?\n"
             "14. Calls to Action: Analyze the presence, prominence, benefits, and language of CTAs.\n"
             "15. Experience: Assess the overall user experience. How well does the design facilitate a smooth and enjoyable interaction?\n"
             "16. Memorability: Evaluate how memorable the design is. Does it leave a lasting impression?\n"
