@@ -109,52 +109,6 @@ def enforce_https_in_production():
 def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static'),
                                'favicon.ico', mimetype='image/vnd.microsoft.icon')
-    
-@app.route('/analyze_multiple', methods=['POST'])
-def analyze_multiple():
-    uploaded_file = request.files.get('uploaded_file')
-    if not uploaded_file or not allowed_file(uploaded_file.filename):
-        return jsonify({"error": "Invalid file type or no file uploaded"}), 400
-    
-    is_image = request.form.get('is_image', 'true').lower() == 'true'
-
-    analysis_functions = [
-        analyze_media,
-        overall_analysis,
-        story_telling_analysis,
-        emotional_resonance,
-        emotional_analysis,
-        Emotional_Appraisal_Models,
-        behavioural_principles,
-        nlp_principles_analysis,
-        text_analysis,
-        Text_Analysis_2,
-        Text_Analysis_2_table,
-        headline_analysis,
-        headline_detailed_analysis,
-        main_headline_detailed_analysis,
-        image_headline_detailed_analysis,
-        supporting_headline_detailed_analysis,
-        main_headline_analysis,
-        image_headline_analysis,
-        supporting_headline_analysis,
-        meta_profile,
-        linkedin_profile,
-        x_profile,
-        image_analysis,
-        image_analysis_2,
-        image_analysis_2_table
-    ]
-
-    results = {}
-    for func in analysis_functions:
-        try:
-            result = func(uploaded_file, is_image)
-            results.update(result)
-        except Exception as e:
-            results[func.__name__] = {"error": str(e)}
-
-    return jsonify(results)
 
 @app.route('/analyze_media', methods=['POST'])
 def analyze_media():
@@ -212,11 +166,11 @@ Analyze the provided image for marketing effectiveness. First, provide detailed 
             "Then, for each aspect listed below, provide a score from 1 to 5 in increments of 0.5 (1 being low, 5 being high) and a concise explanation for each aspect, along with suggestions for improvement. The results should be presented in a table format with the columns: Aspect, Score, Explanation, and Improvement. After the table, provide a concise explanation with suggestions for overall improvement. Here are the aspects to consider:\n"
             "\n"
             "The aspects to consider are:\n"
-            "1. Creative Score: Assess the creativity of the design. Does it stand out and capture attention through innovative elements?\n"
+            "1. Distinction: Does the content contain pictures that grab user attention? Does it appeal to the primal brain with and without text?\n"
             "2. Attention: Evaluate the order of content consumption in the uploaded image. Start by identifying and analyzing the headline for its prominence and position. Next, evaluate any additional text for visibility and reader engagement sequence. Assess the positioning of images in relation to the text, followed by an examination of interactive elements such as buttons. Discuss the order in which the content is consumed (e.g., headline first, then text, or image then text then button, etc.). Determine if the content prioritizes important information, and draws and holds attention effectively.\n"
-            "3. Distinction: Does the content contain pictures that grab user attention? Does it appeal to the primal brain with and without text?\n"
-            "4. Purpose and Value: Is the purpose and value clear within 3 seconds? Is the content product or customer-centric?\n"
-            "5. Clarity: Evaluate the clarity of the design elements. Are the visuals and text easy to understand?\n"
+            "3. Purpose and Value: Is the purpose and value clear within 3 seconds? Is the content product or customer-centric?\n"
+            "4. Clarity: Evaluate the clarity of the design elements. Are the visuals and text easy to understand?\n"
+            "5. Creativity Score: Assess the creativity of the design. Does it stand out and capture attention through innovative elements?\n"
             "6. First Impressions: Analyze the initial impact of the design. Does it create a strong positive first impression?\n"
             "7. Headline Review: Evaluate the headline for clarity, conciseness, customer centricity, SEO keyword integration, emotional appeal, uniqueness, urgency, benefit to the reader, audience targeting, length, use of numbers/lists, brand consistency, and power words.\n"
             "8. Headline keywords and emotional appeal: Does the headline incorporate keywords and evoke an emotional response?\n"
@@ -224,7 +178,7 @@ Analyze the provided image for marketing effectiveness. First, provide detailed 
             "10. Engagement: Assess the engagement level of the user experience. Is the UX design captivating and satisfying to interact with?\n"
             "11. Trust: Assess the trustworthiness of the content based on visual and textual elements. Is the content brand or customer-centric (customer-centric content has a higher trustworthiness)? Assess the credibility, reliability, and intimacy conveyed by the content.\n"
             "12. Motivation: Assess the design's ability to motivate users. Does it align with user motivators and demonstrate authority or provide social proof?\n"
-            "13. Influence: Analyze the influence of the design. Does the asset effectively persuade viewers and lead them towards a desired action?\n"
+            "13. Influence: Analyze the influence of the design. Does the asset effectively persuade viewers and lead them toward a desired action?\n"
             "14. Calls to Action: Analyze the presence, prominence, benefits, and language of CTAs.\n"
             "15. Experience: Assess the overall user experience. How well does the design facilitate a smooth and enjoyable interaction?\n"
             "16. Memorability: Evaluate how memorable the design is. Does it leave a lasting impression?\n"
