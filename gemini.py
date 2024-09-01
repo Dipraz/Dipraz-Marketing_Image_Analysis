@@ -1553,6 +1553,126 @@ and regional norms.
         except Exception as e:
             st.error(f"Failed to read or process the media: {e}")
             return None
+        
+    def Personality_Trait_Assessment(uploaded_file, is_image=True):
+        prompt = f"""
+Personality traits table:
+
+If the content is non-english, translate the content to English. PLease evaluate the content against these principles in a table with a score for each element, from 1-5, in increments of 0.5, based on how well each personality will respond to the content. Please also include columns for analysis and  recommendations. At the end, pLease also include an overall summary and overall recommendations.
+
+Main Personality Trait Models
+1. The Big Five Personality Traits (Five-Factor Model) - OCEAN/CANOE
+Overview: This is the most widely accepted and researched personality model, often referred to by the acronyms OCEAN or CANOE. It identifies five broad dimensions of personality.
+Traits:
+Openness to Experience: Imagination, creativity, curiosity, and a preference for novelty and variety.
+Conscientiousness: Organization, dependability, discipline, and goal-directed behavior.
+Extraversion: Sociability, assertiveness, excitement-seeking, and positive emotionality.
+Agreeableness: Compassion, cooperation, trust, and kindness towards others.
+Neuroticism: Tendency towards emotional instability, anxiety, moodiness, and sadness.
+2. Eysenck’s Three-Factor Model (PEN Model)
+Overview: Developed by Hans Eysenck, this model proposes that personality is based on three major dimensions.
+Traits:
+Psychoticism: Aggressiveness, impulsivity, and a lack of empathy.
+Extraversion: Sociability, liveliness, and activity.
+Neuroticism: Emotional instability, anxiety, and moodiness.
+3. HEXACO Model
+Overview: An extension of the Big Five model, HEXACO adds a sixth factor to the personality traits.
+Traits:
+Honesty-Humility: Sincerity, fairness, modesty, and a lack of greed.
+Emotionality: Similar to Neuroticism but also includes sentimentality and dependence.
+Extraversion: Sociability, assertiveness, and enthusiasm.
+Agreeableness: Patience, forgiveness, and cooperation.
+Conscientiousness: Organization, diligence, and reliability.
+Openness to Experience: Aesthetic appreciation, inquisitiveness, and creativity.
+4. Cattell’s 16 Personality Factors (16PF)
+Overview: Developed by Raymond Cattell, this model identifies 16 primary factors that describe human personality.
+Traits: Some key traits include warmth, reasoning, emotional stability, dominance, liveliness, rule-consciousness, social boldness, sensitivity, and vigilance.
+5. Myers-Briggs Type Indicator (MBTI)
+Overview: Based on Carl Jung’s theory of psychological types, the MBTI identifies personality types based on four dichotomies.
+Traits:
+Extraversion (E) vs. Introversion (I): Focus on the outer world vs. inner world.
+Sensing (S) vs. Intuition (N): Focus on concrete information vs. abstract concepts.
+Thinking (T) vs. Feeling (F): Decision-making based on logic vs. emotions.
+Judging (J) vs. Perceiving (P): Preference for structure vs. flexibility.
+6. The Dark Triad
+Overview: This model examines three negative personality traits that are often associated with manipulative and antisocial behavior.
+Traits:
+Machiavellianism: Manipulativeness, deceitfulness, and a focus on personal gain.
+Narcissism: Excessive self-love, entitlement, and a need for admiration.
+Psychopathy: Lack of empathy, impulsivity, and antisocial behaviors.
+7. Cloninger’s Temperament and Character Inventory (TCI)
+Overview: Developed by Robert Cloninger, this model distinguishes between temperament (automatic responses) and character (self-concept).
+Traits:
+Novelty Seeking: Impulsiveness and a tendency towards excitement.
+Harm Avoidance: Caution and a tendency to avoid risk.
+Reward Dependence: Reliance on social approval and sensitivity to social cues.
+Persistence: Perseverance in spite of frustration and fatigue.
+8. Enneagram of Personality
+Overview: The Enneagram identifies nine distinct personality types, each with unique motivations, fears, and growth paths. It emphasizes personal development and self-awareness.
+Types:
+Reformer (Type 1): Perfectionistic, principled, self-controlled.
+Helper (Type 2): Caring, generous, people-pleasing.
+Achiever (Type 3): Success-oriented, adaptable, driven.
+Individualist (Type 4): Sensitive, expressive, introspective.
+Investigator (Type 5): Analytical, innovative, private.
+Loyalist (Type 6): Committed, responsible, anxious.
+Enthusiast (Type 7): Spontaneous, versatile, distractible.
+Challenger (Type 8): Confident, assertive, confrontational.
+Peacemaker (Type 9): Easygoing, agreeable, complacent.
+9. DISC Personality Model
+Overview: The DISC model categorizes behavior into four primary traits, focusing on how individuals respond to various situations and interact with others.
+Traits:
+Dominance (D): Assertive, results-oriented, and driven.
+Influence (I): Sociable, enthusiastic, and persuasive.
+Steadiness (S): Cooperative, patient, and supportive.
+Conscientiousness (C): Analytical, detail-oriented, and systematic.
+10. Keirsey Temperament Sorter
+Overview: Based on the MBTI, the Keirsey Temperament Sorter groups the 16 personality types into four temperaments, each with distinct communication and behavior styles.
+Temperaments:
+Artisan: Spontaneous, adaptable, and action-oriented.
+Guardian: Dependable, detail-focused, and community-minded.
+Idealist: Empathetic, enthusiastic, and driven by personal growth.
+Rational: Strategic, logical, and problem-solving.
+11. Revised NEO Personality Inventory (NEO-PI-R)
+Overview: An extension of the Big Five model, the NEO-PI-R provides a more detailed assessment of the five factors, breaking them down into six facets each, for a deeper personality analysis.
+Facets: Provides finer granularity of traits such as anxiety, excitement-seeking, and orderliness within each of the Big Five categories.
+12. Jungian Archetypes
+Overview: Based on Carl Jung's theories, this model identifies universal, archetypal characters that are present in the collective unconscious and influence human behavior.
+Archetypes:
+The Hero: Represents courage, strength, and resilience.
+The Caregiver: Nurturing, supportive, and protective.
+The Explorer: Seeks adventure, discovery, and new experiences.
+The Rebel: Challenges authority, seeks change, and breaks rules.
+The Lover: Values relationships, passion, and connection.
+The Creator: Driven by imagination, innovation, and artistry.
+"""
+        try:
+            if is_image:
+                image = Image.open(io.BytesIO(uploaded_file.read()))
+                response = model.generate_content([prompt, image])
+            else:
+                with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
+                    tmp.write(uploaded_file.read())
+                    tmp_path = tmp.name
+
+                frames = extract_frames(tmp_path)
+                if frames is None or not frames:  # Check if frames were extracted successfully
+                    st.error("No frames were extracted from the video. Please check the video format.")
+                    return None
+
+                response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
+
+            if response.candidates:
+                raw_response = response.candidates[0].content.parts[0].text.strip()
+                st.write("Personality Trait Assessment Results::")
+                st.markdown(raw_response, unsafe_allow_html=True)  # Assuming the response is in HTML table format
+            else:
+                st.error("Unexpected response structure from the model.")
+            return None
+        except Exception as e:
+            st.error(f"Failed to read or process the media: {e}")
+            return None        
+        
     def Image_Analysis(uploaded_file, is_image=True):
         prompt = f"""
 For each aspect listed below, provide a score from 1 to 5 in increments of 0.5 (1 being low, 5 being high) and an explanation for each aspect, along with suggestions for improvement. The results should be presented in a table format with the columns: Aspect, Score, Explanation, and Improvement. After the table, provide an explanation with suggestions for overall improvement. Here are the aspects to consider:
@@ -2048,7 +2168,7 @@ with st.sidebar:
         meta_profile_button = st.button("Facebook targeting")
         linkedin_profile_button = st.button("LinkedIn targeting")
         x_profile_button = st.button("X (formerly Twitter) targeting")
-
+        personality_trait_assessment_button = st.button("Personality Trait Assessment")
     with tabs[4]:  # Others
         main_headline_text_analysis_button = st.button("Main Headline Text Analysis")
         image_headline_text_analysis_button = st.button("Image Headline Text Analysis")
@@ -2241,6 +2361,12 @@ for uploaded_file in uploaded_files:
                 if result:
                     st.write("## X (formerly Twitter) targeting Analysis Results:")
                     st.markdown(result)
+        elif personality_trait_assessment_button:
+            with st.spinner("Performing Personality Trait Assessment Analysis..."):
+                result = Personality_Trait_Assessment(uploaded_file, is_image)
+                if result:
+                    st.write("## Personality Trait Assessment Analysis Results:")
+                    st.markdown(result)                    
         elif Image_Analysis_button:
             with st.spinner("Performing Image Analysis..."):
                 result = Image_Analysis(uploaded_file, is_image)
