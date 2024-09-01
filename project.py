@@ -25,16 +25,16 @@ else:
 
     # Define generation configuration
     generation_config = {
-        "temperature": 0.5,
-        "top_p": 0.9,
-        "top_k": 40,
+        "temperature": 0.2,
+        "top_p": 0.8,
+        "top_k": 64,
         "max_output_tokens": 8192,
         "response_mime_type": "text/plain",
     }
 
     # Initialize Generative AI model with generation configuration
     model = genai.GenerativeModel(
-        model_name="gemini-1.5-flash-latest",
+        model_name="gemini-1.5-pro",
         generation_config=generation_config,
     )
 
@@ -44,39 +44,29 @@ else:
         and ask specific questions to interact with the content in a dynamic way. 🚀
     """)
 
-    # Initialize chat history
-    if 'chat_history' not in st.session_state:
-        st.session_state.chat_history = []
-
     # Chat section
     st.subheader("🤖 General Chat with Gemini")
-    chat_container = st.container()
-    
-    with chat_container:
-        # Display chat history
-        for sender, message in st.session_state.chat_history:
-            if sender == "You":
-                st.markdown(f"**🧑‍💻 You:** {message}")
-            else:
-                st.markdown(f"**🤖 Gemini:** {message}")
+    chat_history = st.session_state.get('chat_history', [])
+    user_input = st.text_input("Ask Gemini a general question:", key="chat_input")
 
-        user_input = st.text_input("Ask Gemini a general question:", key="chat_input")
+    if st.button("Send", key="send_button"):
+        if user_input:
+            # Update chat history with user message
+            chat_history.append(("You", user_input))
+            st.session_state.chat_history = chat_history
 
-        if st.button("Send", key="send_button"):
-            if user_input:
-                # Update chat history with user message
-                st.session_state.chat_history.append(("You", user_input))
+            # Show typing animation
+            with st.spinner("Gemini is thinking..."):
+                response = model.start_chat().send_message(user_input)
+                chat_history.append(("Gemini", response.text))
+                st.session_state.chat_history = chat_history
 
-                # Show typing animation and get response
-                with st.spinner("Gemini is thinking..."):
-                    response = model.start_chat().send_message(user_input)
-                    st.session_state.chat_history.append(("Gemini", response.text))
-
-                # Clear the user input
-                st.session_state.chat_input = ""
-
-        if st.button("Clear Chat History"):
-            st.session_state.chat_history = []
+    # Display chat history
+    for sender, message in chat_history:
+        if sender == "You":
+            st.write(f"**🧑‍💻 You:** {message}")
+        else:
+            st.write(f"**🤖 Gemini:** {message}")
 
     # File upload section
     st.subheader("📂 Upload a File and Chat with it")
@@ -120,4 +110,4 @@ else:
                     st.write(f"**Gemini:** {response.text}")
 
     st.markdown("---")
-    st.markdown("Developed with ❤️ by your AI assistant team.")
+    st.markdown("Developed by Dipraz...")
