@@ -110,4 +110,4 @@ else:
                     st.write(f"**Gemini:** {response.text}")
 
     st.markdown("---")
-    st.markdown("Developed with ❤️ by your AI assistant team.")
+    st.markdown("Developed by Dipraz...")
