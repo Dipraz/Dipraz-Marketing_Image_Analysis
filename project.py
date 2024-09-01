@@ -2,9 +2,10 @@ import streamlit as st
 from dotenv import load_dotenv
 import os
 from PIL import Image
-import io
 import google.generativeai as genai
+import tempfile
 import pandas as pd
+import PyPDF2
 
 # Load environment variables from .env file
 load_dotenv()
@@ -13,18 +14,21 @@ load_dotenv()
 api_key = os.getenv('GOOGLE_API_KEY')
 credentials_path = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
 
-# Set the Google application credentials
+# Check if credentials_path is set
 if credentials_path is None:
     st.error("GOOGLE_APPLICATION_CREDENTIALS environment variable not set. Please check your .env file.")
 else:
+    # Set the Google application credentials
     os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = credentials_path
-    genai.configure(api_key=api_key)  # Configure the Generative AI API key
+
+    # Configure the Generative AI API key
+    genai.configure(api_key=api_key)
 
     # Define generation configuration
     generation_config = {
-        "temperature": 0.2,
-        "top_p": 0.8,
-        "top_k": 64,
+        "temperature": 0.5,
+        "top_p": 0.9,
+        "top_k": 40,
         "max_output_tokens": 8192,
         "response_mime_type": "text/plain",
     }
@@ -35,72 +39,84 @@ else:
         generation_config=generation_config,
     )
 
-# Streamlit app layout with styling
-st.set_page_config(page_title="Chat with Gemini (Advanced)", page_icon=":robot_face:")
-st.markdown("""
-<style>
-.chat-container {
-    border: 1px solid #ccc;
-    padding: 10px;
-    border-radius: 5px;
-    max-height: 500px; /* Adjust as needed */
-    overflow-y: auto;
-}
-.user-message {
-    background-color: #e9f5ff;
-    padding: 5px;
-    margin-bottom: 5px;
-    border-radius: 3px;
-    align-self: flex-end;
-}
-.assistant-message {
-    background-color: #f0f0f0;
-    padding: 5px;
-    margin-bottom: 5px;
-    border-radius: 3px;
-    align-self: flex-start;
-}
-</style>
-""", unsafe_allow_html=True)
+    st.title("💬 Interactive AI Chat and File Analysis with Gemini API")
+    st.markdown("""
+        Welcome to the **Gemini AI Chat and File Processor**! 
+        You can chat with our AI, upload files for processing, and enjoy a seamless interaction experience. 🚀
+    """)
 
-st.title("Chat with Gemini (Advanced)")
-user_input = st.text_area("Enter your message or upload a file:", height=100, placeholder="Type your message here...")
-uploaded_file = st.file_uploader("Upload a file (image, PDF, or Excel):", type=["jpg", "jpeg", "png", "pdf", "xlsx"])
+    # Chat section
+    st.subheader("🤖 Chat with Gemini")
+    chat_history = st.session_state.get('chat_history', [])
+    user_input = st.text_input("Ask me anything:", key="chat_input")
+    
+    if st.button("Send", key="send_button"):
+        if user_input:
+            # Update chat history with user message
+            chat_history.append(("You", user_input))
+            st.session_state.chat_history = chat_history
+            
+            # Show typing animation
+            with st.spinner("Gemini is thinking..."):
+                response = model.start_chat().send_message(user_input)
+                chat_history.append(("Gemini", response.text))
+                st.session_state.chat_history = chat_history
 
-def handle_uploaded_file(uploaded_file):
-    if uploaded_file.type.startswith("image/"):
-        image = Image.open(uploaded_file)
-        image = convert_to_rgb(image)
-        image = resize_image(image)
-        return image  # Return the processed image
-
-    elif uploaded_file.type == "application/pdf":
-        from PyPDF2 import PdfReader
-        pdf_reader = PdfReader(uploaded_file)
-        text_content = ""
-        for page in pdf_reader.pages:
-            text_content += page.extract_text() if page.extract_text() else ""
-        return text_content  # Return the extracted text
-
-    elif uploaded_file.type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
-        df = pd.read_excel(uploaded_file)
-        return df.to_csv(index=False)  # Return the CSV converted content
-
-if st.button("Send"):
-    if user_input:
-        response = model.generate_content(user_input)
-        st.session_state.messages.append({"role": "assistant", "content": response.text})
-    elif uploaded_file:
-        file_content = handle_uploaded_file(uploaded_file)
-        if isinstance(file_content, Image.Image):
-            response = model.generate_image(prompt="Visual analysis requested.", image=file_content)
-            st.image(response, caption="Generated Image", use_column_width=True)
+    # Display chat history
+    for sender, message in chat_history:
+        if sender == "You":
+            st.write(f"**🧑‍💻 You:** {message}")
         else:
-            response = model.generate_content(file_content)
-            st.session_state.messages.append({"role": "assistant", "content": response.text})
+            st.write(f"**🤖 Gemini:** {message}")
 
-    st.session_state.messages.append({"role": "user", "content": user_input or "Uploaded a file"})
+    # File upload section
+    st.subheader("📂 Upload a File")
+    uploaded_file = st.file_uploader("Choose a file to upload", type=["png", "jpg", "jpeg", "pdf", "xlsx", "xls"])
 
-    # Display chat history in the app
-    for message in st.session_state.messages:
-        st.markdown(f'<div class="{message["role"]}-message">{message["content"]}</div>', unsafe_allow_html=True)
+    if uploaded_file is not None:
+        file_type = uploaded_file.type
+
+        # Display progress bar
+        progress_bar = st.progress(0)
+
+        if file_type in ["image/png", "image/jpeg"]:
+            progress_bar.progress(30)
+            image = Image.open(uploaded_file)
+            st.image(image, caption='Uploaded Image', use_column_width=True)
+            progress_bar.progress(60)
+
+            with st.spinner("Analyzing image..."):
+                response = model.generate_content(["Describe this image.", image], generation_config=generation_config)
+                st.write(response.text)
+            progress_bar.progress(100)
+
+        elif file_type == "application/pdf":
+            progress_bar.progress(30)
+            pdf_reader = PyPDF2.PdfReader(uploaded_file)
+            text = ""
+            for page in pdf_reader.pages:
+                text += page.extract_text()
+            st.write(text)
+            progress_bar.progress(60)
+
+            with st.spinner("Summarizing PDF content..."):
+                response = model.generate_content(f"Summarize the following content: {text}", generation_config=generation_config)
+                st.write(response.text)
+            progress_bar.progress(100)
+
+        elif file_type in ["application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/vnd.ms-excel"]:
+            progress_bar.progress(30)
+            excel_data = pd.read_excel(uploaded_file)
+            st.write(excel_data)
+            progress_bar.progress(60)
+
+            with st.spinner("Analyzing Excel data..."):
+                response = model.generate_content(f"Analyze the following data: {excel_data.head().to_json()}", generation_config=generation_config)
+                st.write(response.text)
+            progress_bar.progress(100)
+
+        # Reset progress bar after processing
+        progress_bar.empty()
+
+    st.markdown("---")
+    st.markdown("Developed with ❤️ by your AI assistant team.")
