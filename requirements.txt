@@ -11,8 +11,8 @@ pillow
 imageio
 opencv-python-headless
 python-dotenv
-
-
+openpyxl
+python-docx
 # Core Dependencies
 PyPDF2
 langchain
