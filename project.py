@@ -7,6 +7,7 @@ import docx
 import pandas as pd
 import google.generativeai as genai
 import io
+import docx
 
 # Load environment variables from .env file
 load_dotenv()
