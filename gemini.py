@@ -35,7 +35,7 @@ else:
         "top_p": 0.8,
         "top_k": 64,
         "max_output_tokens": 8192,
-        "response_mime_type": "text/plain",
+        "response_mime_type": "application/json",
     }
 
     # Initialize Generative AI model with generation configuration
@@ -1671,7 +1671,111 @@ The Creator: Driven by imagination, innovation, and artistry.
             return None
         except Exception as e:
             st.error(f"Failed to read or process the media: {e}")
+            return None
+        
+    def BMTI_Analysis(uploaded_file, is_image=True):
+        prompt = f"""
+If the content is non-english, translate the content to English. PLease evaluate the content against these personality types in a table with a score for how well each would perceive and respond to the content, from 1-5, in increments of 0.5. Please also include columns for analysis and  recommendations. At the end, please also include an overall summary and overall recommendations.
+
+The Myers-Briggs Type Indicator (MBTI) consists of 16 personality types, each a combination of four dichotomies:
+
+Extraversion (E) vs. Introversion (I): Focus on the outer world vs. the inner world.
+Sensing (S) vs. Intuition (N): Focus on concrete details vs. abstract concepts.
+Thinking (T) vs. Feeling (F): Decision-making based on logic vs. emotions.
+Judging (J) vs. Perceiving (P): Preference for structure vs. spontaneity.
+The 16 MBTI Personality Types
+ISTJ - The Inspector
+
+Introverted, Sensing, Thinking, Judging
+Practical, fact-minded, and responsible.
+ISFJ - The Protector
+
+Introverted, Sensing, Feeling, Judging
+Kind, conscientious, and dedicated to serving others.
+INFJ - The Advocate
+
+Introverted, Intuitive, Feeling, Judging
+Idealistic, insightful, and driven by personal values.
+INTJ - The Architect
+
+Introverted, Intuitive, Thinking, Judging
+Strategic, logical, and determined innovators.
+ISTP - The Virtuoso
+
+Introverted, Sensing, Thinking, Perceiving
+Bold, practical, and skilled at handling tools and situations.
+ISFP - The Adventurer
+
+Introverted, Sensing, Feeling, Perceiving
+Flexible, charming, and live in the moment.
+INFP - The Mediator
+
+Introverted, Intuitive, Feeling, Perceiving
+Idealistic, creative, and driven by core values.
+INTP - The Logician
+
+Introverted, Intuitive, Thinking, Perceiving
+Analytical, curious, and enjoy exploring ideas and concepts.
+ESTP - The Entrepreneur
+
+Extraverted, Sensing, Thinking, Perceiving
+Energetic, spontaneous, and enjoy living on the edge.
+ESFP - The Entertainer
+
+Extraverted, Sensing, Feeling, Perceiving
+Fun-loving, sociable, and love the spotlight.
+ENFP - The Campaigner
+
+Extraverted, Intuitive, Feeling, Perceiving
+Enthusiastic, imaginative, and enjoy exploring possibilities.
+ENTP - The Debater
+
+Extraverted, Intuitive, Thinking, Perceiving
+Quick-witted, innovative, and love intellectual challenges.
+ESTJ - The Executive
+
+Extraverted, Sensing, Thinking, Judging
+Organized, direct, and enjoy taking charge of situations.
+ESFJ - The Consul
+
+Extraverted, Sensing, Feeling, Judging
+Caring, sociable, and value harmony in relationships.
+ENFJ - The Protagonist
+
+Extraverted, Intuitive, Feeling, Judging
+Charismatic, inspiring, and love helping others reach their potential.
+ENTJ - The Commander
+
+Extraverted, Intuitive, Thinking, Judging
+Bold, strategic, and love to lead.
+"""
+        try:
+            if is_image:
+                image = Image.open(io.BytesIO(uploaded_file.read()))
+                response = model.generate_content([prompt, image])
+            else:
+                with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
+                    tmp.write(uploaded_file.read())
+                    tmp_path = tmp.name
+
+                frames = extract_frames(tmp_path)
+                if frames is None or not frames:  # Check if frames were extracted successfully
+                    st.error("No frames were extracted from the video. Please check the video format.")
+                    return None
+
+                response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
+
+            if response.candidates:
+                raw_response = response.candidates[0].content.parts[0].text.strip()
+                st.write("BMTI Analysis Results::")
+                st.markdown(raw_response, unsafe_allow_html=True)  # Assuming the response is in HTML table format
+            else:
+                st.error("Unexpected response structure from the model.")
+            return None
+        except Exception as e:
+            st.error(f"Failed to read or process the media: {e}")
             return None        
+                
         
     def Image_Analysis(uploaded_file, is_image=True):
         prompt = f"""
@@ -2169,6 +2273,7 @@ with st.sidebar:
         linkedin_profile_button = st.button("LinkedIn targeting")
         x_profile_button = st.button("X (formerly Twitter) targeting")
         personality_trait_assessment_button = st.button("Personality Trait Assessment")
+        BMTI_Analysis_button = st.button("BMTI Analysis")
     with tabs[4]:  # Others
         main_headline_text_analysis_button = st.button("Main Headline Text Analysis")
         image_headline_text_analysis_button = st.button("Image Headline Text Analysis")
@@ -2366,6 +2471,12 @@ for uploaded_file in uploaded_files:
                 result = Personality_Trait_Assessment(uploaded_file, is_image)
                 if result:
                     st.write("## Personality Trait Assessment Analysis Results:")
+                    st.markdown(result)
+        elif BMTI_Analysis_button:
+            with st.spinner("Performing BMTI Analysis..."):
+                result = BMTI_Analysis(uploaded_file, is_image)
+                if result:
+                    st.write("## BMTI Analysis Results:")
                     st.markdown(result)                    
         elif Image_Analysis_button:
             with st.spinner("Performing Image Analysis..."):
