@@ -28,7 +28,7 @@ else:
         "temperature": 0.2,
         "top_p": 0.8,
         "top_k": 64,
-        "max_output_tokens": 8192,
+        "max_output_tokens": 2000,
         "response_mime_type": "text/plain",
     }
 
