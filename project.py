@@ -161,4 +161,4 @@ else:
                 st.write(response)
 
         # Add assistant message to chat history
-        st.session_state.messages.append({"role": "assistant", "content": response}")
+        st.session_state.messages.append({"role": "assistant", "content": response})  # Corrected line
