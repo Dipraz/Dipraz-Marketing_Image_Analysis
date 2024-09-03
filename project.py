@@ -60,7 +60,7 @@ def process_uploaded_files(uploaded_files):
         elif file.type in ["image/jpeg", "image/png"]:
             file_texts.append(extract_text_from_image(file))
         else:
-            st.write(f"Unsupported file type: {file.type}")
+            st.warning(f"Unsupported file type: {file.type}")
     return "\n".join(file_texts)
 
 # Check if credentials_path is set
@@ -117,24 +117,31 @@ else:
             return "Error: Could not generate response."
 
     # Title of the app
-    st.title("Chat with Gemini Pro 1.5")
+    st.title("📄 Chat with Gemini Pro 1.5")
+    st.markdown("Welcome to the Gemini Pro 1.5 Chat Interface! You can upload PDFs, Excel files, or images, and start chatting based on their contents.")
 
-    # Clear chat button
-    if st.button("Clear Chat"):
-        clear_chat()
+    # Sidebar for navigation
+    with st.sidebar:
+        st.header("Options")
+        if st.button("Clear Chat"):
+            clear_chat()
+            st.success("Chat history cleared!")
 
     # File uploader widget
+    st.markdown("### Upload Files")
     uploaded_files = st.file_uploader(
-        "Upload files (optional)",
-        type=["txt", "pdf", "jpg", "jpeg", "png", "xls", "xlsx"],
+        "You can upload files here (PDF, Excel, Images).",
+        type=["pdf", "xls", "xlsx", "jpg", "jpeg", "png"],
         accept_multiple_files=True,
     )
 
-    # Store uploaded files in session state
+    # Process files and give feedback
     if uploaded_files:
         st.session_state.uploaded_files.extend(uploaded_files)
+        st.success(f"Successfully uploaded {len(uploaded_files)} file(s).")
 
     # Display chat history
+    st.markdown("### Chat History")
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.write(message["content"])
@@ -154,4 +161,4 @@ else:
                 st.write(response)
 
         # Add assistant message to chat history
-        st.session_state.messages.append({"role": "assistant", "content": response})
+        st.session_state.messages.append({"role": "assistant", "content": response}")
