@@ -73,12 +73,11 @@ else:
     # Configure the Generative AI API key
     genai.configure(api_key=api_key)
 
-    # Define generation configuration
     generation_config = {
-        "temperature": 0.3,  # Adjust as needed
-        "top_p": 0.9,
-        "top_k": 40,
-        "max_output_tokens": 5000,
+        "temperature": 0.6,  # Encourage creativity and diversity in responses
+        "top_p": 0.8,        # Sample from the top 80% most likely tokens, balancing focus and variety
+        "top_k": 40,          # Consider the top 40 tokens at each step
+        "max_output_tokens": 2048, # Limit responses to a reasonable length to maintain interactivity
         "response_mime_type": "text/plain",
     }
 
