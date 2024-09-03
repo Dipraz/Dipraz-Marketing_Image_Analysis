@@ -54,18 +54,22 @@ else:
         if chat_session is None:
             return "Error: Model not initialized."
 
-        # Process uploaded files and include a response for recognized file types
-        file_responses = []
+        # Construct the prompt including uploaded files information
+        file_descriptions = []
         for file in uploaded_files:
             if file.type == "application/pdf":
-                file_responses.append(f"PDF file '{file.name}' is attached. Please provide the file so I can summarize it for you.")
+                file_descriptions.append(f"PDF file '{file.name}' is available for reference.")
+            elif file.type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+                file_descriptions.append(f"Excel file '{file.name}' is available for reference.")
+            elif file.type.startswith("image/"):
+                file_descriptions.append(f"Image file '{file.name}' is available for reference.")
             else:
-                file_responses.append(f"Unrecognized file type '{file.type}' for '{file.name}'.")
+                file_descriptions.append(f"File '{file.name}' of type '{file.type}' is available, but might not be fully supported.")
 
-        # Construct the prompt with chat history and file responses
+        # Construct the full prompt including chat history and file references
         full_prompt = "\n".join(
             [f"User: {message['content']}" for message in st.session_state.messages]
-            + file_responses
+            + file_descriptions
             + [f"User: {prompt}"]
         )
 
@@ -90,7 +94,7 @@ else:
     # File uploader widget
     uploaded_files = st.file_uploader(
         "Upload files (optional)",
-        type=["txt", "pdf", "jpg", "jpeg", "png"],
+        type=["txt", "pdf", "xls", "xlsx", "jpg", "jpeg", "png"],
         accept_multiple_files=True,
     )
 
