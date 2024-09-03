@@ -1,7 +1,7 @@
 import streamlit as st
 import os
 from dotenv import load_dotenv
-from google.generativeai import genai
+import google.generativeai as genai
 from google.api_core.client_options import ClientOptions
 from google.cloud import storage
 import tempfile
