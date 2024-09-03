@@ -2,9 +2,6 @@ import streamlit as st
 import os
 from dotenv import load_dotenv
 import google.generativeai as genai
-from google.api_core.client_options import ClientOptions
-from google.cloud import storage
-import tempfile
 
 # Load environment variables from .env file
 load_dotenv()
@@ -17,6 +14,11 @@ credentials_path = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
 if "messages" not in st.session_state:
     st.session_state["messages"] = []
 if "uploaded_files" not in st.session_state:
+    st.session_state["uploaded_files"] = []
+
+# Function to clear chat history
+def clear_chat():
+    st.session_state["messages"] = []
     st.session_state["uploaded_files"] = []
 
 # Check if credentials_path is set
@@ -34,32 +36,56 @@ else:
         "temperature": 0.5,  # Adjust as needed
         "top_p": 0.9,
         "top_k": 40,
-        "max_output_tokens": 8192, 
+        "max_output_tokens": 8192,
         "response_mime_type": "text/plain",
     }
 
-    # Initialize Generative AI model with generation configuration
-    model = genai.models.GenerativeModel(
-        model_name="gemini-1.5-flash-latest",
-        generation_config=generation_config,
-    )
-
-    # Start a chat session to maintain context
-    chat_session = model.start_chat()
+    # Initialize Generative AI model and chat session
+    try:
+        chat_session = genai.GenerativeModel(
+            model_name="gemini-1.5-flash-latest",
+            generation_config=generation_config,
+        ).start_chat(history=[])
+    except Exception as e:
+        st.error(f"Failed to initialize the Generative AI model: {e}")
+        chat_session = None
 
     def generate_response(prompt, uploaded_files):
-        # Construct the prompt with uploaded files (if any)
-        file_context = "\n".join([f"Uploaded file: {file.name}" for file in uploaded_files])
-        if file_context:
-            prompt = f"{file_context}\nUser: {prompt}"
+        if chat_session is None:
+            return "Error: Model not initialized."
 
-        # Generate response using the chat session
-        response = chat_session.send_message(prompt)
+        # Process uploaded files and include a response for recognized file types
+        file_responses = []
+        for file in uploaded_files:
+            if file.type == "application/pdf":
+                file_responses.append(f"PDF file '{file.name}' is attached. Please provide the file so I can summarize it for you.")
+            else:
+                file_responses.append(f"Unrecognized file type '{file.type}' for '{file.name}'.")
 
-        return response.text
+        # Construct the prompt with chat history and file responses
+        full_prompt = "\n".join(
+            [f"User: {message['content']}" for message in st.session_state.messages]
+            + file_responses
+            + [f"User: {prompt}"]
+        )
+
+        try:
+            # Send message and get response using the chat session
+            response = chat_session.send_message(full_prompt)
+            return response.text
+        except AttributeError as e:
+            st.error(f"An error occurred: {e}")
+            return "Error: Could not generate response."
+        except Exception as e:
+            st.error(f"An unexpected error occurred: {e}")
+            return "Error: Could not generate response."
 
     # Title of the app
     st.title("Chat with Gemini Pro 1.5")
+
+    # Clear chat button
+    if st.button("Clear Chat"):
+        clear_chat()
 
     # File uploader widget
     uploaded_files = st.file_uploader(
