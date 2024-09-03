@@ -1,7 +1,10 @@
 import streamlit as st
 import os
 from dotenv import load_dotenv
-import google.generativeai as genai
+from google.generativeai import genai
+from google.api_core.client_options import ClientOptions
+from google.cloud import storage
+import tempfile
 
 # Load environment variables from .env file
 load_dotenv()
@@ -9,6 +12,12 @@ load_dotenv()
 # Get the API key and credentials file from environment variables
 api_key = os.getenv('GOOGLE_API_KEY')
 credentials_path = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
+
+# Initialize session state variables
+if "messages" not in st.session_state:
+    st.session_state["messages"] = []
+if "uploaded_files" not in st.session_state:
+    st.session_state["uploaded_files"] = []
 
 # Check if credentials_path is set
 if credentials_path is None:
@@ -22,10 +31,10 @@ else:
 
     # Define generation configuration
     generation_config = {
-        "temperature": 0.5,
+        "temperature": 0.5,  # Adjust as needed
         "top_p": 0.9,
         "top_k": 40,
-        "max_output_tokens": 8192,
+        "max_output_tokens": 8192, 
         "response_mime_type": "text/plain",
     }
 
@@ -35,37 +44,51 @@ else:
         generation_config=generation_config,
     )
 
-    # Initialize chat history and documents in session state
-    if "chat_history" not in st.session_state:
-        st.session_state.chat_history = []
-    if "documents" not in st.session_state:
-        st.session_state.documents = []
+    def generate_response(prompt, uploaded_files):
+        # Construct the prompt with chat history and uploaded files
+        full_prompt = "\n".join(
+            [f"User: {message['content']}" for message in st.session_state.messages]
+            + [f"Uploaded file: {file.name}" for file in uploaded_files]
+            + [f"User: {prompt}"]
+        )
 
+        # Generate response using the model
+        response = model.generate_text(full_prompt)
+
+        return response.text
+
+    # Title of the app
     st.title("Chat with Gemini Pro 1.5")
 
-    # User input
-    user_input = st.text_input("You:", "")
+    # File uploader widget
+    uploaded_files = st.file_uploader(
+        "Upload files (optional)",
+        type=["txt", "pdf", "jpg", "jpeg", "png"],
+        accept_multiple_files=True,
+    )
 
-    # Document upload
-    uploaded_file = st.file_uploader("Upload a document (optional)", type=["txt", "pdf"])
-    if uploaded_file is not None:
-        # Process the uploaded file and add its content to the documents list
-        # You'll need to implement the file processing logic based on the file type
-        # For example, you could use libraries like PyPDF2 for PDF processing or simply read the text from a .txt file
-        st.session_state.documents.append(uploaded_file.read())
-
-    # Generate response
-    if st.button("Send") and user_input:
-        # Construct the prompt with chat history and documents
-        prompt = "\n".join(st.session_state.chat_history + st.session_state.documents) + "\nUser: " + user_input
-
-        # Generate response from Gemini Pro
-        response = model.generate_text(prompt)
-
-        # Add user input and response to chat history
-        st.session_state.chat_history.append("User: " + user_input)
-        st.session_state.chat_history.append("Gemini: " + response.text)
+    # Store uploaded files in session state
+    if uploaded_files:
+        st.session_state.uploaded_files.extend(uploaded_files)
 
     # Display chat history
-    for message in st.session_state.chat_history:
-        st.write(message)
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"]):
+            st.write(message["content"])
+
+    # User input
+    if prompt := st.chat_input("Your message"):
+        # Add user message to chat history
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        # Display user message in chat
+        with st.chat_message("user"):
+            st.write(prompt)
+
+        # Generate response
+        with st.chat_message("assistant"):
+            with st.spinner("Thinking..."):
+                response = generate_response(prompt, st.session_state.uploaded_files)
+                st.write(response)
+
+        # Add assistant message to chat history
+        st.session_state.messages.append({"role": "assistant", "content": response})
