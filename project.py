@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 import google.generativeai as genai
 from PyPDF2 import PdfReader
 import pandas as pd
-import easyocr
+import pytesseract
 from PIL import Image
 
 # Load environment variables from .env file
@@ -39,14 +39,10 @@ def extract_text_from_excel(file):
     text = df.to_string(index=False)
     return text
 
-# Initialize the easyocr reader
-reader = easyocr.Reader(['en'])  # Specify the language(s) you want to support
-
-# Function to extract text from image files using easyocr
+# Function to extract text from image files
 def extract_text_from_image(file):
     image = Image.open(file)
-    result = reader.readtext(image)
-    text = " ".join([res[1] for res in result])  # Concatenate detected text
+    text = pytesseract.image_to_string(image)
     return text
 
 # Function to process uploaded files
