@@ -18,9 +18,7 @@ PyPDF2
 langchain
 langchain-google-genai
 google-generativeai
-
+pytesseract
 # Vector Store
 faiss-cpu  # or faiss-gpu if you have access to GPU on Hugging Face
 
-# Additional (Recommended)
-langchain_community  # For broader vector store options, if needed
