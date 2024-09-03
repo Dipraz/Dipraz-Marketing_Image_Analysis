@@ -2,6 +2,10 @@ import streamlit as st
 import os
 from dotenv import load_dotenv
 import google.generativeai as genai
+from PyPDF2 import PdfReader
+import pandas as pd
+import pytesseract
+from PIL import Image
 
 # Load environment variables from .env file
 load_dotenv()
@@ -20,6 +24,40 @@ if "uploaded_files" not in st.session_state:
 def clear_chat():
     st.session_state["messages"] = []
     st.session_state["uploaded_files"] = []
+
+# Function to extract text from PDF files
+def extract_text_from_pdf(file):
+    pdf_reader = PdfReader(file)
+    text = ""
+    for page in pdf_reader.pages:
+        text += page.extract_text()
+    return text
+
+# Function to extract text from Excel files
+def extract_text_from_excel(file):
+    df = pd.read_excel(file)
+    text = df.to_string(index=False)
+    return text
+
+# Function to extract text from image files
+def extract_text_from_image(file):
+    image = Image.open(file)
+    text = pytesseract.image_to_string(image)
+    return text
+
+# Function to process uploaded files
+def process_uploaded_files(uploaded_files):
+    file_texts = []
+    for file in uploaded_files:
+        if file.type == "application/pdf":
+            file_texts.append(extract_text_from_pdf(file))
+        elif file.type in ["application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"]:
+            file_texts.append(extract_text_from_excel(file))
+        elif file.type in ["image/jpeg", "image/png"]:
+            file_texts.append(extract_text_from_image(file))
+        else:
+            st.write(f"Unsupported file type: {file.type}")
+    return "\n".join(file_texts)
 
 # Check if credentials_path is set
 if credentials_path is None:
@@ -54,22 +92,13 @@ else:
         if chat_session is None:
             return "Error: Model not initialized."
 
-        # Construct the prompt including uploaded files information
-        file_descriptions = []
-        for file in uploaded_files:
-            if file.type == "application/pdf":
-                file_descriptions.append(f"PDF file '{file.name}' is available for reference.")
-            elif file.type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
-                file_descriptions.append(f"Excel file '{file.name}' is available for reference.")
-            elif file.type.startswith("image/"):
-                file_descriptions.append(f"Image file '{file.name}' is available for reference.")
-            else:
-                file_descriptions.append(f"File '{file.name}' of type '{file.type}' is available, but might not be fully supported.")
+        # Extract text from the uploaded files
+        file_contents = process_uploaded_files(uploaded_files)
 
-        # Construct the full prompt including chat history and file references
+        # Construct the prompt with chat history and file content
         full_prompt = "\n".join(
             [f"User: {message['content']}" for message in st.session_state.messages]
-            + file_descriptions
+            + [f"Content from uploaded files:\n{file_contents}"]  # Include file contents in the prompt
             + [f"User: {prompt}"]
         )
 
@@ -94,7 +123,7 @@ else:
     # File uploader widget
     uploaded_files = st.file_uploader(
         "Upload files (optional)",
-        type=["txt", "pdf", "xls", "xlsx", "jpg", "jpeg", "png"],
+        type=["txt", "pdf", "jpg", "jpeg", "png", "xls", "xlsx"],
         accept_multiple_files=True,
     )
 
