@@ -20,6 +20,7 @@ langchain-google-genai
 google-generativeai
 pytesseract
 tesseract
+easyocr
 # Vector Store
 faiss-cpu  # or faiss-gpu if you have access to GPU on Hugging Face
 
