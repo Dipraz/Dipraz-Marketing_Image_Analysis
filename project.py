@@ -6,7 +6,9 @@ from PyPDF2 import PdfReader
 import pandas as pd
 import pytesseract
 from PIL import Image
-from pytesseract import pytesseract
+
+# Set the path to the Tesseract executable
+pytesseract.pytesseract.tesseract_cmd = '/path/to/tesseract'
 
 # Load environment variables from .env file
 load_dotenv()
