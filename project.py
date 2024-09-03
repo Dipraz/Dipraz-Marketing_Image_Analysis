@@ -45,6 +45,10 @@ else:
     )
 
     def generate_response(prompt, uploaded_files):
+        
+        response = model.generate(full_prompt)  # Change here
+
+        return response.text         
         # Construct the prompt with chat history and uploaded files
         full_prompt = "\n".join(
             [f"User: {message['content']}" for message in st.session_state.messages]
@@ -63,7 +67,7 @@ else:
     # File uploader widget
     uploaded_files = st.file_uploader(
         "Upload files (optional)",
-        type=["txt", "pdf", "jpg", "jpeg", "png"],
+        type=["png", "jpg", "jpeg", "pdf", "xlsx", "xls"],
         accept_multiple_files=True,
     )
 
