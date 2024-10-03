@@ -2184,6 +2184,88 @@ Is there a clear connection between the subject and the intended message?
         except Exception as e:
             st.error(f"Failed to read or process the media: {e}")
             return None
+    def motivation(uploaded_file, is_image=True):
+        prompt = """
+When evaluating whether a piece of content would motivate someone to act or make a purchase based on Self-Determination Theory (SDT), the focus should be on how the content satisfies the audience's psychological needs for autonomy, competence, and relatedness. These needs are crucial drivers of intrinsic motivation, which can lead to more genuine and lasting engagement, including purchasing behavior.
+
+
+For each aspect listed below, provide a score from 1 to 5 in increments of 0.5 (1 being low, 5 being high) and an explanation for each aspect, along with suggestions for improvement. The results should be presented in a table format with the columns: Aspect, Score, Explanation, Improvement. After the table, provide a concise explanation with suggestions for overall improvement. Here are the aspects to consider:
+
+Autonomy (The need to feel in control and have choices)
+Does the content provide the audience with a sense of choice or control in their decision-making process?
+
+Does the content allow the consumer to feel that they are making their own decision, rather than being pressured?
+Are there options or customizable features presented that emphasize personal control over the purchase?
+How well does the content empower the audience to make an informed decision?
+
+Is the content transparent, providing clear, unbiased information that helps the consumer feel confident in making their own choice?
+Does it respect the audience’s intelligence and autonomy by avoiding manipulative language or fear-based tactics?
+Does the content acknowledge the audience’s unique preferences and needs?
+
+Is the messaging personalized, recognizing the individual’s preferences, lifestyle, or circumstances, so they feel that their choice aligns with their own values?
+Competence (The need to feel effective and capable)
+Does the content make the audience feel capable of successfully using the product or service?
+
+Is the product or service presented in a way that highlights how easy it is to use or implement, thus reducing potential feelings of inadequacy or uncertainty?
+Are benefits and usage instructions clearly explained, helping the audience feel confident in their ability to derive value from the purchase?
+Does the content help the audience understand how the product can improve their life or solve their problem?
+
+Is it clear how the product enhances the consumer’s skills, knowledge, or capabilities, making them feel more competent or accomplished?
+Does the content showcase success stories or examples that demonstrate the audience’s potential for success with the product?
+
+Are there testimonials, case studies, or examples that show how others (similar to the target audience) have successfully used the product, enhancing the feeling of "I can do this too"?
+Relatedness (The need to feel connected to others or a community)
+Does the content create a sense of belonging or connection to a community?
+
+Does the content emphasize social proof, like reviews or user-generated content, making the audience feel that they are part of a group of satisfied customers?
+Is there a sense of alignment with a community or cause, where purchasing the product helps the audience feel connected to others who share similar values or interests?
+How well does the content build emotional resonance and human connection?
+
+Does the content evoke feelings of trust, warmth, or empathy that make the audience feel emotionally connected to the brand, product, or other users?
+Is the brand portrayed as approachable and supportive, fostering a relationship rather than a transactional interaction?
+Does the content align with the audience’s values, helping them feel understood and connected to a larger purpose?
+
+Does the messaging reflect the values, desires, or social identity of the audience, making them feel that the purchase is aligned with their personal goals or societal causes?
+General SDT-Aligned Questions for Content Assessment
+Does the content create a balance between external incentives (promotions, discounts) and intrinsic motivation (personal values, empowerment) to make the purchase?
+
+Does it avoid over-relying on extrinsic motivators (e.g., discounts, fear of missing out) in favor of encouraging personal satisfaction and long-term benefits?
+How well does the content foster a sense of long-term value rather than pushing for an immediate transaction?
+
+Is the audience encouraged to consider how the product will satisfy deeper, more lasting needs (autonomy, competence, relatedness) rather than just surface-level wants?
+Does the content help the audience see how the purchase will improve their life in a meaningful way?
+
+Does it connect the product to the audience’s internal motivations, such as self-improvement, connection to others, or greater self-sufficiency?
+By asking these questions, you can determine if the content appeals to intrinsic motivations, which are more likely to lead to sustainable customer engagement and purchasing decisions, in line with Self-Determination Theory.
+
+At the end of the table, please add a summary "Motivational Score" which is based on 50% of the Autonomy Score, 30% of the Competence Score and 20% of the Relatedness Score.
+        """
+        try:
+            if is_image:
+                image = Image.open(io.BytesIO(uploaded_file.read()))
+                response = model.generate_content([prompt, image])
+            else:
+                with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp:
+                    tmp.write(uploaded_file.read())
+                    tmp_path = tmp.name
+
+                frames = extract_frames(tmp_path)
+                if frames is None or not frames:  # Check if frames were extracted successfully
+                    st.error("No frames were extracted from the video. Please check the video format.")
+                    return None
+
+                response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
+
+            if response.candidates:
+                raw_response = response.candidates[0].content.parts[0].text.strip()
+                st.write("Motivation Results:")
+                st.markdown(raw_response, unsafe_allow_html=True)  # Assuming the response is in HTML table format
+            else:
+                st.error("Unexpected response structure from the model.")
+            return None
+        except Exception as e:
+            st.error(f"Failed to read or process the media: {e}")
+            return None        
     def custom_prompt_analysis(uploaded_file, custom_prompt, is_image=True):
         """Analyzes an image or video using a custom prompt."""
 
@@ -2244,6 +2326,7 @@ with st.sidebar:
     # Analysis buttons within each tab
     with tabs[0]:  # Basic
         basic_analysis = st.button("Basic Analysis")
+        motivation_button = st.button("Motivation")
         flash_analysis_button = st.button("Flash Analysis")
         emotional_resonance_button=st.button("Emotional Resonance")
         emotional_analysis_button=st.button("Emotional Analysis")
@@ -2356,6 +2439,12 @@ for uploaded_file in uploaded_files:
                 result = overall_analysis(uploaded_file, is_image)
                 if result:
                     st.write("## Overall Marketing Analysis Results:")
+                    st.markdown(result)
+        elif motivation_button:
+            with st.spinner("Performing Motivation Analysis..."):
+                result = motivation(uploaded_file, is_image)
+                if result:
+                    st.write("## Motivation Analysis Results:")
                     st.markdown(result)
         elif Story_Telling_Analysis_button:
             with st.spinner("Performing Story Telling Analysis..."):
