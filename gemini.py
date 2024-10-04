@@ -745,16 +745,16 @@ Evaluate the extracted text based on the following criteria. For each aspect, pr
 
                 response = model.generate_content([prompt, frames[0]])  # Using the first frame for analysis
 
-            if response.candidates:
+            if response.candidates and response.candidates[0].content.parts:
                 raw_response = response.candidates[0].content.parts[0].text.strip()
                 st.write("Text Analysis Results:")
                 st.markdown(raw_response, unsafe_allow_html=True)  # Assuming the response is in HTML table format
             else:
-                st.error("Unexpected response structure from the model.")
+                st.error("No candidates returned from the model or the response structure is unexpected.")
             return None
         except Exception as e:
-            st.error(f"Failed to read or process the media: {e}")
-            return None
+            st.error(f"Failed to read or process the media. Error details: {e}")
+            st.error(f"Response from model: {response}")  # Log the response from the model if possible
     def Text_Analysis_2(uploaded_file, is_image=True):
         prompt = """
 If the content is non-english, translate the content to English. PLease evaluate the image against these principles:
