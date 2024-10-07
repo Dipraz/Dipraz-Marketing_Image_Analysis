@@ -5,6 +5,7 @@ from vertexai.generative_models import GenerativeModel, Part
 from PIL import Image
 import time
 import numpy as np
+import json
 import tempfile
 import os
 import traceback
