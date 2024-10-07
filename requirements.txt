@@ -7,7 +7,6 @@ google-auth-httplib2
 numpy
 pandas
 google-generativeai
-pillow
 imageio
 opencv-python-headless
 python-dotenv
@@ -23,4 +22,8 @@ tesseract
 easyocr
 # Vector Store
 faiss-cpu  # or faiss-gpu if you have access to GPU on Hugging Face
+vertexai
+Pillow
+opencv-python
+
 
