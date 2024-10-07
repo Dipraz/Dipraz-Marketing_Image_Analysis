@@ -24,6 +24,5 @@ easyocr
 faiss-cpu  # or faiss-gpu if you have access to GPU on Hugging Face
 vertexai
 Pillow
-opencv-python
 
 
