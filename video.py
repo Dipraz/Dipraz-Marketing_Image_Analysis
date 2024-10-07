@@ -6,9 +6,19 @@ from PIL import Image
 import time
 import numpy as np
 import tempfile
+import os
+import traceback
 
 # Initialize Vertex AI
 vertexai.init(project="gen-lang-client-0842062665", location="us-central1")
+
+# Load credentials from Streamlit secrets
+credentials_path = "/tmp/gcp_credentials.json"
+with open(credentials_path, "w") as f:
+    f.write(st.secrets["gcp"]["private_key"])
+
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = credentials_path
+vertexai.init(project=st.secrets["gcp"]["project_id"], location="us-central1")
 
 # Streamlit UI Setup
 def main():
@@ -119,7 +129,10 @@ def analyze_video(uploaded_video, prompt, temperature, top_p, max_tokens):
                 st.success("Analysis saved as analysis_output.txt")
 
     except Exception as e:
-        st.error(f"An error occurred: {e}")
+        st.error(f"An error occurred: {str(e)}")
+        st.error("Detailed traceback:")
+        st.text(traceback.format_exc())
+
 
 if __name__ == "__main__":
     main()
