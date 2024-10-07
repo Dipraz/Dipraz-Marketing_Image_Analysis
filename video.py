@@ -50,17 +50,25 @@ def main():
     # Upload video
     uploaded_video = st.file_uploader("📤 Upload a video", type=["mp4", "mov", "avi", "mkv", "flv", "webm", "wmv", "ogg"], help="Upload a video file for analysis")
     user_prompt = st.text_area("📝 Enter your prompt for the video analysis:", help="Provide context or a question for analyzing the video content")
+    
     # Button to submit the prompt
     submit_prompt = st.button("Submit Prompt")
+    
     if uploaded_video:
         # Display the first frame of the uploaded video for user confirmation
         st.video(uploaded_video, start_time=0)
         st.write("Preview the video to ensure you uploaded the correct one.")
-
+    
+        # Button to analyze the video
         if st.button("🚀 Analyze Video"):
-            analyze_video(uploaded_video, user_prompt, temperature, top_p, max_tokens)
-        if submit_prompt and user_prompt.strip():
-            analyze_video(uploaded_video, user_prompt, temperature, top_p, max_tokens)
+            if user_prompt.strip():
+                analyze_video(uploaded_video, user_prompt, temperature, top_p, max_tokens)
+            else:
+                st.warning("Please enter a prompt before analyzing the video.")
+    
+    if submit_prompt and user_prompt.strip():
+        st.success("Prompt submitted successfully! Now you can analyze the video.")
+
     # Display example video
     st.sidebar.markdown("---")
     st.sidebar.header("Example Video")
