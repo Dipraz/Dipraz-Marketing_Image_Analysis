@@ -5,7 +5,6 @@ from vertexai.generative_models import GenerativeModel, Part
 from PIL import Image
 import time
 import numpy as np
-import cv2
 import tempfile
 
 # Initialize Vertex AI
