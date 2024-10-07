@@ -9,15 +9,27 @@ import tempfile
 import os
 import traceback
 
-# Initialize Vertex AI
-vertexai.init(project="gen-lang-client-0842062665", location="us-central1")
-
-# Load credentials from Streamlit secrets
+# Load credentials from Streamlit secrets and write to a file
 credentials_path = "/tmp/gcp_credentials.json"
-with open(credentials_path, "w") as f:
-    f.write(st.secrets["gcp"]["private_key"])
 
+with open(credentials_path, "w") as f:
+    json.dump({
+        "type": st.secrets["gcp"]["type"],
+        "project_id": st.secrets["gcp"]["project_id"],
+        "private_key_id": st.secrets["gcp"]["private_key_id"],
+        "private_key": st.secrets["gcp"]["private_key"],
+        "client_email": st.secrets["gcp"]["client_email"],
+        "client_id": st.secrets["gcp"]["client_id"],
+        "auth_uri": st.secrets["gcp"]["auth_uri"],
+        "token_uri": st.secrets["gcp"]["token_uri"],
+        "auth_provider_x509_cert_url": st.secrets["gcp"]["auth_provider_x509_cert_url"],
+        "client_x509_cert_url": st.secrets["gcp"]["client_x509_cert_url"]
+    }, f)
+
+# Set the environment variable for Google Application Credentials
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = credentials_path
+
+# Initialize Vertex AI with the provided credentials
 vertexai.init(project=st.secrets["gcp"]["project_id"], location="us-central1")
 
 # Streamlit UI Setup
