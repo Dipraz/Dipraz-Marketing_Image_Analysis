@@ -108,7 +108,7 @@ def analyze_video(uploaded_video, prompt, temperature, top_p, max_tokens):
         }
 
         safety_settings = []
-        model = GenerativeModel("gemini-1.5-pro-002")
+        model = GenerativeModel("gemini-1.5-flash-002")
 
         # Generate video analysis using the model
         start_time = time.time()
