@@ -2397,7 +2397,7 @@ for uploaded_file in uploaded_files:
                 result = analyze_media(uploaded_file, is_image)
                 if result:
                     st.write("## Basic Analysis Results:")
-                    display_and_download(result, "basic_analysis")
+                    st.markdown(result, unsafe_allow_html=True)
         if emotional_resonance_button:
             with st.spinner("Performing Emotional Resonance Analysis..."):
                 result = emotional_resonance(uploaded_file, is_image)
