@@ -33,14 +33,13 @@ else:
     generation_config = {
         "temperature": 0.2,
         "top_p": 0.8,
-        "top_k": 64,
         "max_output_tokens": 8192,
         "response_mime_type": "text/plain",
     }
 
     # Initialize Generative AI model with generation configuration
     model = genai.GenerativeModel(
-        model_name="gemini-1.5-flash-latest",
+        model_name="gemini-1.5-flash-002",
         generation_config=generation_config,
     )
 
