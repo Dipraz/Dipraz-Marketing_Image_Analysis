@@ -31,10 +31,11 @@ else:
 
     # Define generation configuration
     generation_config = {
-        "temperature": 0.2,
-        "top_p": 0.8,
-        "max_output_tokens": 8192,
-        "response_mime_type": "text/plain",
+      "temperature": 0.7,
+      "top_p": 0.95,
+      "top_k": 64,
+      "max_output_tokens": 65536,
+      "response_mime_type": "text/plain",
     }
 
     # Initialize Generative AI model with generation configuration
