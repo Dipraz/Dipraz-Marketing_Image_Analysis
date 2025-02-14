@@ -39,7 +39,7 @@ else:
 
     # Initialize Generative AI model with generation configuration
     model = genai.GenerativeModel(
-        model_name="gemini-1.5-flash-002",
+        model_name="gemini-1.5-flash",
         generation_config=generation_config,
     )
 
