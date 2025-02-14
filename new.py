@@ -2634,7 +2634,7 @@ def compare_all_images(images, filenames, model, custom_prompt=None):
         return None
 
 # Initialize the Streamlit app
-st.title("Marketing Image Comparison AI Assistant")
+st.title("Marketing Image Comparison AI Assistant with Gemini-2.0-flash")
 
 # File Uploader for Multiple Images
 uploaded_files = st.file_uploader(
