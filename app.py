@@ -31,7 +31,7 @@ else:
 
     # Define generation configuration
     generation_config = {
-      "temperature": 0.7,
+      "temperature": 0.1,
       "top_p": 0.95,
       "top_k": 64,
       "max_output_tokens": 65536,
