@@ -2316,7 +2316,7 @@ At the end of the table, please add a summary "Motivational Score" which is base
             st.error(f"An error occurred while processing the media: {e}")
         return None  # Return None to signal an error occurred
 # --- Streamlit App ---
-st.title("Media Analysis AI Assistant with Gemini-2.0-Flash")
+st.title("Media Analysis AI Assistant with gemini-2.0-flash-thinking-exp-01-21")
 
 # --- Sidebar ---
 with st.sidebar:
