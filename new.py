@@ -363,7 +363,7 @@ Present your analysis in a table format as described below. After the table, pro
 
 **Summary of Recommendations:**
 
-[Provide a concise summary paragraph highlighting the key areas for overall improvement based on your table evaluations to enhance the image's storytelling effectiveness.]
+[Provide a concise summary highlighting the key areas for overall improvement based on your table evaluations to enhance the image's storytelling effectiveness.]
 """
         try:
             if is_image:
