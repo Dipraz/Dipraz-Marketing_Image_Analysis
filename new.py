@@ -297,55 +297,74 @@ After the table, provide a concise paragraph with **Overall Improvement Suggesti
 
     def Story_Telling_Analysis(uploaded_file, is_image=True):
         prompt = """
-Storytelling has a significant impact on creative, enriching the content and enhancing its effectiveness in various ways. Here are some key impacts of storytelling on static creative:
+Storytelling significantly impacts creative content, enriching it and enhancing its effectiveness. Evaluate the provided image based on the following **7 Storytelling Principles** in static creative.
 
-1. Emotional Engagement
-Impact: Storytelling evokes emotions, making the content more relatable and memorable.
-Explanation: A well-crafted story can connect with the audience on an emotional level, fostering empathy, joy, sadness, or excitement. This emotional engagement makes the static creative more impactful.
-Example: An image of a family enjoying a product can tell a story of togetherness and happiness, evoking positive emotions in the viewer.
-2. Attention and Interest
-Impact: Stories capture and hold the audience's attention.
-Explanation: Humans are naturally drawn to stories. Incorporating a narrative element in static creative can intrigue viewers, encouraging them to spend more time engaging with the content.
-Example: A before-and-after image showing the transformation of a product's user tells a story of change and improvement, keeping the viewer interested.
-3. Memorability
-Impact: Stories enhance recall and retention.
-Explanation: Information presented within a story is easier to remember than standalone facts. Storytelling makes the content more memorable, ensuring that the audience retains the message.
-Example: An image series depicting the journey of a product from creation to customer use embeds the brand story in the viewer's mind.
-4. Brand Identity and Values
-Impact: Storytelling conveys brand identity and values.
-Explanation: Through stories, brands can express their mission, vision, and core values, building a strong identity. This helps in differentiating the brand from competitors and building loyalty.
-Example: A static ad featuring a company’s founders working passionately on their first product conveys values of dedication and authenticity.
-5. Simplification of Complex Messages
-Impact: Stories simplify complex messages.
-Explanation: Complex information can be conveyed more easily and understandably through storytelling. This makes the content more accessible and engaging for the audience.
-Example: A static infographic that tells a story about the impact of climate change through visuals and short narratives simplifies a complex issue.
-6. Connection and Trust
-Impact: Stories build a connection and trust with the audience.
-Explanation: Authentic stories foster trust and build a connection with the audience. When viewers relate to the story, they are more likely to trust the brand and its message.
-Example: An image featuring testimonials from real customers sharing their success stories with the product builds credibility and trust.
-7. Call to Action (CTA) Effectiveness
-Impact: Storytelling enhances the effectiveness of CTAs.
-Explanation: When a story is compelling, viewers are more likely to respond to the call to action. The narrative creates a context that makes the CTA more appealing and urgent.
-Example: A static creative that tells a story of someone achieving their goals with the help of a product, followed by a CTA to “Join the success,” is more persuasive.
-Practical Applications of Storytelling in Static Creative:
-Visual Storytelling: Use images that depict a sequence or a moment that implies a broader story.
+**For each principle, you will provide:**
+* **A Score (1-5):** In increments of 0.5, where 1 is low and 5 is high.
+* **An Evaluation:** A concise explanation of how the image performs against the principle.
+* **Improvement Suggestions:** Specific, actionable suggestions to enhance the image based on the principle.
 
-Example: An image of a person holding a graduation certificate can imply the story of hard work, achievement, and success.
-Textual Elements: Incorporate short, compelling copy that suggests a narrative.
+Present your analysis in a table format as described below. After the table, provide a summary of your overall recommendations.
 
-Example: A tagline like “From our family to yours” paired with a family photo tells a story of care and tradition.
-Contextual Backgrounds: Use backgrounds and settings that imply a story.
+---
 
-Example: A product placed in a home setting can imply how it fits into daily life, telling a story of convenience and comfort.
-Character and Journey: Introduce characters and show their journey.
+**7 Storytelling Principles for Evaluation:**
 
-Example: A static ad featuring a character's journey from a problem to a solution using the product.
-User-Generated Content: Share stories from actual customers.
+**1. Emotional Engagement:**
+    * **Impact:** Evokes emotions, making content relatable and memorable.
+    * **Explanation:** Connects with the audience emotionally (empathy, joy, sadness, excitement), increasing impact.
+    * **Example:** Family enjoying a product = togetherness, happiness.
 
-Example: Customer photos with quotes about their experiences tell authentic stories that resonate with new customers.
+**2. Attention and Interest:**
+    * **Impact:** Captures and holds audience attention.
+    * **Explanation:** Narrative element intrigues viewers, increasing engagement time.
+    * **Example:** Before-and-after product transformation = change, improvement, interest.
 
-Evaluate the content using the 7 principles above. Score each element from 1-5, in increments of o.5. Please provide the information in a table, with: element, Score , evaluation, How it could be improved. at the end, please provide a summary of your recommendations.
-        """
+**3. Memorability:**
+    * **Impact:** Enhances recall and retention.
+    * **Explanation:** Information in stories is easier to remember than standalone facts.
+    * **Example:** Image series of product journey = brand story embedded.
+
+**4. Brand Identity and Values:**
+    * **Impact:** Conveys brand identity and values.
+    * **Explanation:** Stories express mission, vision, core values, differentiating brand and building loyalty.
+    * **Example:** Founders working passionately = dedication, authenticity.
+
+**5. Simplification of Complex Messages:**
+    * **Impact:** Simplifies complex messages.
+    * **Explanation:** Complex information becomes understandable through storytelling.
+    * **Example:** Infographic story on climate change impact = simplified complex issue.
+
+**6. Connection and Trust:**
+    * **Impact:** Builds connection and trust.
+    * **Explanation:** Authentic stories foster trust and connection; relatable stories increase brand trust.
+    * **Example:** Customer testimonials = credibility, trust.
+
+**7. Call to Action (CTA) Effectiveness:**
+    * **Impact:** Enhances CTA effectiveness.
+    * **Explanation:** Compelling stories make CTAs more appealing and urgent within the narrative context.
+    * **Example:** Story of goal achievement with product + "Join the success" CTA = persuasive.
+
+---
+
+**Response Table Format:**
+
+| Element                  | Score (1-5) | Evaluation                                          | How it could be improved                                  |
+|--------------------------|-------------|------------------------------------------------------|----------------------------------------------------------|
+| Emotional Engagement     |             | [Your evaluation for Emotional Engagement]          | [Your improvement suggestions for Emotional Engagement] |
+| Attention and Interest   |             | [Your evaluation for Attention and Interest]        | [Your improvement suggestions for Attention and Interest] |
+| Memorability             |             | [Your evaluation for Memorability]                  | [Your improvement suggestions for Memorability]         |
+| Brand Identity & Values  |             | [Your evaluation for Brand Identity & Values]       | [Your improvement suggestions for Brand Identity & Values]|
+| Simplification           |             | [Your evaluation for Simplification]                | [Your improvement suggestions for Simplification]       |
+| Connection and Trust     |             | [Your evaluation for Connection and Trust]          | [Your improvement suggestions for Connection and Trust] |
+| CTA Effectiveness        |             | [Your evaluation for CTA Effectiveness]             | [Your improvement suggestions for CTA Effectiveness]    |
+
+---
+
+**Summary of Recommendations:**
+
+[Provide a concise summary paragraph highlighting the key areas for overall improvement based on your table evaluations to enhance the image's storytelling effectiveness.]
+"""
         try:
             if is_image:
                 image = Image.open(io.BytesIO(uploaded_file.read()))
