@@ -267,7 +267,6 @@ After the table, provide a concise paragraph with **Overall Improvement Suggesti
 **Overall Improvement Suggestions:**
 
 [Concise paragraph summarizing the key areas for overall improvement and offering strategic suggestions to enhance the marketing asset's effectiveness.]
-"""
         """
         try:
             if is_image:
