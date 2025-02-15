@@ -458,56 +458,76 @@ After the table, provide a summary of overall recommendations and suggestions fo
                 return None
     def emotional_analysis(uploaded_file, is_image=True):
             prompt = """
-Using the following list of emotional resonance responses, assess whether the marketing content does or does not apply each. present the information in a table with columns: Name, Applies (None, some, A Lot), Definition, how it is applied, how it could be implemented. These are the principles to assess:
+Using the following list of emotional resonance principles, assess whether the marketing content applies each principle. Present your findings in a table with the columns: Name, Applies (None, Some, A Lot), Definition, How It Is Applied, How It Could Be Implemented.
 
+Emotional Resonance Principles to Assess:
 
-Here are different types of emotional resonance that can be leveraged in marketing to create a strong connection with the audience:
+Empathy
 
-1. Empathy
 Definition: The ability to understand and share the feelings of others.
-Application: Crafting messages that show understanding of the audience's challenges and emotions.
-2. Joy
+Application: Craft messages that show an understanding of the audience's challenges and emotions.
+Joy
+
 Definition: A feeling of great pleasure and happiness.
-Application: Creating content that makes the audience feel happy, excited, or entertained.
-3. Surprise
+Application: Create content that makes the audience feel happy, excited, or entertained.
+Surprise
+
 Definition: A feeling of astonishment or shock caused by something unexpected.
-Application: Using unexpected elements in marketing to capture attention and engage the audience.
-4. Trust
+Application: Use unexpected elements in marketing to capture attention and engage the audience.
+Trust
+
 Definition: Confidence in the honesty, integrity, and reliability of someone or something.
-Application: Building trust through transparent communication, endorsements, and reliable information.
-5. Fear
+Application: Build trust through transparent communication, endorsements, and reliable information.
+Fear
+
 Definition: An unpleasant emotion caused by the belief that someone or something is dangerous.
-Application: Highlighting potential risks or losses to motivate the audience to take action.
-6. Sadness
+Application: Highlight potential risks or losses to motivate the audience to take action.
+Sadness
+
 Definition: A feeling of sorrow or unhappiness.
-Application: Using stories or scenarios that evoke sympathy and compassion to drive support for a cause or product.
-7. Anger
+Application: Use stories or scenarios that evoke sympathy and compassion to drive support for a cause or product.
+Anger
+
 Definition: A strong feeling of displeasure or hostility.
-Application: Addressing injustices or problems that provoke a sense of outrage, motivating the audience to seek solutions.
-8. Anticipation
+Application: Address injustices or problems that provoke a sense of outrage, motivating the audience to seek solutions.
+Anticipation
+
 Definition: Excitement or anxiety about a future event.
-Application: Creating a sense of excitement and eagerness for upcoming products, events, or announcements.
-9. Disgust
+Application: Create a sense of excitement and eagerness for upcoming products, events, or announcements.
+Disgust
+
 Definition: A strong feeling of aversion or repulsion.
-Application: Highlighting negative aspects of a competing product or undesirable conditions to steer the audience towards a better alternative.
-10. Relief
+Application: Highlight negative aspects of a competing product or undesirable conditions to steer the audience toward a better alternative.
+Relief
+
 Definition: A feeling of reassurance and relaxation following release from anxiety or distress.
-Application: Positioning a product or service as a solution that alleviates worries or problems.
-11. Love
+Application: Position a product or service as a solution that alleviates worries or problems.
+Love
+
 Definition: A deep feeling of affection, attachment, or devotion.
-Application: Creating campaigns that evoke feelings of love and affection towards family, friends, or the brand itself.
-12. Pride
+Application: Create campaigns that evoke feelings of love and affection toward family, friends, or the brand itself.
+Pride
+
 Definition: A feeling of deep pleasure or satisfaction derived from one's own achievements.
-Application: Celebrating customer achievements and successes, making them feel proud of their association with the brand.
-13. Belonging
+Application: Celebrate customer achievements and successes, making them feel proud of their association with the brand.
+Belonging
+
 Definition: The feeling of being accepted and included.
-Application: Creating communities and fostering a sense of belonging among customers.
-14. Nostalgia
+Application: Create communities and foster a sense of belonging among customers.
+Nostalgia
+
 Definition: A sentimental longing for the past.
-Application: Using themes and imagery that evoke fond memories and a sense of nostalgia.
-15. Hope
+Application: Use themes and imagery that evoke fond memories and a sense of nostalgia.
+Hope
+
 Definition: A feeling of expectation and desire for a particular thing to happen.
-Application: Inspiring hope and optimism about the future through positive and uplifting messages.
+Application: Inspire hope and optimism about the future through positive and uplifting messages.
+Instructions:
+
+Analyze each principle in relation to the marketing content.
+Indicate whether the content applies each principle as None, Some, or A Lot.
+Provide a concise explanation for how the principle is applied and suggestions for how it could be implemented or improved.
+Ensure that your response is precise, follows the consistent scoring and table format, and focuses on the user's image analysis perspective.
             """
             try:
                 if is_image:
