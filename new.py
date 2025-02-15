@@ -393,29 +393,59 @@ Present your analysis in a table format as described below. After the table, pro
             return None
     def emotional_resonance(uploaded_file, is_image=True):
             prompt = """
-If the content is non-english, translate the content to English. Using the following model, please evaluate the content. Please also suggest improvements.
+**Content Evaluation: Emotional Resonance Analysis**
 
-Evaluating the emotional resonance of a piece of content involves assessing how effectively it evokes the intended emotional responses in the target audience. Score each element from 1-5, in increments of o.5. Please provide the information in a table, with: element, Score , evaluation, how it could be improved. at the end, please provide recommendations. Here are key criteria to consider:
+If the content is non-English, please translate it to English before proceeding with the evaluation.
 
-1. Clarity of Emotional Appeal
-Criteria: The content clearly conveys the intended emotion(s).
-Evaluation: Determine if the emotional message is easily understood without ambiguity.
-2. Relevance to Target Audience
-Criteria: The emotional appeal is relevant to the target audience’s experiences, values, and interests.
-Evaluation: Assess if the content connects with the audience’s personal or professional life.
-3. Authenticity
-Criteria: The emotional appeal feels genuine and credible.
-Evaluation: Check if the content avoids exaggeration and resonates as sincere and trustworthy.
-4. Visual and Verbal Consistency
-Criteria: Visual elements (images, colors, design) and verbal elements (language, tone) consistently support the emotional appeal.
-Evaluation: Ensure that all elements of the content align to reinforce the intended emotion.
-5. Emotional Intensity
-Criteria: The strength of the emotional response elicited is appropriate for the context.
-Evaluation: Measure whether the content evokes a strong enough emotional reaction without being overwhelming or underwhelming.
-6. Engagement
-Criteria: The content encourages audience engagement (likes, shares, comments, etc.).
-Evaluation: Does the content explicitly encourage engagement, and have the means for users to share, like, comment etc.
-            """
+Using the following criteria, evaluate the emotional resonance of the content. Assess how effectively it evokes the intended emotional responses in the target audience.
+
+For each criterion below, provide a **Score (1-5)** in increments of 0.5 (where 1 is low and 5 is high), a concise **Evaluation**, and **Improvement Suggestions**.  Present your analysis in a table format as shown below.  After the table, provide a summary of your overall recommendations.
+
+**Evaluation Criteria for Emotional Resonance:**
+
+**1. Clarity of Emotional Appeal:**
+    * **Criteria:** The content clearly conveys the intended emotion(s) without ambiguity.
+    * **Evaluation:** Is the emotional message easily understood?
+
+**2. Relevance to Target Audience:**
+    * **Criteria:** The emotional appeal is relevant to the target audience’s experiences, values, and interests.
+    * **Evaluation:** Does the content connect with the audience’s personal or professional life?
+
+**3. Authenticity:**
+    * **Criteria:** The emotional appeal feels genuine and credible.
+    * **Evaluation:** Does the content resonate as sincere and trustworthy, avoiding exaggeration?
+
+**4. Visual and Verbal Consistency:**
+    * **Criteria:** Visual elements (images, colors, design) and verbal elements (language, tone) consistently support the emotional appeal.
+    * **Evaluation:** Do all elements reinforce the intended emotion cohesively?
+
+**5. Emotional Intensity:**
+    * **Criteria:** The strength of the emotional response elicited is appropriate for the context (neither overwhelming nor underwhelming).
+    * **Evaluation:** Does the content evoke a sufficiently strong emotional reaction that is fitting for the situation?
+
+**6. Engagement:**
+    * **Criteria:** The content encourages audience engagement (likes, shares, comments, etc.).
+    * **Evaluation:** Does the content encourage engagement explicitly and provide means for users to interact (share, like, comment, etc.)?
+
+---
+
+**Response Table Format:**
+
+| Element                        | Score (1-5) | Evaluation                                                      | How it could be improved                                                    |
+|--------------------------------|-------------|-----------------------------------------------------------------|-----------------------------------------------------------------------------|
+| Clarity of Emotional Appeal    |             | [Your evaluation for Clarity of Emotional Appeal]             | [Your improvement suggestions for Clarity of Emotional Appeal]            |
+| Relevance to Target Audience   |             | [Your evaluation for Relevance to Target Audience]            | [Your improvement suggestions for Relevance to Target Audience]           |
+| Authenticity                   |             | [Your evaluation for Authenticity]                            | [Your improvement suggestions for Authenticity]                           |
+| Visual and Verbal Consistency  |             | [Your evaluation for Visual and Verbal Consistency]           | [Your improvement suggestions for Visual and Verbal Consistency]          |
+| Emotional Intensity            |             | [Your evaluation for Emotional Intensity]                     | [Your improvement suggestions for Emotional Intensity]                    |
+| Engagement                     |             | [Your evaluation for Engagement]                              | [Your improvement suggestions for Engagement]                             |
+
+---
+
+**Overall Recommendations:**
+
+[Provide a concise summary paragraph with overall recommendations to enhance the content's emotional resonance and effectiveness.]
+"""
             try:
                 if is_image:
                     image = Image.open(io.BytesIO(uploaded_file.read()))
