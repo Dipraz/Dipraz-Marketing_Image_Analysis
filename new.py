@@ -393,58 +393,45 @@ Present your analysis in a table format as described below. After the table, pro
             return None
     def emotional_resonance(uploaded_file, is_image=True):
             prompt = """
-**Content Evaluation: Emotional Resonance Analysis**
+If the content is non-English, first translate it into English. Then, using the model below, evaluate the content and suggest improvements.
 
-If the content is non-English, please translate it to English before proceeding with the evaluation.
+Instructions:
 
-Using the following criteria, evaluate the emotional resonance of the content. Assess how effectively it evokes the intended emotional responses in the target audience.
+Translation Check:
 
-For each criterion below, provide a **Score (1-5)** in increments of 0.5 (where 1 is low and 5 is high), a concise **Evaluation**, and **Improvement Suggestions**.  Present your analysis in a table format as shown below.  After the table, provide a summary of your overall recommendations.
+If the content is non-English, translate it to English.
+Evaluation Process:
+For each key criterion, score the element from 1 to 5 (in increments of 0.5). Present your findings in a table with the following columns: Element, Score, Evaluation, How It Could Be Improved.
 
-**Evaluation Criteria for Emotional Resonance:**
+Criteria for Evaluation:
 
-**1. Clarity of Emotional Appeal:**
-    * **Criteria:** The content clearly conveys the intended emotion(s) without ambiguity.
-    * **Evaluation:** Is the emotional message easily understood?
+Clarity of Emotional Appeal
 
-**2. Relevance to Target Audience:**
-    * **Criteria:** The emotional appeal is relevant to the target audience’s experiences, values, and interests.
-    * **Evaluation:** Does the content connect with the audience’s personal or professional life?
+Criteria: The content clearly conveys the intended emotion(s).
+Evaluation: Determine if the emotional message is easily understood without ambiguity.
+Relevance to Target Audience
 
-**3. Authenticity:**
-    * **Criteria:** The emotional appeal feels genuine and credible.
-    * **Evaluation:** Does the content resonate as sincere and trustworthy, avoiding exaggeration?
+Criteria: The emotional appeal is relevant to the target audience’s experiences, values, and interests.
+Evaluation: Assess if the content connects with the audience’s personal or professional life.
+Authenticity
 
-**4. Visual and Verbal Consistency:**
-    * **Criteria:** Visual elements (images, colors, design) and verbal elements (language, tone) consistently support the emotional appeal.
-    * **Evaluation:** Do all elements reinforce the intended emotion cohesively?
+Criteria: The emotional appeal feels genuine and credible.
+Evaluation: Check if the content avoids exaggeration and resonates as sincere and trustworthy.
+Visual and Verbal Consistency
 
-**5. Emotional Intensity:**
-    * **Criteria:** The strength of the emotional response elicited is appropriate for the context (neither overwhelming nor underwhelming).
-    * **Evaluation:** Does the content evoke a sufficiently strong emotional reaction that is fitting for the situation?
+Criteria: Visual elements (images, colors, design) and verbal elements (language, tone) consistently support the emotional appeal.
+Evaluation: Ensure that all elements of the content align to reinforce the intended emotion.
+Emotional Intensity
 
-**6. Engagement:**
-    * **Criteria:** The content encourages audience engagement (likes, shares, comments, etc.).
-    * **Evaluation:** Does the content encourage engagement explicitly and provide means for users to interact (share, like, comment, etc.)?
+Criteria: The strength of the emotional response elicited is appropriate for the context.
+Evaluation: Measure whether the content evokes a strong enough emotional reaction without being overwhelming or underwhelming.
+Engagement
 
----
+Criteria: The content encourages audience engagement (likes, shares, comments, etc.).
+Evaluation: Assess whether the content explicitly encourages engagement and includes means for users to share, like, or comment.
+Final Recommendations:
 
-**Response Table Format:**
-
-| Element                        | Score (1-5) | Evaluation                                                      | How it could be improved                                                    |
-|--------------------------------|-------------|-----------------------------------------------------------------|-----------------------------------------------------------------------------|
-| Clarity of Emotional Appeal    |             | [Your evaluation for Clarity of Emotional Appeal]             | [Your improvement suggestions for Clarity of Emotional Appeal]            |
-| Relevance to Target Audience   |             | [Your evaluation for Relevance to Target Audience]            | [Your improvement suggestions for Relevance to Target Audience]           |
-| Authenticity                   |             | [Your evaluation for Authenticity]                            | [Your improvement suggestions for Authenticity]                           |
-| Visual and Verbal Consistency  |             | [Your evaluation for Visual and Verbal Consistency]           | [Your improvement suggestions for Visual and Verbal Consistency]          |
-| Emotional Intensity            |             | [Your evaluation for Emotional Intensity]                     | [Your improvement suggestions for Emotional Intensity]                    |
-| Engagement                     |             | [Your evaluation for Engagement]                              | [Your improvement suggestions for Engagement]                             |
-
----
-
-**Overall Recommendations:**
-
-[Provide a concise summary paragraph with overall recommendations to enhance the content's emotional resonance and effectiveness.]
+After the table, provide a summary of overall recommendations and suggestions for improvement.
 """
             try:
                 if is_image:
