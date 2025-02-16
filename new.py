@@ -160,59 +160,67 @@ else:
 
     def overall_analysis(uploaded_file, is_image=True):
         prompt = """
-Analyze the provided image for marketing effectiveness. Follow the structured evaluation process below and ensure a complete response for all aspects.
+Analyze the provided image for marketing effectiveness. Please ensure your response covers **all steps** thoroughly, ending with a **complete** table (all 20 aspects) and a **concise overall summary**. 
 
 ### **Part 1: Image Context and Overview**
-1. **Asset Type:** Identify and describe the type of marketing asset. Examples include:
-   - Social media post, advertisement, email, flyer, brochure, landing page, etc.
-   
-2. **Purpose:** Clearly define the primary objective of this asset:
-   - Selling a product, increasing signups, driving traffic, building brand awareness, engaging customers, etc.
-   - Provide a detailed explanation of how it achieves this purpose.
+1. **Asset Type**  
+   - Identify and describe the type of marketing asset (e.g., social media post, advertisement, email, flyer, brochure, landing page, etc.).
 
-3. **Target Audience:** Define the intended audience by analyzing:
-   - Demographics (age, gender, location, income, education level)
-   - Interests, behaviors, and needs relevant to this marketing asset.
+2. **Purpose**  
+   - Clearly state the main objective (e.g., selling a product, getting signups, driving traffic, boosting brand awareness, etc.).  
+   - Explain how the asset aims to achieve this purpose.
+
+3. **Target Audience**  
+   - Describe the intended audience (demographics, location, interests, behaviors).  
+   - Highlight needs or pain points relevant to the asset’s message.
 
 ---
 
 ### **Part 2: Image Effectiveness Scoring**
-For each aspect listed below, provide:
-   - A **score from 1 to 5** (increments of 0.5, where 1 is low, 5 is high)
-   - A **concise explanation** for the score
-   - A **suggested improvement**
+Provide a **score from 1 to 5** (in increments of **0.5**, where **1** is low and **5** is high) for **each** aspect below. Include:
+- A **concise explanation** for the score.
+- **Suggestions for improvement**.
 
-**Table Format:**
-| Aspect                      | Score | Explanation                                     | Suggested Improvement                         |
-|-----------------------------|-------|-------------------------------------------------|----------------------------------------------|
-| Distinction                 | [ ]   | Does the content visually stand out?           | Adjust images, layout, or contrast.         |
-| Attention                   | [ ]   | Is the headline prominent? How is content consumed? | Improve order of elements for readability. |
-| Purpose & Value             | [ ]   | Is the purpose clear within 3 seconds?        | Ensure immediate value is evident.          |
-| Clarity                     | [ ]   | Are visuals and text easy to understand?      | Simplify text and use high-contrast visuals.|
-| Creativity Score            | [ ]   | Does the design stand out creatively?         | Use innovative visual elements.              |
-| First Impressions           | [ ]   | Is the initial impact positive?               | Refine elements that make it memorable.     |
-| Headline Review             | [ ]   | Is the headline clear, concise, and engaging? | Optimize for brevity and SEO.               |
-| Headline Keywords & Appeal  | [ ]   | Does it use power words & emotional triggers? | Strengthen key messaging.                   |
-| Visual Cues & Color Usage   | [ ]   | Are colors guiding attention effectively?     | Adjust contrast and focal points.           |
-| Engagement                  | [ ]   | Is the design captivating for interaction?    | Improve interactive elements.               |
-| Trustworthiness             | [ ]   | Does the content feel credible and reliable?  | Add social proof or trusted endorsements.   |
-| Motivation                  | [ ]   | Does the design inspire action?               | Strengthen persuasive elements.             |
-| Influence                   | [ ]   | Does it lead users toward a desired action?  | Refine persuasive language.                 |
-| Calls to Action (CTAs)      | [ ]   | Are CTAs clear and compelling?               | Optimize placement and wording.             |
-| User Experience (UX)        | [ ]   | Is the navigation and flow seamless?         | Improve layout and ease of use.             |
-| Memorability                | [ ]   | Does the design leave a lasting impression?  | Enhance uniqueness and branding.            |
-| Text Effort                 | [ ]   | Is the text concise and effective?           | Remove unnecessary complexity.              |
-| Tone                        | [ ]   | Does the tone align with the marketing goal? | Adjust to better fit the audience.          |
-| Message Framing             | [ ]   | Is framing used effectively?                 | Optimize for persuasion.                    |
-| Content Investment          | [ ]   | Is the information concise for busy users?   | Reduce text blocks and enhance clarity.     |
+**Table Format** (complete all 20 rows):
+| Aspect                  | Score | Explanation                                      | Improvement                                 |
+|-------------------------|-------|--------------------------------------------------|----------------------------------------------|
+| Distinction             | [ ]   | Does the image stand out?                        |                                              |
+| Attention               | [ ]   | Evaluate content consumption order, headline, etc.|                                              |
+| Purpose & Value         | [ ]   | Clarity within 3 seconds, product vs. customer-centric? |                                              |
+| Clarity                 | [ ]   | Are visuals/text easy to understand?             |                                              |
+| Creativity Score        | [ ]   | Does design capture attention with innovation?   |                                              |
+| First Impressions       | [ ]   | Initial impact positive/negative?                |                                              |
+| Headline Review         | [ ]   | Clarity, conciseness, SEO, emotional appeal, etc.|                                              |
+| Headline Keywords & Appeal | [ ]| Are keywords/emotional triggers used effectively?|                                              |
+| Visual Cues & Color Usage | [ ]| Do color choices/visual cues direct attention?    |                                              |
+| Engagement              | [ ]   | Is the UX design captivating/satisfying?         |                                              |
+| Trust                   | [ ]   | Is the content credible and customer-centric?    |                                              |
+| Motivation              | [ ]   | Does design motivate users to act?               |                                              |
+| Influence               | [ ]   | Does it effectively persuade viewers?            |                                              |
+| Calls to Action         | [ ]   | Are CTAs prominent, beneficial, and well-phrased?|                                              |
+| Experience              | [ ]   | Is the user experience smooth and enjoyable?     |                                              |
+| Memorability            | [ ]   | Does it leave a lasting impression?              |                                              |
+| Effort (Text Density)   | [ ]   | Clarity/conciseness of text (1=Very Dense, 5=Clear)|                                             |
+| Tone                    | [ ]   | Is the tone appropriate/effective for the goal?  |                                              |
+| Framing                 | [ ]   | Is message framing used effectively?             |                                              |
+| Content Investment      | [ ]   | Is the text short and clear for busy users?      |                                              |
+
+**Important**: Please ensure each row is completed with a **Score**, **Explanation**, and **Improvement**.
 
 ---
 
-### **Part 3: Overall Recommendations**
-- Summarize the key findings from the analysis.
-- Provide specific, actionable recommendations to improve the asset.
-- Ensure the analysis remains **objective, marketing-oriented, and focused on image effectiveness**.
+### **Part 3: Overall Summary and Recommendations**
+- Provide a concise **overall analysis** of the asset’s effectiveness.  
+- Offer **specific, actionable recommendations** for improvement based on the table’s findings.  
+- End with a **clear concluding statement** ensuring the response is fully complete.
 
+---
+
+**Instructions for Completion**:
+1. If the content is non-English, translate it to English before analysis.
+2. Do **not** truncate or end abruptly; include **all 20 aspects** with final recommendations.
+3. Maintain an **objective, marketing-oriented perspective** throughout.
+4. Present the final summary after the table, ensuring no steps are omitted.
 """
         try:
             if is_image:
@@ -2924,7 +2932,7 @@ for uploaded_file in uploaded_files:
         if is_image:
             image = Image.open(uploaded_file)
             image = resize_image(image)  # Resize for display
-            st.image(image, caption="Uploaded Image", use_container_width='auto')
+            st.image(image, caption="Uploaded Image", use_column_width='auto')
         else:
             st.video(uploaded_file, format="video/mp4")
 
