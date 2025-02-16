@@ -2096,7 +2096,7 @@ Please ensure that all responses are provided in English and follow the specifie
             return None
         
     def Personality_Trait_Assessment(uploaded_file, is_image=True):
-       prompt = f"""
+        prompt = f"""
 If the content is non-English, first translate it to English. Then, evaluate the content against the following personality trait models. For each personality trait, provide a score from 1 to 5 (in increments of 0.5) based on how well the content is likely to resonate with that personality type. Please include columns for Criterion, Score, Analysis, and Recommendation. At the end, provide an overall summary and overall recommendations.
 
 **Main Personality Trait Models:**
@@ -2198,7 +2198,6 @@ If the content is non-English, first translate it to English. Then, evaluate the
   | Criterion | Score | Analysis | Recommendation |
   
 - After the table, provide an overall summary of your findings along with overall recommendations for enhancing the content’s appeal across these personality traits.
-
 Ensure your response is entirely in English and that it focuses on the user's image analysis perspective, offering clear, actionable insights.
     """
         try:
