@@ -33,7 +33,7 @@ else:
     generation_config = {
         "temperature": 0.1,
         "top_p": 0.8,
-        "max_output_tokens": 8192,
+        "max_output_tokens": 20000,
         "response_mime_type": "text/plain",
     }
     
@@ -160,112 +160,60 @@ else:
 
     def overall_analysis(uploaded_file, is_image=True):
         prompt = """
-Analyze the provided image for marketing effectiveness. Provide detailed responses for the following initial questions:
+Analyze the provided image for marketing effectiveness. Follow the structured evaluation process below and ensure a complete response for all aspects.
 
-**1. Asset Type:**
-   - Clearly identify and describe the type of marketing asset (e.g., email, social media post, advertisement, flyer, brochure, landing page).
+### **Part 1: Image Context and Overview**
+1. **Asset Type:** Identify and describe the type of marketing asset. Examples include:
+   - Social media post, advertisement, email, flyer, brochure, landing page, etc.
+   
+2. **Purpose:** Clearly define the primary objective of this asset:
+   - Selling a product, increasing signups, driving traffic, building brand awareness, engaging customers, etc.
+   - Provide a detailed explanation of how it achieves this purpose.
 
-**2. Purpose:**
-   - Clearly state the specific purpose of this marketing asset (e.g., selling a product, getting more signups, driving traffic to a webpage, increasing brand awareness, engaging with customers).
-   - Provide a detailed explanation of *how* it aims to achieve this purpose.
-
-**3. Asset Audience:**
-   - Identify the target audience for this marketing asset (e.g., age group, gender, location, income level, education, interests, behaviors).
-   - Describe the demographics, interests, and needs of this audience.
-
----
-
-**Aspect-Based Evaluation:**
-
-For each aspect listed below, provide a score from 1 to 5 in increments of 0.5 (where 1 is low and 5 is high).  Present your evaluation in a table format with the following columns: **Aspect, Score, Explanation, Improvement**.
-
-After the table, provide a concise paragraph with **Overall Improvement Suggestions**.
-
-**Evaluation Aspects:**
-
-1. **Distinction:** Does the content use visually arresting pictures to grab user attention? Does it appeal to the primal brain both visually and with accompanying text?
-
-2. **Attention Flow:** Analyze the order in which a user would consume the content.
-   -  Identify and analyze the **headline's prominence and position**.
-   -  Evaluate **additional text** for visibility and reading sequence.
-   -  Assess the **positioning of images** relative to the text.
-   -  Examine **interactive elements** (e.g., buttons).
-   -  Describe the **content consumption order** (e.g., headline -> text -> image -> button).
-   -  Determine if the content **prioritizes important information** and effectively draws and holds attention.
-
-3. **Purpose and Value (3-Second Test):** Is the purpose and value proposition immediately clear (within 3 seconds)? Is the content primarily product-centric or customer-centric?
-
-4. **Clarity of Design:** Evaluate the clarity of all design elements. Are the visuals and text easily understandable at a glance?
-
-5. **Creativity Score:** Assess the design's creativity and originality. How effectively does it stand out and capture attention through innovative design elements?
-
-6. **First Impression:** Analyze the initial impact of the design. Does it create a strong and positive first impression on the viewer?
-
-7. **Headline Review (Comprehensive):** Evaluate the headline based on the following criteria:
-    - Clarity
-    - Conciseness
-    - Customer Centricity
-    - SEO Keyword Integration
-    - Emotional Appeal
-    - Uniqueness
-    - Urgency
-    - Benefit to the Reader
-    - Audience Targeting
-    - Length
-    - Use of Numbers/Lists
-    - Brand Consistency
-    - Power Words
-
-8. **Headline Keywords & Emotional Appeal (Focused):** Does the headline effectively incorporate relevant keywords and evoke an emotional response in the target audience?
-
-9. **Visual Cues & Color Usage:** Analyze the use of visual cues and color.
-    - Does the image effectively use visual cues (e.g., arrows, frames) to guide attention to key elements?
-    - How effectively do color choices and contrast draw the viewer's attention and highlight important information?
-
-10. **Engagement (UX):** Assess the overall user engagement level of the design and user experience. Is the UX design captivating, intuitive, and satisfying to interact with?
-
-11. **Trust & Credibility:** Assess the trustworthiness conveyed by the content.
-    - Is the content brand-centric or customer-centric (customer-centric content generally fosters higher trust)?
-    - Evaluate the credibility, reliability, and intimacy projected by the visual and textual elements.
-
-12. **Motivation & Authority/Social Proof:**  Assess the design's ability to motivate users to action. Does it align with user motivations? Does it effectively leverage authority or social proof elements to encourage action?
-
-13. **Influence & Persuasion:** Analyze the design's overall influence. How effectively does the asset persuade viewers and guide them towards the desired action or conversion?
-
-14. **Calls to Action (CTAs):** Analyze the CTAs.
-    - Presence: Are CTAs clearly present?
-    - Prominence: How prominent are they in the design?
-    - Benefits: Are the benefits of clicking the CTA clear?
-    - Language: Is the language used in CTAs compelling and action-oriented?
-
-15. **Overall User Experience (Holistic):** Assess the overall user experience. How effectively does the design facilitate a smooth, enjoyable, and efficient interaction from the user's perspective?
-
-16. **Memorability:** Evaluate the design's memorability. How likely is it to leave a lasting impression on the viewer after they have seen it?
-
-17. **Effort (Text Clarity):** Evaluate the clarity and conciseness of the text. (Scale: 1 = Very Dense & Difficult to Understand, 5 = Clear & Easy to Understand).  Does it convey the message effectively without being overly verbose or dense?
-
-18. **Tone Effectiveness:** Evaluate the effectiveness of the tone used in the asset in enhancing its overall impact and persuasiveness.
-
-19. **Framing Effectiveness:** Evaluate the effectiveness of the message framing used in the asset in enhancing its overall impact and persuasiveness.
-
-20. **Content Investment (Conciseness):**  Evaluate the amount of text content. Is the amount of content presented concise and easily digestible, avoiding lengthy paragraphs that busy users might ignore? (Consider that paragraph blocks are generally negative for content consumption).
+3. **Target Audience:** Define the intended audience by analyzing:
+   - Demographics (age, gender, location, income, education level)
+   - Interests, behaviors, and needs relevant to this marketing asset.
 
 ---
 
-**Table Format Example:**
+### **Part 2: Image Effectiveness Scoring**
+For each aspect listed below, provide:
+   - A **score from 1 to 5** (increments of 0.5, where 1 is low, 5 is high)
+   - A **concise explanation** for the score
+   - A **suggested improvement**
 
-| Aspect                     | Score | Explanation                                                                 | Improvement Suggestions                                                       |
-|-----------------------------|-------|-----------------------------------------------------------------------------|-------------------------------------------------------------------------------|
-| Distinction                | 3.5   | [Concise explanation of the aspect's performance in the image]             | [Specific, actionable suggestions for improvement]                           |
-| Attention Flow             | 4     | [Concise explanation of the aspect's performance in the image]             | [Specific, actionable suggestions for improvement]                           |
-| ... (and so on for all aspects) | ...   | ...                                                                       | ...                                                                           |
+**Table Format:**
+| Aspect                      | Score | Explanation                                     | Suggested Improvement                         |
+|-----------------------------|-------|-------------------------------------------------|----------------------------------------------|
+| Distinction                 | [ ]   | Does the content visually stand out?           | Adjust images, layout, or contrast.         |
+| Attention                   | [ ]   | Is the headline prominent? How is content consumed? | Improve order of elements for readability. |
+| Purpose & Value             | [ ]   | Is the purpose clear within 3 seconds?        | Ensure immediate value is evident.          |
+| Clarity                     | [ ]   | Are visuals and text easy to understand?      | Simplify text and use high-contrast visuals.|
+| Creativity Score            | [ ]   | Does the design stand out creatively?         | Use innovative visual elements.              |
+| First Impressions           | [ ]   | Is the initial impact positive?               | Refine elements that make it memorable.     |
+| Headline Review             | [ ]   | Is the headline clear, concise, and engaging? | Optimize for brevity and SEO.               |
+| Headline Keywords & Appeal  | [ ]   | Does it use power words & emotional triggers? | Strengthen key messaging.                   |
+| Visual Cues & Color Usage   | [ ]   | Are colors guiding attention effectively?     | Adjust contrast and focal points.           |
+| Engagement                  | [ ]   | Is the design captivating for interaction?    | Improve interactive elements.               |
+| Trustworthiness             | [ ]   | Does the content feel credible and reliable?  | Add social proof or trusted endorsements.   |
+| Motivation                  | [ ]   | Does the design inspire action?               | Strengthen persuasive elements.             |
+| Influence                   | [ ]   | Does it lead users toward a desired action?  | Refine persuasive language.                 |
+| Calls to Action (CTAs)      | [ ]   | Are CTAs clear and compelling?               | Optimize placement and wording.             |
+| User Experience (UX)        | [ ]   | Is the navigation and flow seamless?         | Improve layout and ease of use.             |
+| Memorability                | [ ]   | Does the design leave a lasting impression?  | Enhance uniqueness and branding.            |
+| Text Effort                 | [ ]   | Is the text concise and effective?           | Remove unnecessary complexity.              |
+| Tone                        | [ ]   | Does the tone align with the marketing goal? | Adjust to better fit the audience.          |
+| Message Framing             | [ ]   | Is framing used effectively?                 | Optimize for persuasion.                    |
+| Content Investment          | [ ]   | Is the information concise for busy users?   | Reduce text blocks and enhance clarity.     |
 
 ---
 
-**Overall Improvement Suggestions:**
+### **Part 3: Overall Recommendations**
+- Summarize the key findings from the analysis.
+- Provide specific, actionable recommendations to improve the asset.
+- Ensure the analysis remains **objective, marketing-oriented, and focused on image effectiveness**.
 
-[Concise paragraph summarizing the key areas for overall improvement and offering strategic suggestions to enhance the marketing asset's effectiveness.]
-        """
+"""
         try:
             if is_image:
                 image = Image.open(io.BytesIO(uploaded_file.read()))
@@ -2228,7 +2176,7 @@ Ensure your response is entirely in English and that it focuses on the user's im
             return None
         
     def BMTI_Analysis(uploaded_file, is_image=True):
-       prompt = f"""
+        prompt = f"""
 If the content is non-English, translate it to English. Then, evaluate the content against the following MBTI personality types in a table. For each personality type, provide a score from 1 to 5 (in increments of 0.5) reflecting how well the personality would perceive and respond to the content. Include columns for Analysis and Recommendations. At the end, provide an overall summary and overall recommendations.
 
 The Myers-Briggs Type Indicator (MBTI) consists of 16 personality types, each a combination of four dichotomies:
@@ -2589,7 +2537,7 @@ Please evaluate the image against the following principles. For each aspect, pro
             return None
         
     def Image_Analysis_2_table(uploaded_file, is_image=True):
-       prompt = f"""
+        prompt = f"""
 If the content is non-English, translate it to English.
 Please evaluate the image against the following principles. For each aspect, provide a score from 1 to 5 (in increments of 0.5, where 1 is low and 5 is high), along with a brief explanation and suggestions for improvement. Present your results in a table with the columns: **Aspect**, **Score**, **Explanation**, and **Improvement**. After the table, include an overall summary with recommendations for overall improvement.
 
@@ -2695,7 +2643,7 @@ Please evaluate the image against the following principles. For each aspect, pro
 **Instructions:**
 - Present your evaluation in a table with the columns: **Aspect**, **Score**, **Explanation**, **Improvement**.
 - After the table, provide an overall summary with suggestions for overall improvement.
-"""
+    """
         try:
             if is_image:
                 image = Image.open(io.BytesIO(uploaded_file.read()))
