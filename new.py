@@ -2200,8 +2200,7 @@ If the content is non-English, first translate it to English. Then, evaluate the
 - After the table, provide an overall summary of your findings along with overall recommendations for enhancing the content’s appeal across these personality traits.
 
 Ensure your response is entirely in English and that it focuses on the user's image analysis perspective, offering clear, actionable insights.
-"""
-
+    """
         try:
             if is_image:
                 image = Image.open(io.BytesIO(uploaded_file.read()))
