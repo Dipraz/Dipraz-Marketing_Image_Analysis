@@ -31,9 +31,9 @@ else:
 
     # Define generation configuration
     generation_config = {
-        "temperature": 0.1,
+        "temperature": 0.2,
         "top_p": 0.8,
-        "max_output_tokens": 20000,
+        "max_output_tokens": 30000,
         "response_mime_type": "text/plain",
     }
     
