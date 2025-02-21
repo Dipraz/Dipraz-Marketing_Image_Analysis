@@ -166,41 +166,57 @@ Evaluate and analyze the provided image to assess its effectiveness as a marketi
 ### **Evaluation Method:**  
 
 ✅ **Step 1: Identify Key Asset Details**  
-1. **Asset Type** – Classify the marketing asset (e.g., social media post, advertisement, email, flyer, landing page).  
-2. **Purpose** – Clearly state the asset's objective (e.g., product promotion, lead generation, brand awareness, customer engagement).  
-3. **Target Audience** – Define the demographic, interests, and needs of the intended audience (e.g., age, gender, location, income, behaviors).  
+1. **Asset Type**
+- Clearly identify and describe the type of marketing asset (e.g., email, social media post, advertisement, flyer, brochure, landing page, etc.).
+- Explain why this type fits the image. 
+2. **Purpose**
+- State the specific purpose of the marketing asset (e.g., selling a product, increasing signups, driving webpage traffic, boosting brand awareness, engaging customers, etc.).
+- Provide a detailed explanation of how the design and content aim to achieve this purpose.  
+3. **Target Audience** 
+- Identify the target audience for this marketing asset.
+- Describe their demographics (e.g., age group, gender, location, income level, education), interests, and needs, based on the image's content and design cues.
 
 ✅ **Step 2: Structured Image Evaluation**  
-Each aspect below should be **rated from 1 to 5** (increments of 0.5) with a **detailed explanation and improvement recommendations**. The results must be presented in a **structured table format**.  
+Evaluate the marketing asset across the following 20 aspects. For each:
+
+-Assign a score from 1 to 5 (in 0.5 increments, where 1 is low and 5 is high).
+-Provide a concise explanation justifying the score, referencing specific elements in the image.
+-Offer actionable suggestions for improvement.
+
+Present the results in a table with these columns:
+-Aspect: The name of the aspect being evaluated.
+-Score: The assigned score (1 to 5).
+-Explanation: Why this score was given, based on the image.
+-Improvement: Specific recommendations to enhance this aspect.  
 
 | Aspect                     | Score (1-5) | Explanation | Suggested Improvement |  
 |----------------------------|------------|-------------|------------------------|  
-| **Distinction** | _[Score]_ | Does the image stand out and grab attention? Does it work with/without text? | _[Suggested improvement]_ |  
-| **Attention** | _[Score]_ | Is the **content order effective** (headline → text → CTA)? | _[Suggested improvement]_ |  
-| **Purpose & Value Clarity** | _[Score]_ | Is the **purpose clear within 3 seconds**? Is it **product/customer-focused**? | _[Suggested improvement]_ |  
+| **Distinction** | _[Score]_ | Does the image use pictures that grab attention? Does it appeal to the primal brain (instinctive responses) with or without text? | _[Suggested improvement]_ |  
+| **Attention** | _[Score]_ | Evaluate the order of content consumption: Analyze the headline’s prominence and position, Assess additional text for visibility and engagement sequence, Examine image positioning relative to text, and Review interactive elements (e.g., buttons). Discuss the consumption order (e.g., headline → text → image → button) and whether it prioritizes key information effectively. | _[Suggested improvement]_ |  
+| **Purpose & Value Clarity** | _[Score]_ | Is the purpose and value clear within 3 seconds? Is the content product-centric (focused on the product) or customer-centric (focused on the audience’s needs)? | _[Suggested improvement]_ |  
 | **Clarity** | _[Score]_ | Are the visuals and text **easy to understand**? | _[Suggested improvement]_ |  
 | **Creativity** | _[Score]_ | Does the **design use innovative elements** to capture attention? | _[Suggested improvement]_ |  
 | **First Impressions** | _[Score]_ | Does the **design create a strong initial impact**? | _[Suggested improvement]_ |  
-| **Headline Review** | _[Score]_ | Is the **headline clear, concise, customer-focused, emotionally appealing**? | _[Suggested improvement]_ |  
+| **Headline Review** | _[Score]_ | Evaluate the headline based on: clarity, conciseness, customer centricity, SEO keyword use, emotional appeal, uniqueness, urgency, reader benefit, audience targeting, length, use of numbers/lists, brand consistency, and power words. | _[Suggested improvement]_ |  
 | **Keyword & Emotional Appeal** | _[Score]_ | Does the headline use **SEO-friendly and emotional keywords**? | _[Suggested improvement]_ |  
 | **Visual Cues & Color Usage** | _[Score]_ | Are **colors, contrast, and elements used effectively** to guide attention? | _[Suggested improvement]_ |  
 | **Engagement Potential** | _[Score]_ | Does the UX **encourage interaction and retention**? | _[Suggested improvement]_ |  
-| **Trustworthiness** | _[Score]_ | Does the content feel **credible, reliable, and customer-centric**? | _[Suggested improvement]_ |  
+| **Trustworthiness** | _[Score]_ | Does the content appear trustworthy based on visuals and text? Is it customer-centric (which boosts trust)? Assess credibility, reliability, and intimacy conveyed. | _[Suggested improvement]_ |  
 | **Motivation** | _[Score]_ | Does it align with **user motivators, authority, or social proof**? | _[Suggested improvement]_ |  
 | **Influence** | _[Score]_ | Does it effectively **persuade users to take action**? | _[Suggested improvement]_ |  
-| **Calls to Action (CTA)** | _[Score]_ | Are the **CTA buttons clear, visible, and compelling**? | _[Suggested improvement]_ |  
-| **User Experience (UX)** | _[Score]_ | Does the **design facilitate an easy and enjoyable experience**? | _[Suggested improvement]_ |  
+| **Calls to Action (CTA)** | _[Score]_ | Are the **CTA buttons clear, visible, and compelling**? Analyze the presence, prominence, benefits, and language of CTAs. | _[Suggested improvement]_ |  
+| **User Experience (UX)** | _[Score]_ | Does the design facilitate a smooth and enjoyable user interaction? | _[Suggested improvement]_ |  
 | **Memorability** | _[Score]_ | Does the **design leave a lasting impression**? | _[Suggested improvement]_ |  
-| **Text Readability & Effort** | _[Score]_ | Is the text **clear, concise, and skimmable**? | _[Suggested improvement]_ |  
+| **Text Readability & Effort** | _[Score]_ | Is the text clear and concise, requiring minimal effort to understand? (1 = Very Dense & Difficult, 5 = Clear & Easy to Understand) | _[Suggested improvement]_ |  
 | **Tone Effectiveness** | _[Score]_ | Does the **tone align with brand messaging and audience expectations**? | _[Suggested improvement]_ |  
-| **Message Framing** | _[Score]_ | Is the message **strategically framed** to maximize impact? | _[Suggested improvement]_ |  
-| **Content Investment** | _[Score]_ | Does it **avoid information overload** while keeping the message strong? | _[Suggested improvement]_ |  
+| **Message Framing** | _[Score]_ | Is the message **strategically framed** to maximize impact? Is the message framed to enhance its effectiveness (e.g., positive vs. negative framing)? | _[Suggested improvement]_ |  
+| **Content Investment** | _[Score]_ | Does it **avoid information overload** while keeping the message strong?, Is the content kept short and clear, avoiding lengthy text blocks that busy users won’t read? | _[Suggested improvement]_ |  
 
 ✅ **Step 3: Final Recommendations & Summary**  
-- **Overall Score:** _[Weighted Average of All Scores]_  
-- **Effectiveness Summary:** _[Does the asset successfully drive engagement and action?]_  
+- **Overall Score:** _[Weighted Average of All Scores and sum of the total scores]_  
+- **Effectiveness Summary:** _[Does the asset successfully drive engagement and action?, Highlight key strengths and weaknesses identified in the evaluation.]_  
 - **Top 3 Areas for Improvement:** _[List key focus areas]_  
-- **Final Optimization Strategy:** _[Specific actions to enhance performance]_ 
+- **Final Optimization Strategy:** _[Offer specific, actionable suggestions for overall improvement based on the 20 aspects & Specific actions to enhance performance, ]_ 
         """
         try:
             if is_image:
