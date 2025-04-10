@@ -31,16 +31,14 @@ else:
 
     # Define generation configuration
     generation_config = {
-      "temperature": 0.1,
-      "top_p": 0.95,
-      "top_k": 64,
-      "max_output_tokens": 65536,
-      "response_mime_type": "text/plain",
+        "temperature": 0.1,
+        "top_p": 0.8,
+        "max_output_tokens": 30000,
+        "response_mime_type": "text/plain",
     }
-
-    # Initialize Generative AI model with generation configuration
+    
     model = genai.GenerativeModel(
-      model_name="gemini-2.0-flash-thinking-exp-01-21",
+      model_name="gemini-2.5-pro-preview-03-25",
       generation_config=generation_config,
     )
 
@@ -162,35 +160,63 @@ else:
 
     def overall_analysis(uploaded_file, is_image=True):
         prompt = """
-Analyze the provided image for marketing effectiveness. First, provide detailed responses for the following:\n"
-            "\n"
-            "1. Asset Type: Clearly identify and describe the type of marketing asset. Examples include email, social media posts, advertisements, flyers, brochures, landing pages, etc.\n"
-            "2. Purpose: Clearly state the specific purpose of this marketing asset. Provide a detailed explanation of how it aims to achieve this purpose. Examples include selling a product, getting more signups, driving traffic to a webpage, increasing brand awareness, engaging with customers, etc.\n"
-            "3. Asset Audience: Identify the target audience for this marketing asset. Describe the demographics, interests, and needs of this audience. Examples include age group, gender, location, income level, education, interests, behaviors, etc.\n"
-            "\n"
-            "Then, for each aspect listed below, provide a score from 1 to 5 in increments of 0.5 (1 being low, 5 being high) and a concise explanation for each aspect, along with suggestions for improvement. The results should be presented in a table format with the columns: Aspect, Score, Explanation, and Improvement. After the table, provide a concise explanation with suggestions for overall improvement. Here are the aspects to consider:\n"
-            "\n"
-            "The aspects to consider are:\n"
-            "1. Distinction: Does the content contain pictures that grab user attention? Does it appeal to the primal brain with and without text?\n"
-            "2. Attention: Evaluate the order of content consumption in the uploaded image. Start by identifying and analyzing the headline for its prominence and position. Next, evaluate any additional text for visibility and reader engagement sequence. Assess the positioning of images in relation to the text, followed by an examination of interactive elements such as buttons. Discuss the order in which the content is consumed (e.g., headline first, then text, or image then text then button, etc.). Determine if the content prioritizes important information, and draws and holds attention effectively.\n"
-            "3. Purpose and Value: Is the purpose and value clear within 3 seconds? Is the content product or customer-centric?\n"
-            "4. Clarity: Evaluate the clarity of the design elements. Are the visuals and text easy to understand?\n"
-            "5. Creativity Score: Assess the creativity of the design. Does it stand out and capture attention through innovative elements?\n"
-            "6. First Impressions: Analyze the initial impact of the design. Does it create a strong positive first impression?\n"
-            "7. Headline Review: Evaluate the headline for clarity, conciseness, customer centricity, SEO keyword integration, emotional appeal, uniqueness, urgency, benefit to the reader, audience targeting, length, use of numbers/lists, brand consistency, and power words.\n"
-            "8. Headline keywords and emotional appeal: Does the headline incorporate keywords and evoke an emotional response?\n"
-            "9. Visual Cues and Color Usage: Does the image use visual cues and colors to draw attention to key elements? Analyze how color choices, contrast, and elements like arrows or frames guide the viewer's attention.\n"
-            "10. Engagement: Assess the engagement level of the user experience. Is the UX design captivating and satisfying to interact with?\n"
-            "11. Trust: Assess the trustworthiness of the content based on visual and textual elements. Is the content brand or customer-centric (customer-centric content has a higher trustworthiness)? Assess the credibility, reliability, and intimacy conveyed by the content.\n"
-            "12. Motivation: Assess the design's ability to motivate users. Does it align with user motivators and demonstrate authority or provide social proof?\n"
-            "13. Influence: Analyze the influence of the design. Does the asset effectively persuade viewers and lead them toward a desired action?\n"
-            "14. Calls to Action: Analyze the presence, prominence, benefits, and language of CTAs.\n"
-            "15. Experience: Assess the overall user experience. How well does the design facilitate a smooth and enjoyable interaction?\n"
-            "16. Memorability: Evaluate how memorable the design is. Does it leave a lasting impression?\n"
-            "17. Effort: Evaluate the clarity and conciseness of the text. Does it convey the message effectively without being overly wordy? (1: Very Dense & Difficult, 5: Clear & Easy to Understand)\n"
-            "18. Tone: Is the tone used to increase the effectiveness of the asset effectively?\n"
-            "19. Framing: Is framing of the message used to increase the effectiveness of the asset effectively?\n"
-            "20. Content Investment: Blocks containing paragraphs of text will not be consumed by busy users and would require time to read – this is negative, as the users will not spend the time. Is the amount of content presented kept short and clear?\n"
+### **Objective:**  
+Evaluate and analyze the provided image to assess its effectiveness as a marketing asset in capturing audience attention, conveying value, and driving engagement or action. This analysis will be structured, comprehensive, and data-driven, examining visual, textual, and psychological elements to determine their impact on the target audience. The goal is to provide clear, actionable insights for optimizing the asset’s performance, ensuring maximum clarity, engagement, and conversion potential. The response will be fully completed without truncation, delivering a thorough assessment that guides strategic marketing improvements.
+---
+### **Evaluation Method:**  
+
+✅ **Step 1: Identify Key Asset Details**  
+1. **Asset Type**
+- Clearly identify and describe the type of marketing asset (e.g., email, social media post, advertisement, flyer, brochure, landing page, etc.).
+- Explain why this type fits the image. 
+2. **Purpose**
+- State the specific purpose of the marketing asset (e.g., selling a product, increasing signups, driving webpage traffic, boosting brand awareness, engaging customers, etc.).
+- Provide a detailed explanation of how the design and content aim to achieve this purpose.  
+3. **Target Audience** 
+- Identify the target audience for this marketing asset.
+- Describe their demographics (e.g., age group, gender, location, income level, education), interests, and needs, based on the image's content and design cues.
+
+✅ **Step 2: Structured Image Evaluation**  
+Evaluate the marketing asset across the following 20 aspects. For each:
+
+-Assign a score from 1 to 5 (in 0.5 increments, where 1 is low and 5 is high).
+-Provide a concise explanation justifying the score, referencing specific elements in the image.
+-Offer actionable suggestions for improvement.
+
+Present the results in a table with these columns:
+-Aspect: The name of the aspect being evaluated.
+-Score: The assigned score (1 to 5).
+-Explanation: Why this score was given, based on the image.
+-Improvement: Specific recommendations to enhance this aspect.  
+
+| Aspect                     | Score (1-5) | Explanation | Suggested Improvement |  
+|----------------------------|------------|-------------|------------------------|  
+| **Distinction** | _[Score]_ | Does the image use pictures that grab attention? Does it appeal to the primal brain (instinctive responses) with or without text? | _[Suggested improvement]_ |  
+| **Attention** | _[Score]_ | Evaluate the order of content consumption: Analyze the headline’s prominence and position, Assess additional text for visibility and engagement sequence, Examine image positioning relative to text, and Review interactive elements (e.g., buttons). Discuss the consumption order (e.g., headline → text → image → button) and whether it prioritizes key information effectively. | _[Suggested improvement]_ |  
+| **Purpose & Value Clarity** | _[Score]_ | Is the purpose and value clear within 3 seconds? Is the content product-centric (focused on the product) or customer-centric (focused on the audience’s needs)? | _[Suggested improvement]_ |  
+| **Clarity** | _[Score]_ | Are the visuals and text **easy to understand**? | _[Suggested improvement]_ |  
+| **Creativity** | _[Score]_ | Does the **design use innovative elements** to capture attention? | _[Suggested improvement]_ |  
+| **First Impressions** | _[Score]_ | Does the **design create a strong initial impact**? | _[Suggested improvement]_ |  
+| **Headline Review** | _[Score]_ | Evaluate the headline based on: clarity, conciseness, customer centricity, SEO keyword use, emotional appeal, uniqueness, urgency, reader benefit, audience targeting, length, use of numbers/lists, brand consistency, and power words. | _[Suggested improvement]_ |  
+| **Keyword & Emotional Appeal** | _[Score]_ | Does the headline use **SEO-friendly and emotional keywords**? | _[Suggested improvement]_ |  
+| **Visual Cues & Color Usage** | _[Score]_ | Are **colors, contrast, and elements used effectively** to guide attention? | _[Suggested improvement]_ |  
+| **Engagement Potential** | _[Score]_ | Does the UX **encourage interaction and retention**? | _[Suggested improvement]_ |  
+| **Trustworthiness** | _[Score]_ | Does the content appear trustworthy based on visuals and text? Is it customer-centric (which boosts trust)? Assess credibility, reliability, and intimacy conveyed. | _[Suggested improvement]_ |  
+| **Motivation** | _[Score]_ | Does it align with **user motivators, authority, or social proof**? | _[Suggested improvement]_ |  
+| **Influence** | _[Score]_ | Does it effectively **persuade users to take action**? | _[Suggested improvement]_ |  
+| **Calls to Action (CTA)** | _[Score]_ | Are the **CTA buttons clear, visible, and compelling**? Analyze the presence, prominence, benefits, and language of CTAs. | _[Suggested improvement]_ |  
+| **User Experience (UX)** | _[Score]_ | Does the design facilitate a smooth and enjoyable user interaction? | _[Suggested improvement]_ |  
+| **Memorability** | _[Score]_ | Does the **design leave a lasting impression**? | _[Suggested improvement]_ |  
+| **Text Readability & Effort** | _[Score]_ | Is the text clear and concise, requiring minimal effort to understand? (1 = Very Dense & Difficult, 5 = Clear & Easy to Understand) | _[Suggested improvement]_ |  
+| **Tone Effectiveness** | _[Score]_ | Does the **tone align with brand messaging and audience expectations**? | _[Suggested improvement]_ |  
+| **Message Framing** | _[Score]_ | Is the message **strategically framed** to maximize impact? Is the message framed to enhance its effectiveness (e.g., positive vs. negative framing)? | _[Suggested improvement]_ |  
+| **Content Investment** | _[Score]_ | Does it **avoid information overload** while keeping the message strong?, Is the content kept short and clear, avoiding lengthy text blocks that busy users won’t read? | _[Suggested improvement]_ |  
+
+✅ **Step 3: Final Recommendations & Summary**  
+- **Overall Score:** _[Weighted Average of All Scores and sum of the total scores]_  
+- **Effectiveness Summary:** _[Does the asset successfully drive engagement and action?, Highlight key strengths and weaknesses identified in the evaluation.]_  
+- **Top 3 Areas for Improvement:** _[List key focus areas]_  
+- **Final Optimization Strategy:** _[Offer specific, actionable suggestions for overall improvement based on the 20 aspects & Specific actions to enhance performance, ]_ 
         """
         try:
             if is_image:
@@ -221,55 +247,86 @@ Analyze the provided image for marketing effectiveness. First, provide detailed 
 
     def Story_Telling_Analysis(uploaded_file, is_image=True):
         prompt = """
-Storytelling has a significant impact on creative, enriching the content and enhancing its effectiveness in various ways. Here are some key impacts of storytelling on static creative:
+Analyze the provided image for storytelling effectiveness in marketing. Ensure **each aspect is fully evaluated and completed**, without omission or truncation.
 
-1. Emotional Engagement
-Impact: Storytelling evokes emotions, making the content more relatable and memorable.
-Explanation: A well-crafted story can connect with the audience on an emotional level, fostering empathy, joy, sadness, or excitement. This emotional engagement makes the static creative more impactful.
-Example: An image of a family enjoying a product can tell a story of togetherness and happiness, evoking positive emotions in the viewer.
-2. Attention and Interest
-Impact: Stories capture and hold the audience's attention.
-Explanation: Humans are naturally drawn to stories. Incorporating a narrative element in static creative can intrigue viewers, encouraging them to spend more time engaging with the content.
-Example: A before-and-after image showing the transformation of a product's user tells a story of change and improvement, keeping the viewer interested.
-3. Memorability
-Impact: Stories enhance recall and retention.
-Explanation: Information presented within a story is easier to remember than standalone facts. Storytelling makes the content more memorable, ensuring that the audience retains the message.
-Example: An image series depicting the journey of a product from creation to customer use embeds the brand story in the viewer's mind.
-4. Brand Identity and Values
-Impact: Storytelling conveys brand identity and values.
-Explanation: Through stories, brands can express their mission, vision, and core values, building a strong identity. This helps in differentiating the brand from competitors and building loyalty.
-Example: A static ad featuring a company’s founders working passionately on their first product conveys values of dedication and authenticity.
-5. Simplification of Complex Messages
-Impact: Stories simplify complex messages.
-Explanation: Complex information can be conveyed more easily and understandably through storytelling. This makes the content more accessible and engaging for the audience.
-Example: A static infographic that tells a story about the impact of climate change through visuals and short narratives simplifies a complex issue.
-6. Connection and Trust
-Impact: Stories build a connection and trust with the audience.
-Explanation: Authentic stories foster trust and build a connection with the audience. When viewers relate to the story, they are more likely to trust the brand and its message.
-Example: An image featuring testimonials from real customers sharing their success stories with the product builds credibility and trust.
-7. Call to Action (CTA) Effectiveness
-Impact: Storytelling enhances the effectiveness of CTAs.
-Explanation: When a story is compelling, viewers are more likely to respond to the call to action. The narrative creates a context that makes the CTA more appealing and urgent.
-Example: A static creative that tells a story of someone achieving their goals with the help of a product, followed by a CTA to “Join the success,” is more persuasive.
-Practical Applications of Storytelling in Static Creative:
-Visual Storytelling: Use images that depict a sequence or a moment that implies a broader story.
+### **Part 1: Storytelling Impact Breakdown**
+Provide a detailed assessment of how storytelling enhances **static creative content** across the following seven principles:
 
-Example: An image of a person holding a graduation certificate can imply the story of hard work, achievement, and success.
-Textual Elements: Incorporate short, compelling copy that suggests a narrative.
+1. **Emotional Engagement**  
+   - **Impact**: How well does the content **evoke emotions** (e.g., happiness, nostalgia, excitement, urgency)?  
+   - **Evaluation**: Does the image **connect with the audience on an emotional level**?  
+   - **Example**: A family enjoying a product conveys warmth and togetherness.  
+   - **Improvement**: How can emotions be **intensified or refined**?  
 
-Example: A tagline like “From our family to yours” paired with a family photo tells a story of care and tradition.
-Contextual Backgrounds: Use backgrounds and settings that imply a story.
+2. **Attention and Interest**  
+   - **Impact**: Does the storytelling element **capture and hold attention**?  
+   - **Evaluation**: How **intriguing and engaging** is the content?  
+   - **Example**: A before-and-after transformation keeps the viewer invested.  
+   - **Improvement**: How can the narrative **increase retention**?  
 
-Example: A product placed in a home setting can imply how it fits into daily life, telling a story of convenience and comfort.
-Character and Journey: Introduce characters and show their journey.
+3. **Memorability**  
+   - **Impact**: Does the story help **reinforce brand recall**?  
+   - **Evaluation**: Is the storytelling element **easy to remember**?  
+   - **Example**: A visual journey of the product's impact on a customer.  
+   - **Improvement**: How can the **message be made even more memorable**?  
 
-Example: A static ad featuring a character's journey from a problem to a solution using the product.
-User-Generated Content: Share stories from actual customers.
+4. **Brand Identity and Values**  
+   - **Impact**: Does the content **reflect the brand’s core values**?  
+   - **Evaluation**: How well does the story **align with brand positioning**?  
+   - **Example**: Showing the founders working on their first product to highlight authenticity.  
+   - **Improvement**: How can the brand’s **storytelling be strengthened**?  
 
-Example: Customer photos with quotes about their experiences tell authentic stories that resonate with new customers.
+5. **Simplification of Complex Messages**  
+   - **Impact**: Does storytelling **make complex ideas easier to understand**?  
+   - **Evaluation**: Is the **message clear and accessible**?  
+   - **Example**: A simple infographic telling a sustainability story.  
+   - **Improvement**: How can the content be **simplified further**?  
 
-Evaluate the content using the 7 principles above. Score each element from 1-5, in increments of o.5. Please provide the information in a table, with: element, Score , evaluation, How it could be improved. at the end, please provide a summary of your recommendations.
-        """
+6. **Connection and Trust**  
+   - **Impact**: Does the storytelling element **establish trust** with the audience?  
+   - **Evaluation**: How **authentic and relatable** is the content?  
+   - **Example**: Real customer testimonials featuring their journey with the product.  
+   - **Improvement**: How can **trust-building elements** be enhanced?  
+
+7. **Call-to-Action (CTA) Effectiveness**  
+   - **Impact**: How well does storytelling enhance **CTA performance**?  
+   - **Evaluation**: Does the **narrative create urgency or appeal**?  
+   - **Example**: A success journey leading to a CTA like **“Join the success”**.  
+   - **Improvement**: How can the **CTA be made more compelling**?  
+
+---
+
+### **Part 2: Storytelling Effectiveness Scoring**
+Provide a **score from 1 to 5** (in increments of **0.5**) for **each storytelling principle**, along with a detailed **evaluation** and **improvement suggestions**. Format the response in the table below:
+
+| **Storytelling Principle**   | **Score (1-5)** | **Evaluation**                                         | **Improvement**                                      |
+|-----------------------------|-----------------|-------------------------------------------------------|------------------------------------------------------|
+| **1. Emotional Engagement**  | _1-5_           | How well does the image evoke emotions?                | How can the emotional impact be enhanced?            |
+| **2. Attention & Interest**  | _1-5_           | Does the narrative hold attention effectively?        | How can attention retention be improved?            |
+| **3. Memorability**          | _1-5_           | Does the story make the brand or product memorable?   | How can memorability be increased?                  |
+| **4. Brand Identity & Values** | _1-5_         | Does the image reflect and reinforce brand identity?  | How can storytelling better align with branding?    |
+| **5. Simplification of Messages** | _1-5_     | Does the content make complex ideas more digestible? | How can the story be clearer and more engaging?     |
+| **6. Connection & Trust**    | _1-5_           | Does the content foster audience trust?               | How can credibility and authenticity be enhanced?   |
+| **7. CTA Effectiveness**     | _1-5_           | How persuasive is the CTA in the context of storytelling? | How can the CTA be optimized for stronger impact?   |
+
+---
+
+### **Part 3: Summary and Final Recommendations**
+After the table, provide a **final summary** that includes:
+
+1. **Overall Storytelling Effectiveness Score**  
+   - Calculate an average score based on all **seven principles**.  
+
+2. **Key Strengths**  
+   - Summarize **what is working well** in the content.  
+
+3. **Key Areas for Improvement**  
+   - Highlight **specific weaknesses** and how they can be addressed.  
+
+4. **Final Recommendations for Optimization**  
+   - Provide **3-5 actionable recommendations** to **enhance storytelling impact**.  
+
+"""
         try:
             if is_image:
                 image = Image.open(io.BytesIO(uploaded_file.read()))
@@ -298,29 +355,84 @@ Evaluate the content using the 7 principles above. Score each element from 1-5, 
             return None
     def emotional_resonance(uploaded_file, is_image=True):
             prompt = """
-If the content is non-english, translate the content to English. Using the following model, please evaluate the content. Please also suggest improvements.
+If the content is in a non-English language, **translate it into English first**. Then, evaluate the content’s emotional resonance based on the following criteria. 
 
-Evaluating the emotional resonance of a piece of content involves assessing how effectively it evokes the intended emotional responses in the target audience. Score each element from 1-5, in increments of o.5. Please provide the information in a table, with: element, Score , evaluation, how it could be improved. at the end, please provide recommendations. Here are key criteria to consider:
+For each element, **assign a score from 1 to 5** (in increments of **0.5**), provide an **evaluation**, and suggest **specific improvements**. Present the response in a **structured table** with the following columns: **Element, Score, Evaluation, and Improvement Suggestions**. 
 
-1. Clarity of Emotional Appeal
-Criteria: The content clearly conveys the intended emotion(s).
-Evaluation: Determine if the emotional message is easily understood without ambiguity.
-2. Relevance to Target Audience
-Criteria: The emotional appeal is relevant to the target audience’s experiences, values, and interests.
-Evaluation: Assess if the content connects with the audience’s personal or professional life.
-3. Authenticity
-Criteria: The emotional appeal feels genuine and credible.
-Evaluation: Check if the content avoids exaggeration and resonates as sincere and trustworthy.
-4. Visual and Verbal Consistency
-Criteria: Visual elements (images, colors, design) and verbal elements (language, tone) consistently support the emotional appeal.
-Evaluation: Ensure that all elements of the content align to reinforce the intended emotion.
-5. Emotional Intensity
-Criteria: The strength of the emotional response elicited is appropriate for the context.
-Evaluation: Measure whether the content evokes a strong enough emotional reaction without being overwhelming or underwhelming.
-6. Engagement
-Criteria: The content encourages audience engagement (likes, shares, comments, etc.).
-Evaluation: Does the content explicitly encourage engagement, and have the means for users to share, like, comment etc.
-            """
+At the end, include a **summary** with **overall recommendations** for enhancing emotional appeal.
+
+---
+
+### **Part 1: Emotional Resonance Evaluation**
+Evaluate the content using the following **six key criteria**:
+
+#### **1. Clarity of Emotional Appeal**
+- **Criteria:** The content clearly conveys the intended emotion(s).  
+- **Evaluation:** Is the emotional message easily understood and free from ambiguity?  
+- **Example:** A heartfelt message about community support should **clearly** evoke warmth and connection.  
+- **Improvement:** How can the emotional message be made clearer?  
+
+#### **2. Relevance to Target Audience**
+- **Criteria:** The emotional appeal is **aligned with the audience’s values, interests, and experiences**.  
+- **Evaluation:** Does the content **resonate with the personal or professional life** of the audience?  
+- **Example:** A financial planning ad should use **emotionally relevant examples** (e.g., “secure your family’s future”).  
+- **Improvement:** How can the emotional connection be **deepened for the audience**?  
+
+#### **3. Authenticity**
+- **Criteria:** The emotional appeal **feels natural, credible, and sincere**.  
+- **Evaluation:** Does the content avoid **exaggeration or forced emotions**?  
+- **Example:** A **genuine** testimonial from a real customer builds **trust** better than a scripted message.  
+- **Improvement:** How can **authenticity be enhanced**?  
+
+#### **4. Visual and Verbal Consistency**
+- **Criteria:** The **visual (images, colors, design) and verbal (language, tone) elements** reinforce the intended emotion.  
+- **Evaluation:** Does every element **align to support the emotional appeal**?  
+- **Example:** A **calm, reassuring** medical advertisement should **not** use bright red alarming visuals.  
+- **Improvement:** How can **visuals and text** be more emotionally aligned?  
+
+#### **5. Emotional Intensity**
+- **Criteria:** The emotional response is **appropriate in strength** (not too weak or overwhelming).  
+- **Evaluation:** Does the content **evoke emotions at the right intensity for the message**?  
+- **Example:** A **charity donation appeal** should be **deeply moving but not manipulative**.  
+- **Improvement:** Should the intensity be **dialed up or down**?  
+
+#### **6. Engagement Potential**
+- **Criteria:** The content encourages **user engagement** (likes, shares, comments, actions).  
+- **Evaluation:** Does the content **invite interaction** and **provide clear engagement opportunities**?  
+- **Example:** A **social media post with a compelling question** drives higher engagement.  
+- **Improvement:** How can the content be **more engaging and shareable**?  
+
+---
+
+### **Part 2: Structured Table Format**
+Provide the evaluation results in **this structured table format**:
+
+| **Element**                    | **Score (1-5)** | **Evaluation**                                         | **Improvement Suggestions**                          |
+|--------------------------------|---------------|-------------------------------------------------------|------------------------------------------------------|
+| **Clarity of Emotional Appeal** | _1-5_         | How clear is the emotional message?                   | How can clarity be improved?                        |
+| **Relevance to Target Audience** | _1-5_        | Does the content emotionally resonate with users?     | How can it be made more relevant?                   |
+| **Authenticity**               | _1-5_         | Does the content feel sincere and credible?           | How can it feel more natural and genuine?           |
+| **Visual & Verbal Consistency** | _1-5_         | Are visuals and text aligned with the emotion?        | How can they better reinforce the emotional appeal? |
+| **Emotional Intensity**        | _1-5_         | Is the emotional response appropriate in strength?    | Should it be amplified or toned down?               |
+| **Engagement Potential**        | _1-5_         | Does the content encourage interaction?               | How can engagement be improved?                     |
+
+---
+
+### **Part 3: Final Summary and Recommendations**
+At the end, provide a **concise summary** that includes:
+
+1. **Overall Emotional Resonance Score**  
+   - Calculate an **average score** across all **six elements**.  
+
+2. **Key Strengths**  
+   - Summarize **what works well** in the content.  
+
+3. **Areas for Improvement**  
+   - Highlight **specific weaknesses** and how they can be addressed.  
+
+4. **Final Recommendations**  
+   - Provide **3-5 clear, actionable suggestions** to **enhance emotional impact**.  
+"""
             try:
                 if is_image:
                     image = Image.open(io.BytesIO(uploaded_file.read()))
@@ -346,56 +458,125 @@ Evaluation: Does the content explicitly encourage engagement, and have the means
                 return None
     def emotional_analysis(uploaded_file, is_image=True):
             prompt = """
-Using the following list of emotional resonance responses, assess whether the marketing content does or does not apply each. present the information in a table with columns: Name, Applies (None, some, A Lot), Definition, how it is applied, how it could be implemented. These are the principles to assess:
+If the content is non-English, first translate it into English. Then, evaluate the marketing content based on its emotional resonance, determining whether and how each emotional principle is applied. 
 
+For each emotional resonance type, **present the information in a structured table** with the following columns:  
+- **Name** (Emotion being assessed)  
+- **Applies** (None, Some, A Lot)  
+- **Definition** (Brief explanation of the emotional concept)  
+- **How It Is Applied** (How the marketing content currently uses this emotion)  
+- **How It Could Be Implemented** (Suggestions for improving or strengthening emotional impact)
 
-Here are different types of emotional resonance that can be leveraged in marketing to create a strong connection with the audience:
+---
+### **Emotional Resonance Evaluation Criteria**
+Assess the **following 15 emotional principles** in the marketing content:
 
-1. Empathy
-Definition: The ability to understand and share the feelings of others.
-Application: Crafting messages that show understanding of the audience's challenges and emotions.
-2. Joy
-Definition: A feeling of great pleasure and happiness.
-Application: Creating content that makes the audience feel happy, excited, or entertained.
-3. Surprise
-Definition: A feeling of astonishment or shock caused by something unexpected.
-Application: Using unexpected elements in marketing to capture attention and engage the audience.
-4. Trust
-Definition: Confidence in the honesty, integrity, and reliability of someone or something.
-Application: Building trust through transparent communication, endorsements, and reliable information.
-5. Fear
-Definition: An unpleasant emotion caused by the belief that someone or something is dangerous.
-Application: Highlighting potential risks or losses to motivate the audience to take action.
-6. Sadness
-Definition: A feeling of sorrow or unhappiness.
-Application: Using stories or scenarios that evoke sympathy and compassion to drive support for a cause or product.
-7. Anger
-Definition: A strong feeling of displeasure or hostility.
-Application: Addressing injustices or problems that provoke a sense of outrage, motivating the audience to seek solutions.
-8. Anticipation
-Definition: Excitement or anxiety about a future event.
-Application: Creating a sense of excitement and eagerness for upcoming products, events, or announcements.
-9. Disgust
-Definition: A strong feeling of aversion or repulsion.
-Application: Highlighting negative aspects of a competing product or undesirable conditions to steer the audience towards a better alternative.
-10. Relief
-Definition: A feeling of reassurance and relaxation following release from anxiety or distress.
-Application: Positioning a product or service as a solution that alleviates worries or problems.
-11. Love
-Definition: A deep feeling of affection, attachment, or devotion.
-Application: Creating campaigns that evoke feelings of love and affection towards family, friends, or the brand itself.
-12. Pride
-Definition: A feeling of deep pleasure or satisfaction derived from one's own achievements.
-Application: Celebrating customer achievements and successes, making them feel proud of their association with the brand.
-13. Belonging
-Definition: The feeling of being accepted and included.
-Application: Creating communities and fostering a sense of belonging among customers.
-14. Nostalgia
-Definition: A sentimental longing for the past.
-Application: Using themes and imagery that evoke fond memories and a sense of nostalgia.
-15. Hope
-Definition: A feeling of expectation and desire for a particular thing to happen.
-Application: Inspiring hope and optimism about the future through positive and uplifting messages.
+#### **1. Empathy**
+- **Definition:** The ability to understand and share the feelings of others.  
+- **Evaluation:** Does the content demonstrate understanding of the audience’s emotions and challenges?  
+- **Implementation Example:** Craft messages that align with the audience’s struggles and aspirations.  
+
+#### **2. Joy**
+- **Definition:** A feeling of great pleasure and happiness.  
+- **Evaluation:** Does the content generate excitement, happiness, or amusement?  
+- **Implementation Example:** Use vibrant visuals and uplifting messages that make the audience feel positive.  
+
+#### **3. Surprise**
+- **Definition:** A feeling of astonishment caused by something unexpected.  
+- **Evaluation:** Does the content feature an element of surprise or unpredictability?  
+- **Implementation Example:** Introduce unexpected imagery, wording, or promotions to capture attention.  
+
+#### **4. Trust**
+- **Definition:** Confidence in the honesty, integrity, and reliability of a brand.  
+- **Evaluation:** Does the content establish credibility through transparency and authenticity?  
+- **Implementation Example:** Incorporate testimonials, verified facts, and brand consistency to enhance trust.  
+
+#### **5. Fear**
+- **Definition:** An unpleasant emotion triggered by perceived threats or risks.  
+- **Evaluation:** Does the content highlight dangers, risks, or consequences to drive action?  
+- **Implementation Example:** Use fear-based messaging carefully to encourage protective actions (e.g., cybersecurity threats).  
+
+#### **6. Sadness**
+- **Definition:** A feeling of sorrow or empathy.  
+- **Evaluation:** Does the content evoke sympathy or compassion to engage the audience?  
+- **Implementation Example:** Use human-centered storytelling to highlight real-world problems and solutions.  
+
+#### **7. Anger**
+- **Definition:** A strong feeling of displeasure or frustration.  
+- **Evaluation:** Does the content address injustices or problems that provoke action?  
+- **Implementation Example:** Highlight unfair situations and offer solutions to mobilize the audience.  
+
+#### **8. Anticipation**
+- **Definition:** Excitement or anxiety about an upcoming event.  
+- **Evaluation:** Does the content create excitement for future offerings?  
+- **Implementation Example:** Use countdowns, teasers, and sneak peeks to generate anticipation.  
+
+#### **9. Disgust**
+- **Definition:** A strong aversion to something unpleasant.  
+- **Evaluation:** Does the content leverage repulsion to steer the audience away from undesired alternatives?  
+- **Implementation Example:** Contrast low-quality competitors with the benefits of your product.  
+
+#### **10. Relief**
+- **Definition:** A sense of reassurance and release from stress.  
+- **Evaluation:** Does the content position the product/service as a problem-solver?  
+- **Implementation Example:** Use messaging that alleviates concerns (e.g., “Never worry about X again!”).  
+
+#### **11. Love**
+- **Definition:** A deep feeling of affection, attachment, or devotion.  
+- **Evaluation:** Does the content evoke love for family, relationships, or the brand itself?  
+- **Implementation Example:** Show genuine connections between customers and the brand.  
+
+#### **12. Pride**
+- **Definition:** A sense of accomplishment or satisfaction.  
+- **Evaluation:** Does the content celebrate the audience’s achievements or status?  
+- **Implementation Example:** Highlight how the brand contributes to personal success.  
+
+#### **13. Belonging**
+- **Definition:** A sense of acceptance and inclusion.  
+- **Evaluation:** Does the content create a sense of community?  
+- **Implementation Example:** Encourage audience participation and user-generated content.  
+
+#### **14. Nostalgia**
+- **Definition:** Sentimental longing for the past.  
+- **Evaluation:** Does the content tap into positive memories?  
+- **Implementation Example:** Use retro visuals and references to evoke familiarity.  
+
+#### **15. Hope**
+- **Definition:** Expectation and desire for a positive outcome.  
+- **Evaluation:** Does the content inspire optimism and motivation?  
+- **Implementation Example:** Use uplifting messaging about a better future.  
+
+---
+
+### **Structured Table Format**
+Provide the evaluation results in the following table format:
+
+| **Name**      | **Applies (None, Some, A Lot)** | **Definition**                         | **How It Is Applied**                          | **How It Could Be Implemented**              |
+|--------------|--------------------------------|----------------------------------------|-----------------------------------------------|----------------------------------------------|
+| **Empathy**  | _None/Some/A Lot_             | The ability to understand and share emotions. | How the content shows empathy (or lacks it). | Ways to enhance empathetic storytelling.   |
+| **Joy**      | _None/Some/A Lot_             | A feeling of happiness and excitement. | Does the content evoke joy?                   | Use uplifting visuals and positive messaging. |
+| **Surprise** | _None/Some/A Lot_             | Unexpected elements that grab attention. | Does the content include a surprise factor?  | Add unexpected twists in visuals/text.      |
+| **Trust**    | _None/Some/A Lot_             | Confidence in the brand's reliability. | How trust is built (or not).                  | Strengthen credibility through testimonials. |
+| **Fear**     | _None/Some/A Lot_             | Highlighting risks to drive action.    | Is fear-based messaging used?                 | Ensure fear messaging remains ethical.      |
+| **Sadness**  | _None/Some/A Lot_             | Evoking sympathy and compassion.       | Does the content trigger emotional concern?  | Use real stories to create emotional depth. |
+| **Anger**    | _None/Some/A Lot_             | Addressing injustice to spark action.  | How the content presents injustice/issues.   | Focus on solution-driven messaging.         |
+| **Anticipation** | _None/Some/A Lot_         | Excitement for upcoming events.        | Is excitement effectively generated?         | Add countdowns and sneak peeks.            |
+| **Disgust**  | _None/Some/A Lot_             | Strong aversion to a negative element. | Is disgust used to contrast alternatives?    | Ensure it's used ethically.                 |
+| **Relief**   | _None/Some/A Lot_             | Reassurance and stress alleviation.    | How relief is positioned in the content.     | Use calming visuals and messaging.         |
+| **Love**     | _None/Some/A Lot_             | Deep emotional affection.              | Is love/emotional attachment conveyed?      | Highlight relationships and brand affinity. |
+| **Pride**    | _None/Some/A Lot_             | Satisfaction from achievements.        | Does the content celebrate achievements?     | Showcase user success stories.              |
+| **Belonging** | _None/Some/A Lot_           | Feeling of being accepted.             | Does the content create community?          | Foster inclusivity in brand messaging.     |
+| **Nostalgia** | _None/Some/A Lot_           | Sentimental longing for the past.      | Are nostalgic elements included?            | Use retro visuals and references.         |
+| **Hope**     | _None/Some/A Lot_             | Inspiring optimism for the future.     | Is hope conveyed through the content?       | Use uplifting, forward-thinking messaging. |
+
+---
+
+### **Final Summary and Recommendations**
+At the end, provide:
+1. **Overall Emotional Resonance Score** (average of applied emotions).  
+2. **Key Strengths** (which emotions were most effective).  
+3. **Areas for Improvement** (which emotions could be strengthened).  
+4. **3-5 Actionable Recommendations** to enhance emotional impact.  
             """
             try:
                 if is_image:
@@ -426,73 +607,114 @@ Application: Inspiring hope and optimism about the future through positive and u
             
     def Emotional_Appraisal_Models(uploaded_file, is_image=True):
             prompt = """
-Firstly, translate any non-english text to english. Using the following emotional appraisal models, please evaluate the content. Please suggest possible  improvements against each model evaluation:
+If the content is non-English, first translate it into English. Then, analyze the marketing content using the following emotional appraisal models. Provide a structured evaluation for each model, including key findings and suggested improvements. 
 
-1. Lazarus’ Cognitive-Motivational-Relational Theory
-Overview: Richard Lazarus proposed that emotions are the result of cognitive appraisals of events, which consider both personal relevance and coping potential.
-Components:
-Primary Appraisal: Evaluation of the significance of an event for personal well-being (e.g., Is this event beneficial or harmful?).
-Secondary Appraisal: Evaluation of one's ability to cope with the event (e.g., Do I have the resources to deal with this?).
-Core Relational Themes: Specific patterns of appraisal that lead to particular emotions (e.g., loss leads to sadness, threat leads to fear).
-2. Scherer's Component Process Model (CPM)
-Overview: Klaus Scherer’s model posits that emotions result from a sequence of appraisals along several dimensions.
-Components:
-Novelty: Is the event new or unexpected?
-Pleasantness: Is the event pleasant or unpleasant?
-Goal Significance: Does the event help or hinder the attainment of goals?
-Coping Potential: Can the individual cope with or manage the event?
-Norm Compatibility: Does the event conform to social and personal norms?
-3. Smith and Ellsworth’s Appraisal Model
-Overview: Craig Smith and Phoebe Ellsworth identified several dimensions of appraisal that influence emotional responses.
-Components:
-Attention: The degree to which the event draws attention.
-Certainty: The certainty or predictability of the event.
-Control/Coping: The degree of control one has over the event and the ability to cope.
-Pleasantness: The pleasantness or unpleasantness of the event.
-Perceived Obstacle: The extent to which the event is perceived as an obstacle to goals.
-Responsibility: Who is responsible for the event (self, others, or circumstances).
-Anticipated Effort: The amount of effort required to deal with the event.
-4. Roseman’s Appraisal Theory
-Overview: Ira Roseman’s model focuses on how appraisals of situations in terms of motivational congruence and agency influence emotions.
-Components:
-Motivational State: Whether the event is consistent or inconsistent with one’s goals.
-Situational State: Whether the event is caused by the environment or the individual.
-Probability: The likelihood of the event occurring.
-Agency: Who is responsible for the event (self, other, or circumstance).
-Power/Control: The degree of control one has over the event.
-5. Weiner’s Attributional Theory of Emotion
-Overview: Bernard Weiner’s model focuses on how attributions about the causes of events influence emotional reactions.
-Components:
-Locus: Whether the cause of the event is internal or external.
-Stability: Whether the cause is stable or unstable over time.
-Controllability: Whether the cause is controllable or uncontrollable by the individual.
-6. Frijda’s Laws of Emotion
-Overview: Nico Frijda proposed several “laws” that describe regularities in the relationship between appraisals and emotional responses.
-Components:
-Law of Situational Meaning: Emotions arise in response to meaning structures of situations.
-Law of Concern: Emotions arise when events are relevant to one’s concerns.
-Law of Apparent Reality: Emotions are elicited by events appraised as real.
-Law of Change: Emotions are triggered by changes in circumstances.
-Law of Habituation: Continuous exposure to a stimulus reduces its emotional impact.
-Law of Comparative Feeling: Emotional intensity depends on comparisons with other events.
-Law of Hedonic Asymmetry: Pleasure is more transient than pain.
-Law of Conservation of Emotional Momentum: Emotions persist until the triggering conditions change.
-7. Ellsworth’s Model of Appraisal Dimensions
-Overview: Phoebe Ellsworth extended appraisal theory by emphasizing the importance of cultural and contextual factors in emotional appraisal.
-Components:
-Certainty: How certain one is about the event.
-Attention: The extent to which the event captures attention.
-Control: The degree of control one has over the event.
-Pleasantness: Whether the event is perceived as pleasant or unpleasant.
-Responsibility: Attribution of responsibility for the event.
-Legitimacy: Whether the event is perceived as fair or unfair.
-Practical Applications in Marketing
-By understanding these emotional appraisal models, marketers can create content that:
+For each **emotional appraisal model**, present the results in a **structured table** with the following columns:
+- **Model Name** (The emotional appraisal model being applied)
+- **Component** (Specific evaluation criteria within the model)
+- **Assessment** (How the marketing content aligns with this component)
+- **Emotional Response** (The predicted emotional reaction from the target audience)
+- **Improvement Suggestions** (Ways to enhance the emotional impact based on the model)
 
-Resonates with Core Concerns: Address the primary and secondary appraisals of the target audience.
-Triggers Relevant Emotions: Design messages that align with specific appraisal dimensions to evoke desired emotional responses.
-Enhances Perceived Control: Empower consumers by highlighting how products or services can help them manage or cope with challenges.
-Builds Trust and Credibility: Ensure messages are consistent, predictable, and align with social norms to build trust.
+---
+
+### **Emotional Appraisal Models for Evaluation**
+
+#### **1. Lazarus’ Cognitive-Motivational-Relational Theory**
+- **Overview:** Emotions result from cognitive evaluations (appraisals) of events that consider personal relevance and coping potential.
+- **Key Components:**
+  - **Primary Appraisal:** How significant is this event to personal well-being? (Beneficial vs. Harmful)
+  - **Secondary Appraisal:** Does the individual have the resources to handle this event?
+  - **Core Relational Themes:** Specific appraisals that lead to emotions (e.g., loss → sadness, threat → fear).
+- **Marketing Application:** Evaluate if the content aligns with consumers’ concerns and perceived ability to act.
+
+#### **2. Scherer’s Component Process Model (CPM)**
+- **Overview:** Emotions result from a sequence of appraisals across multiple dimensions.
+- **Key Components:**
+  - **Novelty:** Is the event new or unexpected?
+  - **Pleasantness:** Is the content enjoyable?
+  - **Goal Significance:** Does it help or hinder user goals?
+  - **Coping Potential:** Can the audience easily understand and act on the message?
+  - **Norm Compatibility:** Does it align with societal norms?
+- **Marketing Application:** Assess if the content leverages novelty, ease of engagement, and alignment with audience goals.
+
+#### **3. Smith and Ellsworth’s Appraisal Model**
+- **Overview:** Emotional responses are shaped by how people evaluate situations.
+- **Key Components:**
+  - **Attention:** Does the content draw and sustain focus?
+  - **Certainty:** How predictable is the outcome?
+  - **Control/Coping:** Can the audience influence the situation?
+  - **Pleasantness:** Does the content evoke positive or negative feelings?
+  - **Perceived Obstacle:** Does it introduce friction or barriers?
+  - **Responsibility:** Who is responsible for the event (brand, user, external factors)?
+  - **Anticipated Effort:** How much effort does the audience need to engage?
+- **Marketing Application:** Determine if the content is **easy to consume, emotionally appealing, and action-driven**.
+
+#### **4. Roseman’s Appraisal Theory**
+- **Overview:** Focuses on whether an event aligns with personal motivations and who/what caused it.
+- **Key Components:**
+  - **Motivational State:** Does the content align with user desires?
+  - **Situational State:** Is it controlled by the brand, audience, or external factors?
+  - **Probability:** How likely is the promised outcome?
+  - **Agency:** Who is responsible for the message's credibility?
+  - **Power/Control:** Does the content make users feel in control?
+- **Marketing Application:** Assess whether the messaging empowers the audience or shifts responsibility.
+
+#### **5. Weiner’s Attributional Theory of Emotion**
+- **Overview:** Focuses on how people attribute causes to emotions.
+- **Key Components:**
+  - **Locus:** Is the cause internal (user-driven) or external (brand-driven)?
+  - **Stability:** Is the cause stable or temporary?
+  - **Controllability:** Can the audience influence the outcome?
+- **Marketing Application:** Ensure the content **reinforces consumer confidence and control** over outcomes.
+
+#### **6. Frijda’s Laws of Emotion**
+- **Overview:** Describes patterns in how people react emotionally to events.
+- **Key Laws:**
+  - **Law of Situational Meaning:** Emotions stem from event meanings.
+  - **Law of Concern:** Emotional reactions are tied to personal relevance.
+  - **Law of Apparent Reality:** Perceived realness determines intensity.
+  - **Law of Change:** New stimuli evoke stronger emotions.
+  - **Law of Habituation:** Repeated exposure dulls response.
+  - **Law of Comparative Feeling:** Emotions are relative to past experiences.
+  - **Law of Hedonic Asymmetry:** Negative emotions last longer than positive ones.
+  - **Law of Emotional Momentum:** Emotions persist unless altered.
+- **Marketing Application:** Assess if the content **creates sustained emotional impact** or fades quickly.
+
+#### **7. Ellsworth’s Model of Appraisal Dimensions**
+- **Overview:** Extends appraisal theory to **culture and context**.
+- **Key Components:**
+  - **Certainty:** Does the content instill confidence in outcomes?
+  - **Attention:** Does it capture and sustain focus?
+  - **Control:** Does the audience feel empowered?
+  - **Pleasantness:** Is the content emotionally appealing?
+  - **Responsibility:** Who is accountable for outcomes?
+  - **Legitimacy:** Is the message perceived as fair?
+- **Marketing Application:** Ensure content is **engaging, ethical, and culturally aligned**.
+
+---
+
+### **Structured Table Format**
+For each model, provide insights in the following structured table:
+
+| **Model Name**   | **Component**            | **Assessment**                                     | **Emotional Response**                     | **Improvement Suggestions**                  |
+|-----------------|-------------------------|---------------------------------------------------|-------------------------------------------|---------------------------------------------|
+| **Lazarus' Theory** | Primary Appraisal       | Does the audience perceive the event as a benefit or threat? | Is the emotion aligned with personal concerns? | Adjust messaging to emphasize benefits.    |
+| **CPM**         | Novelty                   | Is the content fresh and attention-grabbing?     | Curiosity, excitement, or indifference   | Introduce unexpected elements.             |
+| **Smith & Ellsworth** | Attention             | Does it hold audience focus effectively?         | Engagement or distraction                 | Optimize layout and emphasis.               |
+| **Roseman’s Theory** | Motivational State    | Does the content align with user goals?          | Motivation or frustration                 | Align messaging with key audience needs.    |
+| **Weiner’s Attribution** | Locus           | Who is seen as responsible for the message?      | Trust or skepticism                      | Clarify brand accountability.               |
+| **Frijda’s Laws** | Law of Change           | Is the content dynamic and evolving?             | Emotional persistence or disengagement    | Maintain novelty through variation.         |
+| **Ellsworth’s Model** | Legitimacy          | Does the audience perceive the message as fair?  | Trust or resistance                      | Avoid exaggerated claims, ensure honesty.   |
+
+---
+
+### **Final Summary and Recommendations**
+At the end of the analysis, provide:
+1. **Overall Emotional Impact Score** (average alignment with emotional models).  
+2. **Key Strengths** (which emotional triggers were most effective).  
+3. **Areas for Improvement** (which emotional triggers could be strengthened).  
+4. **3-5 Actionable Strategies** to improve **emotional depth and marketing effectiveness**.
             """
             try:
                 if is_image:
@@ -522,48 +744,129 @@ Builds Trust and Credibility: Ensure messages are consistent, predictable, and a
                 return None    
     def behavioural_principles(uploaded_file, is_image=True):
         prompt = """
-Using the following Behavioral Science principles, assess whether the marketing content does or does not apply each principle. Present the information in a table with columns: 'Applies the Principle (None, Some, A Lot)', 'Principle (Description)', 'Explanation', and 'How it could be implemented'. These are the principles to assess:
+Evaluate the provided marketing content using the following **Behavioral Science principles** to determine its effectiveness. 
 
-    1. Anchoring: The tendency to rely heavily on the first piece of information encountered (the "anchor") when making decisions.
-       Example: Displaying a higher original price next to a discounted price to make the discount seem more substantial.
-    2. Social Proof: People tend to follow the actions of others, assuming that those actions are correct.
-       Example: Showing customer reviews and testimonials to build trust and encourage purchases.
-    3. Scarcity: Items or opportunities become more desirable when they are perceived to be scarce or limited.
-       Example: Using phrases like "limited time offer" or "only a few left in stock" to create urgency.
-    4. Reciprocity: People feel obligated to return favors or kindnesses received from others.
-       Example: Offering a free sample or trial to encourage future purchases.
-    5. Loss Aversion: People prefer to avoid losses rather than acquire equivalent gains.
-       Example: Emphasizing what customers stand to lose if they don't take action, such as missing out on a sale.
-    6. Commitment and Consistency: Once people commit to something, they are more likely to follow through to maintain consistency.
-       Example: Getting customers to make a small commitment first, like signing up for a newsletter, before asking for a larger commitment.
-    7. Authority: People are more likely to trust and follow the advice of an authority figure.
-       Example: Featuring endorsements from experts or industry leaders.
-    8. Framing: The way information is presented can influence decision-making.
-       Example: Highlighting the benefits of a product rather than the features, or framing a price as "only $1 a day" instead of "$30 a month".
-    9. Endowment Effect: People value things more highly if they own them.
-       Example: Allowing customers to try a product at home before making a purchase decision.
-    10. Priming: Exposure to certain stimuli can influence subsequent behavior and decisions.
-        Example: Using images and words that evoke positive emotions to enhance the appeal of a product.
-    11. Decoy Effect: Adding a third option can make one of the original two options more attractive.
-        Example: Introducing a higher-priced premium option to make the mid-tier option seem like better value.
-    12. Default Effect: People tend to go with the default option presented to them.
-        Example: Setting a popular product or service as the default selection on a website.
-    13. Availability Heuristic: People judge the likelihood of events based on how easily examples come to mind.
-        Example: Highlighting popular or recent customer success stories to create a perception of common positive outcomes.
-    14. Cognitive Dissonance: The discomfort experienced when holding conflicting beliefs, leading to a change in attitude or behavior to reduce discomfort.
-        Example: Reinforcing the positive aspects of a purchase to reduce buyer's remorse.
-    15. Emotional Appeal: Emotions can significantly influence decision-making.
-        Example: Using storytelling and emotional imagery to create a connection with the audience.
-    16. Bandwagon Effect: People are more likely to do something if they see others doing it.
-        Example: Showcasing the popularity of a product through sales numbers or social media mentions.
-    17. Frequency Illusion (Baader-Meinhof Phenomenon): Once people notice something, they start seeing it everywhere.
-        Example: Repeatedly exposing customers to a brand or product through various channels to increase recognition.
-    18. In-group Favoritism: People prefer products or services associated with groups they identify with.
-        Example: Creating marketing campaigns that resonate with specific demographics or communities.
-    19. Hyperbolic Discounting: People prefer smaller, immediate rewards over larger, delayed rewards.
-        Example: Offering instant discounts or rewards for immediate purchases.
-    20. Paradox of Choice: Having too many options can lead to decision paralysis.
-        Example: Simplifying choices by offering curated selections or recommended products.
+---
+
+### **Instructions:**
+1. **Assessment Table Format:**  
+   - For each principle, assess whether the content **applies it fully, partially, or not at all**.
+   - Present the analysis in a **structured table** with the following columns:
+     - **Applies the Principle** (None, Some, A Lot)
+     - **Principle (Description)**
+     - **Explanation** (How the content applies—or does not apply—the principle)
+     - **How It Could Be Implemented** (Suggestions to strengthen the application of the principle)
+
+2. **Comprehensive Evaluation:**  
+   - Ensure **each principle** is reviewed **systematically** for its application within the content.  
+   - Identify **missing opportunities** and **recommend specific improvements**.
+
+---
+
+### **Behavioral Science Principles for Assessment**
+
+#### **1. Anchoring**  
+- **Definition:** People rely on the first piece of information they encounter when making decisions.  
+- **Example:** Displaying a **higher original price** next to a discounted price to make the discount **seem more significant**.
+
+#### **2. Social Proof**  
+- **Definition:** People assume that the actions of others indicate the correct choice.  
+- **Example:** Showcasing **customer reviews, testimonials, or influencer endorsements** to build trust.
+
+#### **3. Scarcity**  
+- **Definition:** Perceived scarcity increases desirability.  
+- **Example:** Using **"limited time offer"** or **"only a few left in stock"** to create urgency.
+
+#### **4. Reciprocity**  
+- **Definition:** People feel obligated to return favors.  
+- **Example:** Offering a **free sample, trial, or exclusive content** to encourage future engagement.
+
+#### **5. Loss Aversion**  
+- **Definition:** People prefer **avoiding losses** over gaining equivalent rewards.  
+- **Example:** Emphasizing **what customers will lose** if they do not act now.
+
+#### **6. Commitment and Consistency**  
+- **Definition:** Once people commit, they are likely to follow through.  
+- **Example:** Encouraging **small commitments** (like signing up for a newsletter) before a larger one.
+
+#### **7. Authority**  
+- **Definition:** People trust figures of **expertise and authority**.  
+- **Example:** Featuring **endorsements from industry experts** or statistics.
+
+#### **8. Framing**  
+- **Definition:** The way information is presented influences decisions.  
+- **Example:** Presenting a price as **"Only $1 per day"** instead of **"$30 per month"**.
+
+#### **9. Endowment Effect**  
+- **Definition:** People **overvalue** things they feel ownership over.  
+- **Example:** Allowing customers to **try a product before buying**.
+
+#### **10. Priming**  
+- **Definition:** Prior exposure influences subsequent decisions.  
+- **Example:** Using **positive language and visuals** to **shape perception**.
+
+#### **11. Decoy Effect**  
+- **Definition:** Introducing a third **less attractive** option makes another option **more desirable**.  
+- **Example:** Adding a **premium pricing tier** to make the **mid-tier option** more attractive.
+
+#### **12. Default Effect**  
+- **Definition:** People stick with the **default option** presented.  
+- **Example:** Making a **popular or high-margin product the default selection**.
+
+#### **13. Availability Heuristic**  
+- **Definition:** People judge likelihood based on **how easily examples come to mind**.  
+- **Example:** Highlighting **recent success stories** to reinforce credibility.
+
+#### **14. Cognitive Dissonance**  
+- **Definition:** People experience discomfort when holding conflicting beliefs, leading to **attitude changes**.  
+- **Example:** Reinforcing **positive aspects of a purchase** to **reduce buyer's remorse**.
+
+#### **15. Emotional Appeal**  
+- **Definition:** **Emotions** significantly influence decision-making.  
+- **Example:** Using **storytelling, emotional imagery, and relatable messaging**.
+
+#### **16. Bandwagon Effect**  
+- **Definition:** People are **more likely** to do something if **others are doing it**.  
+- **Example:** Highlighting **high sales numbers, viral trends, or social media mentions**.
+
+#### **17. Frequency Illusion (Baader-Meinhof Phenomenon)**  
+- **Definition:** Once people **notice something**, they **see it more frequently**.  
+- **Example:** Increasing **brand exposure through multiple channels**.
+
+#### **18. In-Group Favoritism**  
+- **Definition:** People prefer **products that align with their identity groups**.  
+- **Example:** **Targeted messaging** toward specific **demographics, cultures, or communities**.
+
+#### **19. Hyperbolic Discounting**  
+- **Definition:** People prefer **immediate rewards** over **delayed benefits**.  
+- **Example:** Offering **instant discounts or rewards for immediate action**.
+
+#### **20. Paradox of Choice**  
+- **Definition:** Too many choices **overwhelm** consumers, leading to **decision paralysis**.  
+- **Example:** **Simplifying choices** with **curated selections or recommended options**.
+
+---
+
+### **Structured Table Format**
+For each principle, the response should be structured as follows:
+
+| **Applies the Principle** | **Principle (Description)** | **Explanation** | **How It Could Be Implemented** |
+|-----------------|---------------------------------|-----------------------------------------|----------------------------------------------|
+| **None / Some / A Lot** | **Anchoring** (The first info encountered affects decisions) | The content does/does not emphasize a strong initial anchor (e.g., pricing, comparison) | Introduce price anchoring or reference points |
+| **None / Some / A Lot** | **Social Proof** (People follow the crowd) | There are / are not customer reviews, testimonials, or influencer endorsements | Increase visible user-generated content |
+| **None / Some / A Lot** | **Scarcity** (Limited availability increases desire) | The content does/does not create urgency with time-limited offers or stock scarcity | Add countdown timers or scarcity messaging |
+| **None / Some / A Lot** | **Reciprocity** (Giving first increases the chance of return) | There is / is not a free sample, trial, or incentive | Introduce lead magnets or free trials |
+| **None / Some / A Lot** | **Loss Aversion** (Avoiding loss is more motivating than gaining) | The content does/does not emphasize potential losses | Frame messaging around “Don’t miss out” scenarios |
+| **None / Some / A Lot** | **Emotional Appeal** (Feelings drive decisions) | The content does/does not incorporate strong emotional storytelling | Strengthen visuals, relatable scenarios |
+
+---
+
+### **Final Summary & Recommendations**
+After the **principle-by-principle** evaluation, provide:
+1. **Overall Behavioral Science Score** (How well the content applies psychological persuasion principles).
+2. **Key Strengths** (Which behavioral principles were effectively applied).
+3. **Areas for Improvement** (Which principles were underutilized or missing).
+4. **3-5 Actionable Strategies** to **enhance engagement and persuasion**.
     """
         try:
             if is_image:
@@ -594,72 +897,125 @@ Using the following Behavioral Science principles, assess whether the marketing 
 
     def nlp_principles_analysis(uploaded_file, is_image=True):
         prompt = """
-Using the following Neuro-Linguistic Programming (NLP) techniques, assess whether the marketing content does or does not apply each principle. present the information in a table with columns: Applies the principle (None, some, A Lot), Principle (Description), Explanation, how it could be implemented. These are the principles to assess:
+**Objective:**  
+Evaluate the **marketing content** using **Neuro-Linguistic Programming (NLP) techniques** to determine its effectiveness in persuasion and engagement.  
+---
+### **Instructions:**  
+1. **Assessment Table Format:**  
+   - Analyze whether the **marketing content** applies each NLP principle **fully, partially, or not at all**.  
+   - Present the findings in a **structured table** with the following columns:  
+     - **Applies the Principle** (None, Some, A Lot)  
+     - **Principle (Description)**  
+     - **Explanation** (How the content applies—or does not apply—the principle)  
+     - **How It Could Be Implemented** (Recommendations to strengthen the application)  
 
+2. **Comprehensive Evaluation:**  
+   - Review **each NLP principle systematically** to identify **strengths, weaknesses, and opportunities for improvement**.  
+   - Offer **practical and specific** recommendations for **enhancing engagement and persuasion**.  
+---
+### **Neuro-Linguistic Programming (NLP) Techniques for Assessment**  
 
-Here are the top 20 Neuro-Linguistic Programming (NLP) techniques to assess the effectiveness of static marketing content, including examples:
+#### **1. Representational Systems**  
+- **Definition:** People process information visually, auditorily, or kinesthetically.  
+- **Example:** If the target audience prefers visual information, **use strong imagery, colors, and graphics**.  
 
-Representational Systems:
+#### **2. Anchoring**  
+- **Definition:** Associating emotions or experiences with specific stimuli.  
+- **Example:** **Consistently using brand colors, logos, or music** to create **familiarity and trust**.  
 
-Example: If your target audience prefers visual information, ensure the content includes vivid images and visually appealing graphics.
-Anchoring:
+#### **3. Meta-Modeling**  
+- **Definition:** Challenging vague statements to enhance clarity and precision.  
+- **Example:** Instead of **"Best product available"**, say **"Rated #1 by Consumer Reports for durability and performance."**  
 
-Example: Use consistent colors and logos to create positive associations with your brand every time the audience sees them.
-Meta-Modeling:
+#### **4. Milton Model**  
+- **Definition:** Using ambiguous and persuasive language to engage subconscious decision-making.  
+- **Example:** **"You may start to feel more confident using this product..."** (open-ended suggestion).  
 
-Example: Clarify ambiguous statements like "Our product is the best" by specifying "Our product is rated #1 for quality by Consumer Reports."
-Milton Model:
+#### **5. Chunking**  
+- **Definition:** Adjusting the level of detail based on audience preference.  
+- **Example:** **Providing high-level benefits first**, then offering **detailed product specifications** for those seeking more information.  
 
-Example: Use phrases like "You may find yourself feeling more relaxed when using our product" to embed suggestions subtly.
-Chunking:
+#### **6. Pacing and Leading**  
+- **Definition:** Establishing rapport by aligning with the audience’s current mindset before introducing new ideas.  
+- **Example:** **"Do you struggle with productivity? Our planner can help you stay on track effortlessly."**  
 
-Example: Provide both high-level benefits (chunking up) and detailed features (chunking down) of your product to cater to different audience needs.
-Pacing and Leading:
+#### **7. Swish Pattern**  
+- **Definition:** Replacing negative associations with positive ones.  
+- **Example:** **Using imagery of an untidy desk transitioning to an organized workspace** to **imply transformation and improvement**.  
 
-Example: Start with a relatable problem (pacing) like "Do you struggle with time management?" and lead to your solution: "Our planner can help you stay organized and efficient."
-Swish Pattern:
+#### **8. Submodalities**  
+- **Definition:** Adjusting sensory details to create stronger emotional impact.  
+- **Example:** **Using high-contrast colors and larger fonts for key messages** to ensure visibility and urgency.  
 
-Example: Replace negative images (e.g., cluttered desk) with positive images (e.g., clean, organized workspace) in your content.
-Submodalities:
+#### **9. Perceptual Positions**  
+- **Definition:** Viewing content from different perspectives (self, others, observer).  
+- **Example:** **"Imagine how much time you will save…"** (self), **"Your colleagues will admire your organization"** (others), **"Experts recommend this approach"** (observer).  
 
-Example: Use bright, bold colors for calls to action to evoke excitement and urgency.
-Perceptual Positions:
+#### **10. Well-Formed Outcomes**  
+- **Definition:** Ensuring the marketing message clearly defines **a goal, path, and achievable result**.  
+- **Example:** **"Increase your productivity by 20% within 30 days using our planner."**  
 
-Example: Present content from the user's perspective ("You will benefit from..."), from others' perspectives ("Others will admire your..."), and from an observer's perspective ("Imagine the positive impact...").
-Well-Formed Outcomes:
+#### **11. Rapport Building**  
+- **Definition:** Aligning language, values, and emotions with the audience.  
+- **Example:** **Using language that resonates with the audience’s lifestyle or professional challenges.**  
 
-Example: Clearly state the desired outcome: "Increase your productivity by 20% with our planner in just one month."
-Rapport Building:
+#### **12. Calibration**  
+- **Definition:** Adjusting content based on **user engagement metrics and feedback**.  
+- **Example:** **Monitoring engagement rates and refining messaging for better clarity and impact.**  
 
-Example: Use language that resonates with your audience’s values and experiences: "We understand how hectic life can be, and we’re here to help."
-Calibration:
+#### **13. Reframing**  
+- **Definition:** Changing perception by presenting a new perspective.  
+- **Example:** **"Traffic isn’t wasted time—it’s an opportunity to learn through our podcast!"**  
 
-Example: Monitor engagement metrics like click-through rates and adjust content accordingly to better meet audience needs.
-Reframing:
+#### **14. Logical Levels**  
+- **Definition:** Addressing audience needs at different levels:  
+  - **Environment** – Where they interact with the product (**"Work from anywhere"**).  
+  - **Behavior** – How they use it (**"Stay focused and organized"**).  
+  - **Identity** – What it means about them (**"Be a highly effective professional"**).  
 
-Example: Turn a negative situation into a positive opportunity: "Stuck in traffic? Use this time to listen to our educational podcasts and learn something new."
-Logical Levels:
+#### **15. Timeline Therapy**  
+- **Definition:** Presenting past, present, and future outcomes to shape perception.  
+- **Example:** **"Thousands have already improved their workflow, and now it's your turn!"**  
 
-Example: Ensure your content addresses different levels, from environment ("Work anywhere") to identity ("Be a proactive leader").
-Timeline Therapy:
+#### **16. Meta Programs**  
+- **Definition:** Understanding **whether the audience is motivated toward goals or away from problems**.  
+- **Example:** **"Achieve your dream productivity levels"** (toward) vs. **"Eliminate distractions and wasted time"** (away from).  
 
-Example: Highlight past successes, current benefits, and future potential: "Our product has helped thousands, it’s helping people right now, and it can help you too."
-Meta Programs:
+#### **17. Strategy Elicitation**  
+- **Definition:** Mapping **step-by-step user decisions** to align with their thinking process.  
+- **Example:** **"Step 1: Sign up. Step 2: Select your goals. Step 3: Achieve success."**  
 
-Example: Tailor content to different motivational patterns, such as "towards" goals ("Achieve your dreams with our help") or "away from" problems ("Avoid stress with our solution").
-Strategy Elicitation:
+#### **18. Sensory Acuity**  
+- **Definition:** Enhancing sensory appeal to **increase emotional engagement**.  
+- **Example:** **"Feel the soft leather, see the rich color, and hear the precision of our product."**  
 
-Example: Show step-by-step how to use your product to achieve desired results, aligning with the audience's decision-making strategies.
-Sensory Acuity:
+#### **19. Pattern Interrupts**  
+- **Definition:** Using unexpected elements to **capture attention and break habitual thinking patterns**.  
+- **Example:** **"Most planners don’t work—here’s why ours does."**  
 
-Example: Use descriptive language that appeals to the senses: "Feel the soft texture, see the vibrant colors, and hear the clear sound."
-Pattern Interrupts:
+#### **20. Belief Change Techniques**  
+- **Definition:** Overcoming audience skepticism by **challenging limiting beliefs**.  
+- **Example:** **Showcasing case studies or testimonials to counter doubts.**  
 
-Example: Include unexpected elements like surprising statistics or bold images to capture attention and break habitual thought patterns.
-Belief Change Techniques:
+---
 
-Example: Challenge limiting beliefs with testimonials or case studies that show successful outcomes, shifting beliefs towards the positive.
-By utilizing these NLP techniques, you can create static marketing content that is more engaging, persuasive, and effective in achieving your marketing goals.
+### **Structured Table Format**
+The response should be formatted as follows:
+
+| **Applies the Principle** | **Principle (Description)** | **Explanation** | **How It Could Be Implemented** |
+|-----------------|---------------------------------|-----------------------------------------|----------------------------------------------|
+| **None / Some / A Lot** | **Anchoring** (Creating strong brand associations) | The content does/does not reinforce brand recognition through colors, logos, or repeated messaging. | Introduce visual consistency in branding. |
+| **None / Some / A Lot** | **Meta-Modeling** (Enhancing clarity) | The content does/does not use vague claims like "Best on the market" without evidence. | Add specific data or credibility indicators. |
+| **None / Some / A Lot** | **Pacing and Leading** (Aligning with user experiences) | The content does/does not connect with audience struggles before presenting a solution. | Start by identifying common audience pain points. |
+| **None / Some / A Lot** | **Belief Change Techniques** (Challenging skepticism) | The content does/does not address potential objections with proof. | Include customer testimonials or expert validation. |
+
+---
+### **Final Summary & Recommendations**
+After analyzing the content through **NLP principles**, provide:
+1. **Overall NLP Effectiveness Score** (How well the content applies persuasion techniques).  
+2. **Key Strengths** (Which NLP techniques are effectively used).  
+3. **Areas for Improvement** (Which NLP techniques are missing or underutilized).  
+4. **3-5 Actionable Strategies** for **enhancing engagement and impact**.
     """
         try:
             if is_image:
@@ -690,44 +1046,70 @@ By utilizing these NLP techniques, you can create static marketing content that 
             
     def text_analysis(uploaded_file, is_image=True):
         prompt = """
-As a UX design and marketing analysis consultant, you are tasked with reviewing the text content of a marketing asset (image or video, excluding the headline) for a client. Your goal is to provide a comprehensive analysis of the text's effectiveness and offer actionable recommendations for improvement, making sure that all responses are provided in English.
-**Important:** Please provide all your analysis and recommendations in English, regardless of the language used in the original marketing asset.
-**Part 1: Text Extraction and Contextualization**
+### **Objective:**  
+Analyze the **text content** of a marketing asset (**image or video, excluding the headline**) to assess its effectiveness in clarity, engagement, persuasion, and relevance. Provide actionable recommendations for improvement.
+---
+### **Instructions:**  
 
-* **Image Analysis:**
-  1. **Text Extraction:** Thoroughly identify and extract ALL visible text within the image, including headlines, body copy, captions, calls to action, taglines, logos, and any other textual elements. Also, Translate non-English text to English.
-  2. **Presentation:** Present the extracted text in a clear, bulleted list format, maintaining the original order and structure as much as possible.
-  3. **Visual Analysis:**
-     * **Placement:** Specify the location of each text element within the image (e.g., top left, centered, bottom right). Note any instances of overlapping text or elements that might hinder readability.
-     * **Font Choices:** Describe the font style (serif, sans-serif, script, etc.), weight (bold, regular, light), size, and color of each distinct text element.
-     * **Visual Relationships:** Explain how the text interacts with other visual elements (images, graphics, colors) and how it contributes to the overall message and hierarchy of information.
+#### **Part 1: Text Extraction and Contextualization**  
 
-* **Video Analysis:**
-  1. **Key Frame Identification:** Select the most representative frame(s) that showcase the primary text content.
-  2. **Text Extraction:** Extract and present the text from these key frames in a clear, bulleted list format.
-  3. **Temporal Analysis:** Briefly describe any significant textual changes or patterns that occur throughout the video.
-  4. **Integration with Visuals and Audio:** Analyze how the text interacts with the video's visuals (scenes, characters, actions) and audio (dialogue, music, sound effects).
+- **Image Analysis:**  
+  1. **Text Extraction:** Identify and extract **ALL visible text** in the image, including:  
+     - Body copy  
+     - Captions  
+     - Calls to action  
+     - Taglines  
+     - Logo text  
+     - Any other textual elements  
+  2. **Translation:** If the text is **not in English**, first **translate it accurately into English**.  
+  3. **Presentation:** Display the extracted text in **a structured, bulleted list** maintaining the **original order and structure** as closely as possible.  
+  4. **Visual Analysis:**  
+     - **Placement:** Specify where each text element is located (e.g., **top left, center, bottom right**). Identify **overlapping text** or **visual clutter** that may impact readability.  
+     - **Font Choices:** Describe the **font type** (serif, sans-serif, script), **weight** (bold, regular, light), **size**, and **color** of each text element.  
+     - **Text & Visual Interactions:** Explain how the **text integrates with other visual elements** (images, graphics, colors) and whether it **supports** or **detracts from** the overall message.  
 
-**Part 2: Textual Assessment**
+- **Video Analysis:**  
+  1. **Key Frame Identification:** Select the **most representative frame(s)** that showcase **primary text content**.  
+  2. **Text Extraction:** Extract and present the **visible text** from these frames in a **structured, bulleted list**.  
+  3. **Temporal Analysis:** Summarize how **text elements change throughout the video**, noting key **timing patterns** or **animated effects** that influence visibility.  
+  4. **Integration with Visuals & Audio:** Analyze how the **text interacts with visuals (scenes, characters, actions)** and **audio elements (dialogue, music, sound effects)**.  
 
-Evaluate the extracted text based on the following criteria. For each aspect, provide a score from 1 (poor) to 5 (excellent) in increments of 0.5, a concise justification of the score highlighting strengths and weaknesses, and specific, actionable suggestions for enhancing the text's effectiveness. Structure your assessment in a table format with columns for Aspect, Score, Explanation, and Improvement.
+---
 
-| Aspect                     | Score | Explanation                                                                                                | Improvement                                                                                      |
-|----------------------------|-------|------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------|
-| Clarity and Conciseness    |       | Assess how easy it is to understand the text, considering sentence structure, vocabulary, and overall flow.| Suggest ways to simplify language, eliminate jargon, or shorten sentences.                       |
-| Customer Focus             |       | Evaluate if the text addresses the customer's needs and uses language that resonates with them.            | Offer suggestions for incorporating the customer's perspective more effectively.                  |
-| Engagement                 |       | Assess how compelling the text is, including storytelling, humor, and value proposition.                   | Propose methods to enhance engagement, such as using stronger verbs or improving formatting.      |
-| Reading Effort             |       | Evaluate the ease of reading and understanding the text, considering vocabulary and sentence structure.   | Suggest using simpler structures and more accessible vocabulary.                                  |
-| Purpose and Value          |       | Determine if the text's purpose and value proposition are clear and compelling.                            | Recommend clarifying the key message or benefits more directly.                                   |
-| Motivation & Persuasion    |       | Analyze the text's persuasive power, including calls to action and social proof.                          | Suggest strengthening persuasive elements, such as adding stronger calls to action.               |
-| Depth and Detail           |       | Evaluate if the text provides sufficient information and detail for the target audience.                   | Suggest adding or condensing information as necessary to meet audience needs.                     |
-| Trustworthiness            |       | Assess the credibility of the text and its success in building trust with the audience.                    | Suggest ways to enhance trustworthiness, such as using more transparent language.                 |
-| Memorability               |       | Evaluate if the text includes memorable elements such as catchy phrases or unique storytelling techniques. | Recommend incorporating memorable language or anecdotes to enhance retention.                     |
-| Emotional Appeal           |       | Determine if the text evokes appropriate emotions aligned with the brand image and message.                | Suggest using language that evokes specific emotions to strengthen emotional impact.              |
-| Uniqueness & Differentiation|       | Analyze if the text differentiates the brand from competitors effectively.                                  | Suggest ways to enhance uniqueness, such as developing a stronger brand voice.                    |
-| Urgency and Curiosity      |       | Assess if the text creates a sense of urgency or curiosity, enticing the audience to learn more.           | Recommend methods to increase urgency, such as highlighting limited-time offers.                  |
-| Benefit Orientation        |       | Evaluate if the text clearly articulates the benefits of the product/service to the target audience.       | Suggest making benefits more explicit and customer-centric.                                       |
-| Target Audience Relevance  |       | Determine if the text's language, tone, and style are appropriate and appealing to the intended audience.  | Suggest adjustments to better align with the audience's interests and needs.                      |
+### **Part 2: Textual Assessment**  
+
+**Evaluation Criteria:**  
+- **For each aspect**, assign a **score from 1 (poor) to 5 (excellent)** in **0.5 increments**.  
+- Provide a **concise justification** highlighting **strengths, weaknesses, and opportunities for improvement**.  
+- Offer **clear, specific recommendations** to **enhance readability, engagement, and conversion potential**.  
+- Structure the analysis in **a table format** with the following columns:  
+
+| **Aspect**                 | **Score** | **Explanation** (Strengths & Weaknesses) | **Improvement** (Specific Actionable Steps) |
+|----------------------------|----------|-----------------------------------------|---------------------------------------------|
+| **Clarity & Conciseness**  | _1-5_    | How easy is the text to understand? Are sentences clear and well-structured? | Simplify language, remove jargon, shorten sentences for better clarity. |
+| **Customer Focus**         | _1-5_    | Does the text **address audience needs** and **resonate with their preferences**? | Adjust messaging to make it **more customer-centric**, emphasizing **pain points and solutions**. |
+| **Engagement**             | _1-5_    | How **compelling** is the text? Does it use storytelling, humor, or persuasive techniques? | Use **stronger verbs, storytelling, or a more dynamic tone** to captivate the reader. |
+| **Reading Effort**         | _1-5_    | Is the text **easy to read and process** for the average user? | Use **simpler vocabulary and sentence structures** for better accessibility. |
+| **Purpose & Value**        | _1-5_    | Does the text **clearly communicate** its **purpose and value** to the audience? | Make the **value proposition** more **explicit and compelling**. |
+| **Motivation & Persuasion**| _1-5_    | How effectively does the text **persuade users**? Are there **strong CTAs or social proof**? | Strengthen **calls to action**, use **authority indicators** (reviews, statistics). |
+| **Depth & Detail**         | _1-5_    | Is the text **too vague** or does it provide **enough information** for decision-making? | Adjust text length by **adding missing details** or **removing unnecessary content**. |
+| **Trustworthiness**        | _1-5_    | Does the text build **credibility** through language, tone, and factual accuracy? | Use **transparent, informative language** to **reinforce authenticity**. |
+| **Memorability**           | _1-5_    | Is the text **unique, catchy, or distinctive**? Does it include **memorable elements**? | Incorporate **catchy phrases, unique brand messaging**, or **a storytelling approach**. |
+| **Emotional Appeal**       | _1-5_    | Does the text **evoke the right emotions** aligned with the brand’s message? | Refine **word choice and tone** to evoke stronger **emotional connections**. |
+| **Uniqueness & Differentiation** | _1-5_ | Does the text make the brand stand out from competitors? | Enhance **brand personality**, avoid **generic phrasing**. |
+| **Urgency & Curiosity**    | _1-5_    | Does the text create **a sense of urgency or intrigue**? | Use **time-sensitive phrases** or **engaging hooks** to prompt action. |
+| **Benefit Orientation**    | _1-5_    | Does the text focus on **benefits** rather than just **features**? | Make benefits **more explicit and customer-focused**. |
+| **Target Audience Relevance** | _1-5_ | Does the text use the **right language, tone, and style** for the intended audience? | Adjust phrasing to **match audience preferences and expectations**. |
+
+---
+
+### **Final Summary & Recommendations**  
+
+At the end of the evaluation, **provide a well-structured summary** with:  
+1. **Overall Effectiveness Score** (based on the average of all individual scores).  
+2. **Key Strengths:** A **summary of what works well** in the text.  
+3. **Areas for Improvement:** The **top 3-5 areas** where the text could be enhanced.  
+4. **Action Plan:** A **concise, prioritized list of recommendations** to optimize readability, engagement, and persuasion.
 """
         try:
             if is_image:
@@ -757,32 +1139,109 @@ Evaluate the extracted text based on the following criteria. For each aspect, pr
             st.error(f"Response from model: {response}")  # Log the response from the model if possible
     def Text_Analysis_2(uploaded_file, is_image=True):
         prompt = """
-If the content is non-english, translate the content to English. PLease evaluate the image against these principles:
+### **Objective:**  
+Analyze the provided **image content** for **textual, structural, visual, and compliance-related aspects** to ensure its marketing effectiveness. Evaluate and provide actionable recommendations for improvement.
+---
 
-1. Textual Analysis
-Readability Analysis: Use tools like the Flesch-Kincaid readability tests to determine how easy the content is to read. This helps ensure that the language is appropriate for the target audience.
-Lexical Diversity: Analyze the variety of words used in the content. High lexical diversity can indicate richness in language, which can be engaging, while lower diversity might be simpler and clearer.
-2. Semantic Analysis
-Keyword Analysis: Evaluate the frequency and placement of key terms related to the brand or product. Ensure that the most important keywords are prominently featured and well-integrated.
-Topic Modeling: Use techniques like Latent Dirichlet Allocation (LDA) to identify the main topics covered in the content. This helps in understanding if the content aligns with the intended message and themes.
-3. Sentiment Analysis
-Polarity Assessment: Use natural language processing (NLP) tools to analyze the sentiment of the content, categorizing it as positive, negative, or neutral. This helps in ensuring the tone matches the intended emotional impact.
-Emotion Detection: Beyond simple sentiment, more advanced NLP tools can detect specific emotions (joy, anger, sadness, etc.) conveyed by the content.
-4. Structural Analysis
-Narrative Structure: Examine the structure of the content to ensure it follows a logical flow. For instance, a typical narrative structure might include an introduction, problem statement, solution, and conclusion.
-Visual Composition Analysis: For visual marketing content, analyze the layout, use of colors, fonts, and imagery. Ensure that these elements are aligned with branding guidelines and are aesthetically pleasing.
-5. Linguistic Style Matching
-Consistency with Brand Voice: Analyze if the content maintains consistency with the established brand voice and style guidelines. This involves checking for tone, style, and terminology.
-Grammar and Syntax Analysis: Use grammar checking tools to ensure the content is free from grammatical errors and awkward phrasing.
-6. Cohesion and Coherence Analysis
-Cohesion Metrics: Measure how well different parts of the text link together. Tools like Coh-Metrix can provide insights into the coherence of the content.
-Logical Flow: Evaluate the logical progression of ideas to ensure the content flows smoothly and makes logical sense from start to finish.
-7. Visual and Multimodal Analysis
-Image and Text Alignment: Analyze the relationship between text and images in the content. Ensure that images support and enhance the message conveyed by the text.
-Aesthetic Quality: Evaluate the aesthetic elements of visual content, considering aspects like balance, symmetry, color harmony, and typography.
-8. Compliance and Ethical Analysis
-Regulatory Compliance: Ensure that the content complies with advertising regulations and industry standards.
-Ethical Considerations: Analyze the content for any potential ethical issues, such as misleading claims, cultural insensitivity, or inappropriate content.
+### **Instructions:**  
+
+#### **Step 1: Translation (if applicable)**  
+- If the content is **not in English**, first **translate it accurately into English** before proceeding with the analysis.
+---
+
+### **Step 2: Evaluation Criteria**  
+- **Each aspect** should be assigned a **score from 1 (poor) to 5 (excellent)** in **0.5 increments**.  
+- Provide a **concise explanation** of strengths and weaknesses.  
+- Offer **specific, actionable recommendations** to enhance **clarity, engagement, and effectiveness**.  
+- **Results should be structured in a table format** with the following columns:  
+
+| **Aspect**                     | **Score** | **Explanation** (Strengths & Weaknesses) | **Improvement** (Specific Actionable Steps) |
+|----------------------------|----------|-----------------------------------------|---------------------------------------------|
+
+---
+
+### **Step 3: Detailed Image Analysis**  
+
+#### **1. Textual Analysis**  
+- **Readability Analysis:**  
+  - Measure readability using the **Flesch-Kincaid readability test** to determine how **easy or difficult** the content is to read.  
+  - Ensure that the language is appropriate for the **target audience's education and literacy level**.  
+
+- **Lexical Diversity:**  
+  - Evaluate the **variety of words used** in the content.  
+  - **Higher diversity** can indicate **richness in language** but may reduce clarity.  
+  - **Lower diversity** may be **simpler and clearer** but risks sounding repetitive.  
+
+#### **2. Semantic Analysis**  
+- **Keyword Analysis:**  
+  - Identify **key terms related to the brand or product** and analyze their **frequency, prominence, and integration**.  
+  - Ensure **strategic placement** of keywords for **SEO and brand messaging clarity**.  
+
+- **Topic Modeling:**  
+  - Use techniques like **Latent Dirichlet Allocation (LDA)** to identify the **main themes of the content**.  
+  - Assess if these topics align with the **intended marketing message and brand strategy**.  
+
+#### **3. Sentiment Analysis**  
+- **Polarity Assessment:**  
+  - Use **Natural Language Processing (NLP)** to categorize the sentiment as **positive, neutral, or negative**.  
+  - Ensure the **tone aligns with the brand’s intended emotional impact**.  
+
+- **Emotion Detection:**  
+  - Beyond polarity, analyze for **specific emotions** conveyed (e.g., **joy, anger, excitement, sadness**).  
+  - Assess if the content **evokes the desired emotions in the target audience**.  
+
+#### **4. Structural Analysis**  
+- **Narrative Structure:**  
+  - Does the text follow a logical sequence (e.g., **introduction → problem statement → solution → CTA**)?
+  - Ensure the **message is easy to follow and compelling**.  
+
+- **Visual Composition Analysis:**  
+  - Analyze the **layout, typography, color scheme, and imagery**.  
+  - Ensure alignment with **brand guidelines** and **aesthetic best practices**.  
+
+#### **5. Linguistic Style Matching**  
+- **Consistency with Brand Voice:**  
+  - Does the content match the **brand’s tone, style, and personality**?  
+  - Ensure **terminology and phrasing are aligned with prior brand communications**.  
+
+- **Grammar & Syntax Analysis:**  
+  - Check for **grammatical errors, awkward phrasing, and sentence structure**.  
+  - Ensure the text is **polished and professional**.  
+
+#### **6. Cohesion & Coherence Analysis**  
+- **Cohesion Metrics:**  
+  - Evaluate how **well different parts of the text link together** for **logical consistency**.  
+  - Use tools like **Coh-Metrix** to assess readability and content cohesion.  
+
+- **Logical Flow:**  
+  - Ensure the **progression of ideas** makes **sense** and **guides the reader effectively**.  
+
+#### **7. Visual & Multimodal Analysis**  
+- **Image & Text Alignment:**  
+  - Assess how **text elements interact with visuals** (e.g., are they **complementary or distracting**?).  
+  - Ensure **proper contrast, positioning, and readability**.  
+
+- **Aesthetic Quality:**  
+  - Evaluate design elements like **balance, symmetry, typography, and color harmony**.  
+  - Ensure the image is **visually appealing and professional**.  
+
+#### **8. Compliance & Ethical Analysis**  
+- **Regulatory Compliance:**  
+  - Verify that the content adheres to **advertising regulations and industry standards**.  
+  - Ensure there are **no misleading claims, false advertising, or unverified testimonials**.  
+
+- **Ethical Considerations:**  
+  - Assess whether the content is **culturally sensitive, non-offensive, and inclusive**.  
+  - Ensure there are **no stereotypes, biases, or potentially harmful messaging**.  
+---
+### **Final Summary & Recommendations**  
+
+At the end of the evaluation, **provide a well-structured summary** with:  
+
+1. **Overall Effectiveness Score** (average of all individual scores).  
+2. **Key Strengths:** A **summary of what works well** in the text and design.  
+3. **Areas for Improvement:** The **top 3-5 areas** that require enhancement.  
+4. **Action Plan:** A **concise, prioritized list of recommended changes** to optimize clarity, engagement, and marketing impact.
 """
         try:
             if is_image:
@@ -812,32 +1271,113 @@ Ethical Considerations: Analyze the content for any potential ethical issues, su
             return None
     def Text_Analysis_2_table(uploaded_file, is_image=True):
         prompt = """
-If the content is non-english, translate the content to English. PLease evaluate the image against these principles in a table with a score for each element and sub element, from 1-5, in increments of 0.5. Please also include columns for analysis and  recommendations:
+### **Objective:**  
+Analyze the provided **image content** for **textual, semantic, sentiment, structural, and compliance-related aspects** to ensure its marketing effectiveness. Evaluate and provide **actionable recommendations** for improvement.
 
-1. Textual Analysis
-Readability Analysis: Use tools like the Flesch-Kincaid readability tests to determine how easy the content is to read. This helps ensure that the language is appropriate for the target audience.
-Lexical Diversity: Analyze the variety of words used in the content. High lexical diversity can indicate richness in language, which can be engaging, while lower diversity might be simpler and clearer.
-2. Semantic Analysis
-Keyword Analysis: Evaluate the frequency and placement of key terms related to the brand or product. Ensure that the most important keywords are prominently featured and well-integrated.
-Topic Modeling: Use techniques like Latent Dirichlet Allocation (LDA) to identify the main topics covered in the content. This helps in understanding if the content aligns with the intended message and themes.
-3. Sentiment Analysis
-Polarity Assessment: Use natural language processing (NLP) tools to analyze the sentiment of the content, categorizing it as positive, negative, or neutral. This helps in ensuring the tone matches the intended emotional impact.
-Emotion Detection: Beyond simple sentiment, more advanced NLP tools can detect specific emotions (joy, anger, sadness, etc.) conveyed by the content.
-4. Structural Analysis
-Narrative Structure: Examine the structure of the content to ensure it follows a logical flow. For instance, a typical narrative structure might include an introduction, problem statement, solution, and conclusion.
-Visual Composition Analysis: For visual marketing content, analyze the layout, use of colors, fonts, and imagery. Ensure that these elements are aligned with branding guidelines and are aesthetically pleasing.
-5. Linguistic Style Matching
-Consistency with Brand Voice: Analyze if the content maintains consistency with the established brand voice and style guidelines. This involves checking for tone, style, and terminology.
-Grammar and Syntax Analysis: Use grammar checking tools to ensure the content is free from grammatical errors and awkward phrasing.
-6. Cohesion and Coherence Analysis
-Cohesion Metrics: Measure how well different parts of the text link together. Tools like Coh-Metrix can provide insights into the coherence of the content.
-Logical Flow: Evaluate the logical progression of ideas to ensure the content flows smoothly and makes logical sense from start to finish.
-7. Visual and Multimodal Analysis
-Image and Text Alignment: Analyze the relationship between text and images in the content. Ensure that images support and enhance the message conveyed by the text.
-Aesthetic Quality: Evaluate the aesthetic elements of visual content, considering aspects like balance, symmetry, color harmony, and typography.
-8. Compliance and Ethical Analysis
-Regulatory Compliance: Ensure that the content complies with advertising regulations and industry standards.
-Ethical Considerations: Analyze the content for any potential ethical issues, such as misleading claims, cultural insensitivity, or inappropriate content.
+---
+
+### **Instructions:**  
+
+#### **Step 1: Translation (if applicable)**  
+- If the content is **not in English**, first **translate it accurately into English** before proceeding with the analysis.
+
+---
+
+### **Step 2: Evaluation Criteria**  
+- **Each aspect** should be assigned a **score from 1 (poor) to 5 (excellent)** in **0.5 increments**.  
+- Provide a **concise explanation** of strengths and weaknesses.  
+- Offer **specific, actionable recommendations** to enhance **clarity, engagement, and effectiveness**.  
+- **Results should be structured in a table format** with the following columns:  
+
+| **Aspect**                     | **Score** | **Explanation** (Strengths & Weaknesses) | **Improvement** (Specific Actionable Steps) |
+|----------------------------|----------|-----------------------------------------|---------------------------------------------|
+
+---
+
+### **Step 3: Detailed Image Analysis**  
+
+#### **1. Textual Analysis**  
+- **Readability Analysis:**  
+  - Evaluate readability using **Flesch-Kincaid readability tests** to determine how **easy or difficult** the content is to read.  
+  - Ensure that the language is appropriate for the **target audience's literacy level and cognitive load**.  
+
+- **Lexical Diversity:**  
+  - Analyze the **variety of words used** in the content.  
+  - **Higher diversity** can indicate **richness in language**, enhancing engagement.  
+  - **Lower diversity** may be **simpler and clearer**, reducing cognitive effort.  
+
+#### **2. Semantic Analysis**  
+- **Keyword Analysis:**  
+  - Identify **key terms related to the brand or product** and analyze their **frequency, prominence, and integration**.  
+  - Ensure **strategic placement** of keywords for **SEO and brand messaging clarity**.  
+
+- **Topic Modeling:**  
+  - Use techniques like **Latent Dirichlet Allocation (LDA)** to identify the **main themes of the content**.  
+  - Assess if these topics align with the **intended marketing message and brand strategy**.  
+
+#### **3. Sentiment Analysis**  
+- **Polarity Assessment:**  
+  - Use **Natural Language Processing (NLP)** to categorize the sentiment as **positive, neutral, or negative**.  
+  - Ensure the **tone aligns with the brand’s intended emotional impact**.  
+
+- **Emotion Detection:**  
+  - Beyond polarity, analyze for **specific emotions** conveyed (e.g., **joy, anger, excitement, sadness**).  
+  - Assess if the content **evokes the desired emotions in the target audience**.  
+
+#### **4. Structural Analysis**  
+- **Narrative Structure:**  
+  - Does the text follow a logical sequence (e.g., **introduction → problem statement → solution → CTA**)?
+  - Ensure the **message is clear, compelling, and actionable**.  
+
+- **Visual Composition Analysis:**  
+  - Analyze the **layout, typography, color scheme, and imagery**.  
+  - Ensure alignment with **brand guidelines** and **aesthetic best practices**.  
+
+#### **5. Linguistic Style Matching**  
+- **Consistency with Brand Voice:**  
+  - Does the content match the **brand’s tone, style, and personality**?  
+  - Ensure **terminology and phrasing align with prior brand communications**.  
+
+- **Grammar & Syntax Analysis:**  
+  - Check for **grammatical errors, awkward phrasing, and sentence structure**.  
+  - Ensure the text is **polished, professional, and free of ambiguity**.  
+
+#### **6. Cohesion & Coherence Analysis**  
+- **Cohesion Metrics:**  
+  - Evaluate how **well different parts of the text link together** for **logical consistency**.  
+  - Use tools like **Coh-Metrix** to assess readability and content cohesion.  
+
+- **Logical Flow:**  
+  - Ensure the **progression of ideas** makes **sense** and **guides the reader effectively**.  
+
+#### **7. Visual & Multimodal Analysis**  
+- **Image & Text Alignment:**  
+  - Assess how **text elements interact with visuals** (e.g., are they **complementary or distracting**?).  
+  - Ensure **proper contrast, positioning, and readability**.  
+
+- **Aesthetic Quality:**  
+  - Evaluate design elements like **balance, symmetry, typography, and color harmony**.  
+  - Ensure the image is **visually appealing, professional, and optimized for engagement**.  
+
+#### **8. Compliance & Ethical Analysis**  
+- **Regulatory Compliance:**  
+  - Verify that the content adheres to **advertising regulations and industry standards**.  
+  - Ensure there are **no misleading claims, false advertising, or unverified testimonials**.  
+
+- **Ethical Considerations:**  
+  - Assess whether the content is **culturally sensitive, non-offensive, and inclusive**.  
+  - Ensure there are **no stereotypes, biases, or potentially harmful messaging**.  
+
+---
+
+### **Final Summary & Recommendations**  
+
+At the end of the evaluation, **provide a structured summary** with:  
+
+1. **Overall Effectiveness Score** (average of all individual scores).  
+2. **Key Strengths:** A **summary of what works well** in the text and design.  
+3. **Areas for Improvement:** The **top 3-5 areas** that require enhancement.  
+4. **Action Plan:** A **concise, prioritized list of recommended changes** to optimize clarity, engagement, and marketing impact.  
 """
         try:
             if is_image:
@@ -867,66 +1407,111 @@ Ethical Considerations: Analyze the content for any potential ethical issues, su
             return None        
     def headline_analysis(uploaded_file, is_image=True):
         prompt = f"""
-Imagine you are a marketing consultant reviewing the headline text of a marketing asset ({'image' if is_image else 'video'}) for a client. Your task is to assess the various headline's effectiveness based on various linguistic and marketing criteria.
+### **Objective:**  
+Analyze the **headline text** of a **marketing asset (image or video)** to assess its **effectiveness, clarity, relevance, and audience impact**. Provide structured insights and **actionable recommendations** for improvement.
 
-**Part 1: Headline Extraction and Context**
+---
 
-**Image/Video:**
-1. **Headline Identification:**
-   * **Main Headline:** Clearly state the main headline extracted from the image or video.
-   * **Image Headline (if applicable):** If the image contains a distinct headline separate from the main headline, clearly state it here.
-   * **Supporting Headline (if applicable):** If there is a supporting headline present, clearly state it here.
+### **Instructions:**  
 
-**Part 2A: Main Headline Analysis**
-"Analyze the provided image content alongside the main headline text to assess the main headline's effectiveness. Rate each criterion on a scale from 1 to 5 using increments of 0.5 (1 being poor, 5 being excellent), and provide an explanation for each score based on the synergy between the image and headline, and a recommendation on how it could be improved. Present your results in a table format with columns labeled: Criterion, Score, Explanation, Recommendation."
+#### **Step 1: Headline Extraction & Context**  
+For the given **image or video**, extract and identify the **headline elements**:  
 
-The criteria to assess are:
-1. **Overall Effectiveness:** Summarize the overall effectiveness of the headline.
-2. **Clarity:** How clearly does the headline convey the main point?
-3. **Customer Focus:** Does the headline emphasize a customer-centric approach?
-4. **Relevance:** How accurately does the headline reflect the content of the image?
-5. **Keywords:** Are relevant keywords included naturally?
-6. **Emotional Appeal:** Does the headline evoke curiosity or an emotional response, considering the image content?
-7. **Uniqueness:** How original and creative is the headline?
-8. **Urgency & Curiosity:** Does the headline create a sense of urgency or pique curiosity, considering the image?
-9. **Benefit-Driven:** Does the headline convey a clear benefit or value proposition, aligned with the image content?
-10. **Target Audience:** Is the headline tailored to resonate with the specific target audience, considering the image's visual cues?
-11. **Length & Format:** Does the headline fall within an ideal length of 6-12 words?
+1. **Main Headline:** Clearly extract the primary headline from the image or video.  
+2. **Image Headline (if applicable):** If a **distinct image-specific** headline exists, state it separately.  
+3. **Supporting Headline (if applicable):** Extract any **additional supporting headlines** contributing to the message.  
 
-**Part 2B: Image Headline Analysis**
-"Analyze the provided image content alongside the image headline text to assess the image headline's effectiveness. Rate each criterion on a scale from 1 to 5 using increments of 0.5 (1 being poor, 5 being excellent), and provide an explanation for each score based on the synergy between the image and headline, and a recommendation on how it could be improved. Present your results in a table format with columns labeled: Criterion, Score, Explanation, Recommendation."
+Ensure accurate **text extraction and formatting**, and **translate non-English text into English** for consistent evaluation.
 
-The criteria to assess are:
-1. **Overall Effectiveness:** Summarize the overall effectiveness of the headline.
-2. **Clarity:** How clearly does the headline convey the main point?
-3. **Customer Focus:** Does the headline emphasize a customer-centric approach?
-4. **Relevance:** How accurately does the headline reflect the content of the image?
-5. **Keywords:** Are relevant keywords included naturally?
-6. **Emotional Appeal:** Does the headline evoke curiosity or an emotional response, considering the image content?
-7. **Uniqueness:** How original and creative is the headline?
-8. **Urgency & Curiosity:** Does the headline create a sense of urgency or pique curiosity, considering the image?
-9. **Benefit-Driven:** Does the headline convey a clear benefit or value proposition, aligned with the image content?
-10. **Target Audience:** Is the headline tailored to resonate with the specific target audience, considering the image's visual cues?
-11. **Length & Format:** Does the headline fall within an ideal length of 6-12 words?
+---
 
-**Part 2C: Supporting Headline Analysis**
-"Analyze the provided image content alongside the supporting headline text to assess the supporting headline's effectiveness. Rate each criterion on a scale from 1 to 5 using increments of 0.5 (1 being poor, 5 being excellent), and provide an explanation for each score based on the synergy between the image and headline, and a recommendation on how it could be improved. Present your results in a table format with columns labeled: Criterion, Score, Explanation, Recommendation."
+### **Step 2: Headline Analysis & Evaluation**  
+For each headline type (**Main, Image, and Supporting**), **analyze and rate the effectiveness** based on the **image/video content** using a **structured table format**.  
 
-The criteria to assess are:
-1. **Overall Effectiveness:** Summarize the overall effectiveness of the headline.
-2. **Clarity:** How clearly does the headline convey the main point?
-3. **Customer Focus:** Does the headline emphasize a customer-centric approach?
-4. **Relevance:** How accurately does the headline reflect the content of the image?
-5. **Keywords:** Are relevant keywords included naturally?
-6. **Emotional Appeal:** Does the headline evoke curiosity or an emotional response, considering the image content?
-7. **Uniqueness:** How original and creative is the headline?
-8. **Urgency & Curiosity:** Does the headline create a sense of urgency or pique curiosity, considering the image?
-9. **Benefit-Driven:** Does the headline convey a clear benefit or value proposition, aligned with the image content?
-10. **Target Audience:** Is the headline tailored to resonate with the specific target audience, considering the image's visual cues?
-11. **Length & Format:** Does the headline fall within an ideal length of 6-12 words?
+- **Each criterion should be rated from 1 (poor) to 5 (excellent) in increments of 0.5.**  
+- Provide a **detailed explanation** supporting the score.  
+- Offer **specific, actionable recommendations** for improvement.  
 
-**Part 3: Improved Headline Suggestions**
-"Provide three improved headlines for EACH of the headline types that better align with the image content. Explain why you have selected these. Present your results in a table format with columns labeled: Headline Type (Main/Image/Supporting), Headline Recommendation, Explanation. This table must contain 9 rows."
+#### **2A: Main Headline Analysis**  
+Evaluate the **main headline's effectiveness** considering its **synergy with the image/video content**.  
+
+| **Criterion**           | **Score (1-5)** | **Explanation** (Strengths & Weaknesses) | **Recommendation** (Specific Actionable Steps) |
+|-------------------------|----------------|-----------------------------------------|---------------------------------------------|
+| **Overall Effectiveness** |                | Summarize how well the headline works overall. | Suggest general refinements. |
+| **Clarity**             |                | How clearly does the headline convey its message? | Recommend improvements for readability and simplicity. |
+| **Customer Focus**      |                | Does the headline prioritize customer needs? | Adjust wording to better engage the audience. |
+| **Relevance**          |                | Does it accurately reflect the **image/video content**? | Suggest alignment strategies with visuals. |
+| **Keywords**          |                | Are relevant keywords naturally included? | Improve SEO or messaging impact. |
+| **Emotional Appeal**  |                | Does it evoke curiosity or an emotional response? | Strengthen emotional triggers. |
+| **Uniqueness**        |                | How original and distinctive is the headline? | Offer ways to differentiate from competitors. |
+| **Urgency & Curiosity** |                | Does it create a compelling reason to act? | Enhance urgency with stronger phrasing. |
+| **Benefit-Driven**     |                | Does it clearly communicate a value proposition? | Rework wording for direct benefits. |
+| **Target Audience Fit** |                | Is it tailored to the intended demographic? | Adjust tone, language, or phrasing. |
+| **Length & Format**    |                | Does it fall within an optimal 6-12 word range? | Suggest modifications for ideal length. |
+
+---
+
+#### **2B: Image Headline Analysis**  
+Evaluate the **headline specifically related to the image content** using the same structure:
+
+| **Criterion**           | **Score (1-5)** | **Explanation** | **Recommendation** |
+|-------------------------|----------------|-----------------|---------------------|
+| **Overall Effectiveness** |                |                 |                     |
+| **Clarity**             |                |                 |                     |
+| **Customer Focus**      |                |                 |                     |
+| **Relevance**          |                |                 |                     |
+| **Keywords**          |                |                 |                     |
+| **Emotional Appeal**  |                |                 |                     |
+| **Uniqueness**        |                |                 |                     |
+| **Urgency & Curiosity** |                |                 |                     |
+| **Benefit-Driven**     |                |                 |                     |
+| **Target Audience Fit** |                |                 |                     |
+| **Length & Format**    |                |                 |                     |
+
+---
+
+#### **2C: Supporting Headline Analysis**  
+Analyze the **effectiveness of any supporting text** in relation to the **image/video content**:
+
+| **Criterion**           | **Score (1-5)** | **Explanation** | **Recommendation** |
+|-------------------------|----------------|-----------------|---------------------|
+| **Overall Effectiveness** |                |                 |                     |
+| **Clarity**             |                |                 |                     |
+| **Customer Focus**      |                |                 |                     |
+| **Relevance**          |                |                 |                     |
+| **Keywords**          |                |                 |                     |
+| **Emotional Appeal**  |                |                 |                     |
+| **Uniqueness**        |                |                 |                     |
+| **Urgency & Curiosity** |                |                 |                     |
+| **Benefit-Driven**     |                |                 |                     |
+| **Target Audience Fit** |                |                 |                     |
+| **Length & Format**    |                |                 |                     |
+
+---
+
+### **Step 3: Improved Headline Suggestions**  
+After completing the evaluation, propose **three alternative headline suggestions** for each headline type (**Main, Image, Supporting**), along with a **justification for each revision**.
+
+| **Headline Type** | **Headline Recommendation** | **Explanation (Why This Works Better)** |
+|------------------|----------------------------|----------------------------------------|
+| **Main Headline** | Suggested alternative 1 | Justification for change |
+|                  | Suggested alternative 2 | Justification for change |
+|                  | Suggested alternative 3 | Justification for change |
+| **Image Headline** | Suggested alternative 1 | Justification for change |
+|                  | Suggested alternative 2 | Justification for change |
+|                  | Suggested alternative 3 | Justification for change |
+| **Supporting Headline** | Suggested alternative 1 | Justification for change |
+|                  | Suggested alternative 2 | Justification for change |
+|                  | Suggested alternative 3 | Justification for change |
+
+---
+
+### **Final Summary & Recommendations**  
+
+1. **Overall Headline Effectiveness Score** (average of all individual headline scores).  
+2. **Key Strengths:** Summarize what **works well** across the headlines.  
+3. **Top Areas for Improvement:** Identify **critical weaknesses** and how they can be addressed.  
+4. **Action Plan:** Provide **concrete steps** to enhance clarity, engagement, and marketing impact.
     """
 
         try:
@@ -968,45 +1553,84 @@ The criteria to assess are:
             return None
 
     def headline_detailed_analysis(uploaded_file, is_image=True):
-        prompt = """
-**Part 1A: Main Headline Optimization Analysis**
-"Analyze the provided image content alongside the main headline text to assess the headline's effectiveness. Evaluate each of the following criteria, provide an explanation based on the synergy between the image and the headline, and offer recommendations for improvement. Present your results in a table format with columns labeled: Criterion, Assessment, Explanation, Recommendation."
+        prompt = f"""
+### **Objective:**  
+Assess the **effectiveness, clarity, and impact** of the **headline text** in a **marketing asset (image or video)** by evaluating key linguistic and marketing criteria. Provide structured insights and **actionable recommendations** for optimization.
+---
+### **Instructions:**  
 
-The criteria to assess are:
-1. **Word count:** Number of words in the headline.
-2. **Keyword Relevance:** Assessment of how well the headline incorporates relevant keywords or phrases.
-3. **Common words:** Number of common words.
-4. **Uncommon Words:** Number of uncommon words.
-5. **Power Words:** Number of words with strong persuasive potential.
-6. **Emotional words:** Number of words conveying emotion (e.g., positive, negative, neutral).
-7. **Sentiment:** Overall sentiment: positive, negative, or neutral.
-8. **Reading Grade Level:** Estimated grade level required to understand the headline.
+#### **Step 1: Headline Extraction & Context**  
+For the given **image or video**, extract and **clearly identify the different headline elements**:  
 
-**Part 1B: Image Headline Optimization Analysis**
-"Analyze the provided image content alongside the image headline text to assess the headline's effectiveness. Evaluate each of the following criteria, provide an explanation based on the synergy between the image and the headline, and offer recommendations for improvement. Present your results in a table format with columns labeled: Criterion, Assessment, Explanation, Recommendation."
+1. **Main Headline:** The primary headline conveys the core message.  
+2. **Image Headline (if applicable):** A separate **image-specific** headline.  
+3. **Supporting Headline (if applicable):** Any **additional text elements** that contribute to the message.  
 
-The criteria to assess are:
-1. **Word count:** Number of words in the headline.
-2. **Keyword Relevance:** Assessment of how well the headline incorporates relevant keywords or phrases.
-3. **Common words:** Number of common words.
-4. **Uncommon Words:** Number of uncommon words.
-5. **Power Words:** Number of words with strong persuasive potential.
-6. **Emotional words:** Number of words conveying emotion (e.g., positive, negative, neutral).
-7. **Sentiment:** Overall sentiment: positive, negative, or neutral.
-8. **Reading Grade Level:** Estimated grade level required to understand the headline.
+Ensure **text extraction accuracy**, maintain the **original structure**, and **translate non-English text into English** before analysis.
 
-**Part 1C: Supporting Headline Optimization Analysis**
-"Analyze the provided image content alongside the supporting headline text to assess the headline's effectiveness. Evaluate each of the following criteria, provide an explanation based on the synergy between the image and the headline, and offer recommendations for improvement. Present your results in a table format with columns labeled: Criterion, Assessment, Explanation, Recommendation."
+---
 
-The criteria to assess are:
-1. **Word count:** Number of words in the headline.
-2. **Keyword Relevance:** Assessment of how well the headline incorporates relevant keywords or phrases.
-3. **Common words:** Number of common words.
-4. **Uncommon Words:** Number of uncommon words.
-5. **Power Words:** Number of words with strong persuasive potential.
-6. **Emotional words:** Number of words conveying emotion (e.g., positive, negative, neutral).
-7. **Sentiment:** Overall sentiment: positive, negative, or neutral.
-8. **Reading Grade Level:** Estimated grade level required to understand the headline.        
+### **Step 2: Headline Optimization Analysis**  
+Each headline type (**Main, Image, and Supporting**) should be **analyzed independently** based on the provided **image/video content** using a **structured table format**.
+
+- **Each criterion should be assessed quantitatively and qualitatively.**  
+- Provide a **clear explanation** for the assessment.  
+- Offer **specific, actionable recommendations** for improvement.  
+
+---
+
+### **Part 1A: Main Headline Optimization Analysis**  
+"Analyze the **main headline** in relation to the image content. Evaluate the following criteria and provide an **explanation and recommendations** in a structured table format."
+
+| **Criterion**            | **Assessment** (Quantitative/Qualitative) | **Explanation** (Strengths & Weaknesses) | **Recommendation** (Actionable Steps) |
+|--------------------------|--------------------------------|----------------------------------|---------------------------------|
+| **Word Count**           | [X words] | Does the length optimize clarity and impact? | Suggest ideal length adjustments. |
+| **Keyword Relevance**    | [High/Moderate/Low] | Are relevant keywords naturally incorporated? | Improve keyword placement or integration. |
+| **Common Words**         | [X words] | Do frequently used words enhance or weaken clarity? | Adjust word choice for precision and engagement. |
+| **Uncommon Words**       | [X words] | Do rare words add uniqueness or create confusion? | Optimize for readability and impact. |
+| **Power Words**          | [X words] | Does the headline include persuasive words? | Strengthen headline with emotionally compelling language. |
+| **Emotional Words**      | [X words] (Positive/Negative/Neutral) | Does the language evoke the right emotions? | Adjust to align with the intended emotional impact. |
+| **Sentiment**            | [Positive/Negative/Neutral] | Does the sentiment align with the marketing goal? | Modify wording to enhance positivity or urgency. |
+| **Reading Grade Level**  | [X Grade Level] | Is the readability appropriate for the target audience? | Simplify or enhance complexity based on audience needs. |
+
+---
+
+### **Part 1B: Image Headline Optimization Analysis**  
+"Analyze the **image headline** for effectiveness, clarity, and marketing impact. Evaluate the following criteria and provide **explanation and recommendations**."
+
+| **Criterion**            | **Assessment** | **Explanation** | **Recommendation** |
+|--------------------------|---------------|-----------------|---------------------|
+| **Word Count**           | X words       |                 |                     |
+| **Keyword Relevance**    | High/Medium/Low |                 |                     |
+| **Common Words**         | X words       |                 |                     |
+| **Uncommon Words**       | X words       |                 |                     |
+| **Power Words**          | X words       |                 |                     |
+| **Emotional Words**      | X words       |                 |                     |
+| **Sentiment**            | Positive/Negative/Neutral |                 |                     |
+| **Reading Grade Level**  | X Grade Level |                 |                     |
+
+---
+
+### **Part 1C: Supporting Headline Optimization Analysis**  
+"Analyze the **supporting headline** to determine its contribution to the overall marketing message."
+
+| **Criterion**            | **Assessment** | **Explanation** | **Recommendation** |
+|--------------------------|---------------|-----------------|---------------------|
+| **Word Count**           | X words       |                 |                     |
+| **Keyword Relevance**    | High/Medium/Low |                 |                     |
+| **Common Words**         | X words       |                 |                     |
+| **Uncommon Words**       | X words       |                 |                     |
+| **Power Words**          | X words       |                 |                     |
+| **Emotional Words**      | X words       |                 |                     |
+| **Sentiment**            | Positive/Negative/Neutral |                 |                     |
+| **Reading Grade Level**  | X Grade Level |                 |                     |
+---
+### **Final Summary & Recommendations**  
+
+1. **Overall Headline Effectiveness Score** (average of all headline scores).  
+2. **Key Strengths:** Summarize the **headline elements that perform well**.  
+3. **Areas for Improvement:** Identify **critical weaknesses** and **how they can be optimized**.  
+4. **Action Plan:** Provide a **step-by-step strategy** for enhancing clarity, engagement, and marketing effectiveness.    
         """
         try:
             if is_image:
@@ -1036,42 +1660,73 @@ The criteria to assess are:
             return None
     def main_headline_detailed_analysis(uploaded_file, is_image=True):
         prompt =  f"""
-Imagine you are a marketing consultant reviewing the main headline text of a marketing asset ({'image' if is_image else 'video'}) for a client.
-Your task is to assess the main headline's effectiveness based on various linguistic and marketing criteria.
+### **Objective:**  
+Evaluate the **effectiveness, clarity, and impact** of the **main headline** in a **marketing asset (image or video)** based on key **linguistic and marketing principles**. Provide structured insights and **actionable recommendations** for improvement.
 
-**Part 1: Headline Extraction and Context**
-**Image/Video:**
-1. **Headline Identification:**
-  * **Main Headline:** Clearly state the main headline extracted from the image or video.
-  * **Image Headline (if applicable):** If the image contains a distinct headline separate from the main headline, clearly state it here.
-  * **Supporting Headline (if applicable):** If there is a supporting headline present, clearly state it here.
+---
 
-**Part 2: Headline Analysis**
-Analyze the extracted Main Headline and present the results in a well-formatted table:
+### **Instructions:**  
 
-Headline being analyzed: [Main Headline]
+#### **Step 1: Headline Extraction & Context**  
+For the given **image or video**, extract and **clearly identify the different headline elements**:  
 
-| Criterion               | Score | Explanation                                       | Main Headline Improvement               |
-|-------------------------|-------|---------------------------------------------------|-----------------------------------------|
-| Clarity                 | _[1-5]_ | _[Explanation for clarity of the main headline]_   | _[Suggested improvement or reason it's effective]_ |
-| Customer Focus          | _[1-5]_ | _[Explanation for customer focus of the main headline]_ | _[Suggested improvement or reason it's effective]_ |
-| Relevance               | _[1-5]_ | _[Explanation for relevance of the main headline]_  | _[Suggested improvement or reason it's effective]_ |
-| Emotional Appeal        | _[1-5]_ | _[Explanation for emotional appeal of the main headline]_ | _[Suggested improvement or reason it's effective]_ |
-| Uniqueness              | _[1-5]_ | _[Explanation for uniqueness of the main headline]_ | _[Suggested improvement or reason it's effective]_ |
-| Urgency & Curiosity     | _[1-5]_ | _[Explanation for urgency & curiosity of the main headline]_ | _[Suggested improvement or reason it's effective]_ |
-| Benefit-Driven          | _[1-5]_ | _[Explanation for benefit-driven nature of the main headline]_ | _[Suggested improvement or reason it's effective]_ |
-| Target Audience         | _[1-5]_ | _[Explanation for target audience focus of the main headline]_ | _[Suggested improvement or reason it's effective]_ |
-| Length & Format         | _[1-5]_ | _[Explanation for length & format of the main headline]_ | _[Suggested improvement or reason it's effective]_ |
-| Overall Effectiveness   | _[1-5]_ | _[Explanation for overall effectiveness of the main headline]_ | _[Suggested improvement or reason it's effective]_ |
+1. **Main Headline:** The primary headline conveying the core message.  
+2. **Image Headline (if applicable):** A separate **image-specific** headline.  
+3. **Supporting Headline (if applicable):** Any **additional text elements** that contribute to the message.  
 
-Total Score: _[Sum of all scores]_
+Ensure **text extraction accuracy**, maintain the **original structure**, and **translate non-English text into English** before analysis.
 
-**Part 3: Improved Headline Suggestions**
-Provide three alternative headlines for the main headline, along with a brief explanation for each option:
+---
 
-* **Option 1:** [Headline] - [Explanation]
-* **Option 2:** [Headline] - [Explanation]
-* **Option 3:** [Headline] - [Explanation]
+### **Step 2: Headline Effectiveness Analysis**  
+Analyze the extracted **main headline** based on the following key **marketing and linguistic criteria**.  
+
+- **Each criterion should be assessed on a scale of 1 to 5** (in increments of 0.5).  
+- Provide a **clear explanation** for the assessment.  
+- Offer **specific, actionable recommendations** for improvement.  
+
+---
+
+#### **Structured Table Format for Headline Analysis**  
+
+**Headline being analyzed:** _[Main Headline]_  
+
+| **Criterion**            | **Score (1-5)** | **Explanation (Strengths & Weaknesses)** | **Suggested Improvement** |
+|--------------------------|----------------|------------------------------------------|---------------------------|
+| **Clarity**             | _[1-5]_         | _Is the headline clear and easy to understand?_ | _Simplify or rephrase unclear words._ |
+| **Customer Focus**      | _[1-5]_         | _Does the headline address customer needs?_ | _Refine wording to highlight customer benefits._ |
+| **Relevance**          | _[1-5]_         | _Does the headline align with the product and audience?_ | _Ensure alignment with marketing message._ |
+| **Emotional Appeal**   | _[1-5]_         | _Does the headline evoke emotions or curiosity?_ | _Incorporate emotionally compelling words._ |
+| **Uniqueness**         | _[1-5]_         | _Is the headline distinctive and not generic?_ | _Improve originality to stand out._ |
+| **Urgency & Curiosity** | _[1-5]_         | _Does it create urgency or entice curiosity?_ | _Use stronger action words or time-limited phrases._ |
+| **Benefit-Driven**     | _[1-5]_         | _Does it communicate a clear value proposition?_ | _Highlight direct benefits for the reader._ |
+| **Target Audience**    | _[1-5]_         | _Is it relevant to the target demographic?_ | _Adjust language to better suit the audience._ |
+| **Length & Format**    | _[1-5]_         | _Is the headline concise (6-12 words)?_ | _Refine for optimal readability._ |
+| **Overall Effectiveness** | _[1-5]_     | _How well does it perform as a marketing tool?_ | _Summarize key areas for improvement._ |
+
+**Total Score:** _[Sum of all scores]_
+---
+
+### **Step 3: Improved Headline Suggestions**  
+Generate three alternative **optimized headlines** for the main headline.  
+
+- Ensure **clarity, emotional appeal, and engagement**.  
+- Align **better with marketing goals and audience needs**.  
+
+**Structured Table Format for Headline Suggestions:**  
+
+| **Option** | **Suggested Headline** | **Rationale for Improvement** |
+|-----------|----------------------|-----------------------------|
+| **Option 1** | _[New Headline]_ | _Explain why this version is more engaging or effective._ |
+| **Option 2** | _[New Headline]_ | _Explain the benefits of this variation._ |
+| **Option 3** | _[New Headline]_ | _Explain how this alternative improves on the original._ |
+---
+### **Final Summary & Recommendations**  
+
+1. **Overall Headline Effectiveness Score** (Average of all ratings).  
+2. **Key Strengths:** Highlight what works well.  
+3. **Critical Areas for Improvement:** Summarize the **main weaknesses** and **how to fix them**.  
+4. **Next Steps:** Offer a **step-by-step strategy** to **refine and test the improved headlines**.
     """
         try:
             if is_image:
@@ -1101,42 +1756,76 @@ Provide three alternative headlines for the main headline, along with a brief ex
             return None
     def image_headline_detailed_analysis(uploaded_file, is_image=True):
         prompt = f"""
-Imagine you are a marketing consultant reviewing the image headline text of a marketing asset ({'image' if is_image else 'video'}) for a client.
-Your task is to assess the image headline's effectiveness based on various linguistic and marketing criteria.
+### **Objective:**  
+Evaluate the **effectiveness, clarity, and marketing impact** of the **image headline** in a **marketing asset (image or video)** using key **linguistic and marketing principles**. Provide structured insights and **actionable recommendations** for improvement.
 
-**Part 1: Headline Extraction and Context**
-**Image/Video:**
-1. **Headline Identification:**
-  * **Main Headline:** Clearly state the main headline extracted from the image or video.
-  * **Image Headline (if applicable):** If the image contains a distinct headline separate from the main headline, clearly state it here.
-  * **Supporting Headline (if applicable):** If there is a supporting headline present, clearly state it here.
+---
 
-**Part 2: Headline Analysis**
-Analyze the extracted Image Headline and present the results in a well-formatted table:
+### **Instructions:**  
 
-Headline being analyzed: [Image Headline]
+#### **Step 1: Headline Extraction & Context**  
+For the given **image or video**, extract and **clearly identify the different headline elements**:  
 
-| Criterion               | Score | Explanation                                       | Image Headline Improvement              |
-|-------------------------|-------|---------------------------------------------------|-----------------------------------------|
-| Clarity                 | _[1-5]_ | _[Explanation for clarity of the image headline]_   | _[Suggested improvement or reason it's effective]_ |
-| Customer Focus          | _[1-5]_ | _[Explanation for customer focus of the image headline]_ | _[Suggested improvement or reason it's effective]_ |
-| Relevance               | _[1-5]_ | _[Explanation for relevance of the image headline]_  | _[Suggested improvement or reason it's effective]_ |
-| Emotional Appeal        | _[1-5]_ | _[Explanation for emotional appeal of the image headline]_ | _[Suggested improvement or reason it's effective]_ |
-| Uniqueness              | _[1-5]_ | _[Explanation for uniqueness of the image headline]_ | _[Suggested improvement or reason it's effective]_ |
-| Urgency & Curiosity     | _[1-5]_ | _[Explanation for urgency & curiosity of the image headline]_ | _[Suggested improvement or reason it's effective]_ |
-| Benefit-Driven          | _[1-5]_ | _[Explanation for benefit-driven nature of the image headline]_ | _[Suggested improvement or reason it's effective]_ |
-| Target Audience         | _[1-5]_ | _[Explanation for target audience focus of the image headline]_ | _[Suggested improvement or reason it's effective]_ |
-| Length & Format         | _[1-5]_ | _[Explanation for length & format of the image headline]_ | _[Suggested improvement or reason it's effective]_ |
-| Overall Effectiveness   | _[1-5]_ | _[Explanation for overall effectiveness of the image headline]_ | _[Suggested improvement or reason it's effective]_ |
+1. **Main Headline:** The **primary** headline conveying the **core message**.  
+2. **Image Headline (if applicable):** A distinct **headline embedded within the image**.  
+3. **Supporting Headline (if applicable):** Additional **text elements that reinforce the message**.  
 
-Total Score: _[Sum of all scores]_
+Ensure **text extraction accuracy**, **preserve the original structure**, and **translate non-English text into English** before proceeding with the analysis.
 
-**Part 3: Improved Headline Suggestions**
-Provide three alternative headlines for the image headline, along with a brief explanation for each option:
+---
 
-* **Option 1:** [Headline] - [Explanation]
-* **Option 2:** [Headline] - [Explanation]
-* **Option 3:** [Headline] - [Explanation]
+### **Step 2: Image Headline Effectiveness Analysis**  
+Analyze the extracted **image headline** based on the following **marketing and linguistic criteria**.  
+
+- **Each criterion should be rated on a scale of 1 to 5** (in increments of 0.5).  
+- Provide a **clear, concise explanation** for the rating.  
+- Offer **specific, actionable recommendations** for improvement.  
+
+---
+
+#### **Structured Table Format for Image Headline Analysis**  
+
+**Headline being analyzed:** _[Image Headline]_  
+
+| **Criterion**            | **Score (1-5)** | **Explanation (Strengths & Weaknesses)** | **Suggested Improvement** |
+|--------------------------|----------------|------------------------------------------|---------------------------|
+| **Clarity**             | _[1-5]_         | _Is the headline easy to understand at a glance?_ | _Simplify complex wording or improve readability._ |
+| **Customer Focus**      | _[1-5]_         | _Does the headline address the customer's needs or desires?_ | _Reframe to make it more customer-centric._ |
+| **Relevance**          | _[1-5]_         | _Does the headline align with the product and audience expectations?_ | _Ensure alignment with the image's marketing message._ |
+| **Emotional Appeal**   | _[1-5]_         | _Does the headline evoke emotions (curiosity, excitement, urgency)?_ | _Strengthen emotional triggers where necessary._ |
+| **Uniqueness**         | _[1-5]_         | _Is the headline distinct and engaging?_ | _Make it stand out from competitors._ |
+| **Urgency & Curiosity** | _[1-5]_         | _Does the headline create urgency or intrigue?_ | _Use time-sensitive language or curiosity-driven phrasing._ |
+| **Benefit-Driven**     | _[1-5]_         | _Does the headline highlight a clear benefit?_ | _Emphasize tangible customer benefits._ |
+| **Target Audience**    | _[1-5]_         | _Is the language and tone tailored to the intended audience?_ | _Adjust the tone and vocabulary to better fit the demographic._ |
+| **Length & Format**    | _[1-5]_         | _Is the headline concise and visually balanced within the image?_ | _Refine for optimal readability and impact._ |
+| **Overall Effectiveness** | _[1-5]_       | _How well does it function as an attention-grabbing marketing tool?_ | _Summarize key areas for improvement._ |
+
+**Total Score:** _[Sum of all scores]_  
+
+---
+
+### **Step 3: Improved Image Headline Suggestions**  
+Generate **three alternative optimized headlines** for the **image headline**, ensuring:  
+
+- **Improved clarity, engagement, and emotional impact**.  
+- **Better alignment with the marketing message and audience expectations**.  
+
+**Structured Table Format for Headline Suggestions:**  
+
+| **Option** | **Suggested Headline** | **Rationale for Improvement** |
+|-----------|----------------------|-----------------------------|
+| **Option 1** | _[New Headline]_ | _Explain how this version improves clarity, engagement, or relevance._ |
+| **Option 2** | _[New Headline]_ | _Describe how this variation strengthens customer focus or emotional appeal._ |
+| **Option 3** | _[New Headline]_ | _Explain why this alternative is more compelling than the original._ |
+
+---
+
+### **Final Summary & Recommendations**  
+
+1. **Overall Headline Effectiveness Score** (Average of all ratings).  
+2. **Key Strengths:** Highlight what works well.  
+3. **Critical Areas for Improvement:** Summarize **weaknesses and how to fix them**.  
+4. **Next Steps:** Offer a **step-by-step strategy** to **refine and test the improved headlines**.
     """
         try:
             if is_image:
@@ -1166,42 +1855,76 @@ Provide three alternative headlines for the image headline, along with a brief e
             return None
     def supporting_headline_detailed_analysis(uploaded_file, is_image=True):
         prompt = f"""
-Imagine you are a marketing consultant reviewing the supporting headline text of a marketing asset ({'image' if is_image else 'video'}) for a client.
-Your task is to assess the supporting headline's effectiveness based on various linguistic and marketing criteria.
+### **Objective:**  
+Evaluate the **effectiveness, clarity, and marketing impact** of the **supporting headline** in a **marketing asset (image or video)** using key **linguistic and marketing principles**. Provide structured insights and **actionable recommendations** for improvement.
 
-**Part 1: Headline Extraction and Context**
-**Image/Video:**
-1. **Headline Identification:**
-  * **Main Headline:** Clearly state the main headline extracted from the image or video.
-  * **Image Headline (if applicable):** If the image contains a distinct headline separate from the main headline, clearly state it here.
-  * **Supporting Headline (if applicable):** If there is a supporting headline present, clearly state it here.
+---
 
-**Part 2: Headline Analysis**
-Analyze the extracted Supporting Headline and present the results in a well-formatted table:
+### **Instructions:**  
 
-Headline being analyzed: [Supporting Headline]
+#### **Step 1: Headline Extraction & Context**  
+For the given **image or video**, extract and **clearly identify the different headline elements**:  
 
-| Criterion               | Score | Explanation                                       | Supporting Headline Improvement         |
-|-------------------------|-------|---------------------------------------------------|-----------------------------------------|
-| Clarity                 | _[1-5]_ | _[Explanation for clarity of the supporting headline]_   | _[Suggested improvement or reason it's effective]_ |
-| Customer Focus          | _[1-5]_ | _[Explanation for customer focus of the supporting headline]_ | _[Suggested improvement or reason it's effective]_ |
-| Relevance               | _[1-5]_ | _[Explanation for relevance of the supporting headline]_  | _[Suggested improvement or reason it's effective]_ |
-| Emotional Appeal        | _[1-5]_ | _[Explanation for emotional appeal of the supporting headline]_ | _[Suggested improvement or reason it's effective]_ |
-| Uniqueness              | _[1-5]_ | _[Explanation for uniqueness of the supporting headline]_ | _[Suggested improvement or reason it's effective]_ |
-| Urgency & Curiosity     | _[1-5]_ | _[Explanation for urgency & curiosity of the supporting headline]_ | _[Suggested improvement or reason it's effective]_ |
-| Benefit-Driven          | _[1-5]_ | _[Explanation for benefit-driven nature of the supporting headline]_ | _[Suggested improvement or reason it's effective]_ |
-| Target Audience         | _[1-5]_ | _[Explanation for target audience focus of the supporting headline]_ | _[Suggested improvement or reason it's effective]_ |
-| Length & Format         | _[1-5]_ | _[Explanation for length & format of the supporting headline]_ | _[Suggested improvement or reason it's effective]_ |
-| Overall Effectiveness   | _[1-5]_ | _[Explanation for overall effectiveness of the supporting headline]_ | _[Suggested improvement or reason it's effective]_ |
+1. **Main Headline:** The **primary** headline conveying the **core message**.  
+2. **Image Headline (if applicable):** A distinct **headline embedded within the image**.  
+3. **Supporting Headline (if applicable):** Additional **text elements that reinforce the message**.  
 
-Total Score: _[Sum of all scores]_
+Ensure **text extraction accuracy**, **preserve the original structure**, and **translate non-English text into English** before proceeding with the analysis.
 
-**Part 3: Improved Headline Suggestions**
-Provide three alternative headlines for the supporting headline, along with a brief explanation for each option:
+---
 
-* **Option 1:** [Headline] - [Explanation]
-* **Option 2:** [Headline] - [Explanation]
-* **Option 3:** [Headline] - [Explanation]
+### **Step 2: Supporting Headline Effectiveness Analysis**  
+Analyze the extracted **supporting headline** based on the following **marketing and linguistic criteria**.  
+
+- **Each criterion should be rated on a scale of 1 to 5** (in increments of 0.5).  
+- Provide a **clear, concise explanation** for the rating.  
+- Offer **specific, actionable recommendations** for improvement.  
+
+---
+
+#### **Structured Table Format for Supporting Headline Analysis**  
+
+**Headline being analyzed:** _[Supporting Headline]_  
+
+| **Criterion**            | **Score (1-5)** | **Explanation (Strengths & Weaknesses)** | **Suggested Improvement** |
+|--------------------------|----------------|------------------------------------------|---------------------------|
+| **Clarity**             | _[1-5]_         | _Is the headline easy to understand at a glance?_ | _Simplify complex wording or improve readability._ |
+| **Customer Focus**      | _[1-5]_         | _Does the headline address the customer's needs or desires?_ | _Reframe to make it more customer-centric._ |
+| **Relevance**          | _[1-5]_         | _Does the headline align with the product and audience expectations?_ | _Ensure alignment with the image's marketing message._ |
+| **Emotional Appeal**   | _[1-5]_         | _Does the headline evoke emotions (curiosity, excitement, urgency)?_ | _Strengthen emotional triggers where necessary._ |
+| **Uniqueness**         | _[1-5]_         | _Is the headline distinct and engaging?_ | _Make it stand out from competitors._ |
+| **Urgency & Curiosity** | _[1-5]_         | _Does the headline create urgency or intrigue?_ | _Use time-sensitive language or curiosity-driven phrasing._ |
+| **Benefit-Driven**     | _[1-5]_         | _Does the headline highlight a clear benefit?_ | _Emphasize tangible customer benefits._ |
+| **Target Audience**    | _[1-5]_         | _Is the language and tone tailored to the intended audience?_ | _Adjust the tone and vocabulary to better fit the demographic._ |
+| **Length & Format**    | _[1-5]_         | _Is the headline concise and visually balanced within the image?_ | _Refine for optimal readability and impact._ |
+| **Overall Effectiveness** | _[1-5]_       | _How well does it function as an attention-grabbing marketing tool?_ | _Summarize key areas for improvement._ |
+
+**Total Score:** _[Sum of all scores]_  
+
+---
+
+### **Step 3: Improved Supporting Headline Suggestions**  
+Generate **three alternative optimized headlines** for the **supporting headline**, ensuring:  
+
+- **Improved clarity, engagement, and emotional impact**.  
+- **Better alignment with the marketing message and audience expectations**.  
+
+**Structured Table Format for Headline Suggestions:**  
+
+| **Option** | **Suggested Headline** | **Rationale for Improvement** |
+|-----------|----------------------|-----------------------------|
+| **Option 1** | _[New Headline]_ | _Explain how this version improves clarity, engagement, or relevance._ |
+| **Option 2** | _[New Headline]_ | _Describe how this variation strengthens customer focus or emotional appeal._ |
+| **Option 3** | _[New Headline]_ | _Explain why this alternative is more compelling than the original._ |
+
+---
+
+### **Final Summary & Recommendations**  
+
+1. **Overall Supporting Headline Effectiveness Score** (Average of all ratings).  
+2. **Key Strengths:** Highlight what works well.  
+3. **Critical Areas for Improvement:** Summarize **weaknesses and how to fix them**.  
+4. **Next Steps:** Offer a **step-by-step strategy** to **refine and test the improved headlines**.
     """
         try:
             if is_image:
@@ -1232,27 +1955,70 @@ Provide three alternative headlines for the supporting headline, along with a br
         
     def main_headline_analysis(uploaded_file, is_image=True):
         prompt = f"""
-Imagine you are a marketing consultant reviewing the main headline text of a marketing asset ({'image' if is_image else 'video'}) for a client.
-Your task is to assess the main headline's effectiveness based on various linguistic and marketing criteria.
+### **Objective:**  
+Evaluate the **effectiveness, clarity, and marketing impact** of the **main headline** in a **marketing asset (image or video)** using key **linguistic and marketing principles**. Provide structured insights and **actionable recommendations** for improvement.
 
-**Part 1: Main Headline Context**
-    **Image/Video:**
-        - **Main Headline Identification:** Extract and clearly state the main headline from the image or video.
+---
 
-    **Part 2: Main Headline Analysis**
-    Present the results in a well-formatted table for the main headline:
-    | Criterion             | Assessment                   | Explanation                                                      | Recommendation                                       |
-    |-----------------------|------------------------------|------------------------------------------------------------------|------------------------------------------------------|
-    | Word Count            | [Automatic count] words      | The headline has [x] words, which is [appropriate/lengthy].     | Consider [reducing/increasing] the word count to [y].|
-    | Keyword Relevance     | [High/Moderate/Low]          | The headline [includes/misses] relevant keywords such as [x].   | Incorporate [more/specific] keywords like [y].       |
-    | Common Words          | [Number] common words        | Common words [enhance/reduce] readability and appeal.           | [Increase/reduce] the use of common words.           |
-    | Uncommon Words        | [Number] uncommon words      | Uncommon words make the headline [stand out/confusing].         | Balance [common/uncommon] words for clarity.         |
-    | Power Words           | [Number] power words         | Power words [create urgency/may overwhelm] the reader.          | Use power words [more sparingly/more effectively].   |
-    | Emotional Words       | [Number] emotional words     | Emotional tone is [effective/overdone/subtle].                  | Adjust the emotional tone by [modifying x].          |
-    | Sentiment             | [Positive/Negative/Neutral]  | The sentiment is [not aligning well/matching] with the image.   | Match the sentiment more closely with the image.     |
-    | Reading Grade Level   | [Grade level] required       | The headline is [too complex/simple] for the target audience.   | Adapt the reading level to [simplify/complexify].    |
-    **Part 3: Improved Headline Suggestions**
-    Provide suggestions for improving the main headline considering the overall analysis.
+### **Instructions:**  
+
+#### **Step 1: Headline Extraction & Context**  
+For the given **image or video**, extract and **clearly identify the main headline**:  
+
+1. **Main Headline Identification:**  
+   - Extract the **exact text** of the main headline.  
+   - If the content is **non-English**, translate it into **English** before analysis.  
+
+---
+
+### **Step 2: Main Headline Effectiveness Analysis**  
+Analyze the extracted **main headline** based on the following **marketing and linguistic criteria**:  
+
+- **Each criterion should be rated on a scale of 1 to 5** (in increments of 0.5).  
+- Provide a **clear, concise explanation** for the rating.  
+- Offer **specific, actionable recommendations** for improvement.  
+
+---
+
+#### **Structured Table Format for Main Headline Analysis**  
+
+**Headline being analyzed:** _[Main Headline]_  
+
+| **Criterion**            | **Assessment**               | **Explanation (Strengths & Weaknesses)** | **Suggested Improvement** |
+|--------------------------|-----------------------------|------------------------------------------|---------------------------|
+| **Word Count**           | _[X words]_                 | _The headline has [X] words, making it [appropriate/too short/too long]._ | _Consider adjusting to [Y] words for optimal impact._ |
+| **Keyword Relevance**    | _[High/Moderate/Low]_       | _The headline [includes/misses] relevant keywords such as [X]._ | _Incorporate [more/specific] keywords like [Y]._ |
+| **Common Words**        | _[Number]_                   | _Common words [enhance/reduce] readability and appeal._ | _[Increase/reduce] the use of common words._ |
+| **Uncommon Words**      | _[Number]_                   | _Uncommon words make the headline [stand out/confusing]._ | _Balance [common/uncommon] words for clarity._ |
+| **Power Words**         | _[Number]_                   | _Power words [create urgency/may overwhelm] the reader._ | _Use power words [more sparingly/more effectively]._ |
+| **Emotional Words**     | _[Number]_                   | _Emotional tone is [effective/overdone/subtle]._ | _Adjust the emotional tone by [modifying X]._ |
+| **Sentiment**           | _[Positive/Negative/Neutral]_ | _The sentiment is [not aligning well/matching] with the image._ | _Match the sentiment more closely with the image._ |
+| **Reading Grade Level** | _[Grade level]_              | _The headline is [too complex/simple] for the target audience._ | _Adapt the reading level to [simplify/complexify]._ |
+
+---
+
+### **Step 3: Improved Main Headline Suggestions**  
+Generate **three alternative optimized headlines**, ensuring:  
+
+- **Improved clarity, engagement, and emotional impact**.  
+- **Better alignment with the marketing message and audience expectations**.  
+
+**Structured Table Format for Headline Suggestions:**  
+
+| **Option** | **Suggested Headline** | **Rationale for Improvement** |
+|-----------|----------------------|-----------------------------|
+| **Option 1** | _[New Headline]_ | _Explain how this version improves clarity, engagement, or relevance._ |
+| **Option 2** | _[New Headline]_ | _Describe how this variation strengthens customer focus or emotional appeal._ |
+| **Option 3** | _[New Headline]_ | _Explain why this alternative is more compelling than the original._ |
+
+---
+
+### **Final Summary & Recommendations**  
+
+1. **Overall Headline Effectiveness Score** (Average of all ratings).  
+2. **Key Strengths:** Highlight what works well.  
+3. **Critical Areas for Improvement:** Summarize **weaknesses and how to fix them**.  
+4. **Next Steps:** Offer a **step-by-step strategy** to **refine and test the improved headlines**.
     """
         try:
             if is_image:
@@ -1282,27 +2048,70 @@ Your task is to assess the main headline's effectiveness based on various lingui
             return None
     def image_headline_analysis(uploaded_file, is_image=True):
         prompt = f"""
-Imagine you are a marketing consultant reviewing the image headline text of a marketing asset ({'image' if is_image else 'video'}) for a client.
-Your task is to assess the image headline's effectiveness based on various linguistic and marketing criteria.
+### **Objective:**  
+Evaluate the **effectiveness, clarity, and marketing impact** of the **image headline** in a **marketing asset (image or video)** using key **linguistic and marketing principles**. Provide structured insights and **actionable recommendations** for improvement.
 
-**Part 1: Image Headline Context**
-    **Image/Video:**
-        - **Image Headline Identification:** Extract and clearly state the separate headline from the image or video.
+---
 
-    **Part 2: Image Headline Analysis**
-    Analyze and format the results:
-    | Criterion             | Assessment                   | Explanation                                                      | Recommendation                                       |
-    |-----------------------|------------------------------|------------------------------------------------------------------|------------------------------------------------------|
-    | Word Count            | [Automatic count] words      | The headline length is [appropriate/lengthy] for visibility.     | Adjust the word count to [increase/decrease] clarity.|
-    | Keyword Relevance     | [High/Moderate/Low]          | Headline's keywords [align/do not align] with visual content.    | Enhance keyword alignment for better SEO.            |
-    | Common Words          | [Number] common words        | Common words [aid/hinder] immediate comprehension.               | Optimize common word usage for [audience/type].      |
-    | Uncommon Words        | [Number] uncommon words      | Uncommon words add [uniqueness/confusion].                       | Find a balance in word rarity for better engagement.  |
-    | Power Words           | [Number] power words         | Uses power words to [effectively/too aggressively] engage.       | Adjust power word usage for subtlety.                |
-    | Emotional Words       | [Number] emotional words     | Emotional words [evoke strong/a weak] response.                  | Modify emotional words to better suit the tone.      |
-    | Sentiment             | [Positive/Negative/Neutral]  | Sentiment [supports/contradicts] the visual theme.               | Align the sentiment more with the visual message.    |
-    | Reading Grade Level   | [Grade level] required       | Reading level is [ideal/not ideal] for the target demographic.   | Tailor the complexity to better fit the audience.     |
-    **Part 3: Recommendations**
-    Suggest three improved headlines based on the analysis.
+### **Instructions:**  
+
+#### **Step 1: Image Headline Extraction & Context**  
+For the given **image or video**, extract and **clearly identify the image headline**:  
+
+1. **Image Headline Identification:**  
+   - Extract the **exact text** of the image headline.  
+   - If the content is **non-English**, translate it into **English** before analysis.  
+
+---
+
+### **Step 2: Image Headline Effectiveness Analysis**  
+Analyze the extracted **image headline** based on the following **marketing and linguistic criteria**:  
+
+- **Each criterion should be rated on a scale of 1 to 5** (in increments of 0.5).  
+- Provide a **clear, concise explanation** for the rating.  
+- Offer **specific, actionable recommendations** for improvement.  
+
+---
+
+#### **Structured Table Format for Image Headline Analysis**  
+
+**Headline being analyzed:** _[Image Headline]_  
+
+| **Criterion**            | **Assessment**               | **Explanation (Strengths & Weaknesses)** | **Suggested Improvement** |
+|--------------------------|-----------------------------|------------------------------------------|---------------------------|
+| **Word Count**           | _[X words]_                 | _The headline has [X] words, making it [appropriate/too short/too long]._ | _Consider adjusting to [Y] words for optimal impact._ |
+| **Keyword Relevance**    | _[High/Moderate/Low]_       | _The headline [includes/misses] relevant keywords such as [X]._ | _Incorporate [more/specific] keywords like [Y]._ |
+| **Common Words**        | _[Number]_                   | _Common words [enhance/reduce] readability and appeal._ | _[Increase/reduce] the use of common words._ |
+| **Uncommon Words**      | _[Number]_                   | _Uncommon words make the headline [stand out/confusing]._ | _Balance [common/uncommon] words for clarity._ |
+| **Power Words**         | _[Number]_                   | _Power words [create urgency/may overwhelm] the reader._ | _Use power words [more sparingly/more effectively]._ |
+| **Emotional Words**     | _[Number]_                   | _Emotional tone is [effective/overdone/subtle]._ | _Adjust the emotional tone by [modifying X]._ |
+| **Sentiment**           | _[Positive/Negative/Neutral]_ | _The sentiment is [not aligning well/matching] with the image._ | _Match the sentiment more closely with the image._ |
+| **Reading Grade Level** | _[Grade level]_              | _The headline is [too complex/simple] for the target audience._ | _Adapt the reading level to [simplify/complexify]._ |
+
+---
+
+### **Step 3: Improved Image Headline Suggestions**  
+Generate **three alternative optimized headlines**, ensuring:  
+
+- **Improved clarity, engagement, and emotional impact**.  
+- **Better alignment with the marketing message and audience expectations**.  
+
+**Structured Table Format for Headline Suggestions:**  
+
+| **Option** | **Suggested Headline** | **Rationale for Improvement** |
+|-----------|----------------------|-----------------------------|
+| **Option 1** | _[New Headline]_ | _Explain how this version improves clarity, engagement, or relevance._ |
+| **Option 2** | _[New Headline]_ | _Describe how this variation strengthens customer focus or emotional appeal._ |
+| **Option 3** | _[New Headline]_ | _Explain why this alternative is more compelling than the original._ |
+
+---
+
+### **Final Summary & Recommendations**  
+
+1. **Overall Image Headline Effectiveness Score** (Average of all ratings).  
+2. **Key Strengths:** Highlight what works well.  
+3. **Critical Areas for Improvement:** Summarize **weaknesses and how to fix them**.  
+4. **Next Steps:** Offer a **step-by-step strategy** to **refine and test the improved headlines**. 
     """
         try:
             if is_image:
@@ -1332,27 +2141,71 @@ Your task is to assess the image headline's effectiveness based on various lingu
             return None
     def supporting_headline_analysis(uploaded_file, is_image=True):
         prompt = f"""
-    Review anyImagine you are a marketing consultant reviewing the supporting headline text of a marketing asset ({'image' if is_image else 'video'}) for a client.
-    Your task is to assess the supporting headline's effectiveness based on various linguistic and marketing criteria. supporting headlines in the provided image or video frame as a marketing consultant.
-    **Part 1: Supporting Headline Context**
-    **Image/Video:**
-        - **Supporting Headline Identification:** Identify and state any supporting headlines.
+### **Objective:**  
+Evaluate the **effectiveness, clarity, and marketing impact** of the **supporting headline** in a **marketing asset (image or video)** using key **linguistic and marketing principles**. Provide structured insights and **actionable recommendations** for improvement.
 
-    **Part 2: Supporting Headline Analysis**
-    Format the results as follows:
-    | Criterion             | Assessment                   | Explanation                                                      | Recommendation                                       |
-    |-----------------------|------------------------------|------------------------------------------------------------------|------------------------------------------------------|
-    | Word Count            | [Automatic count] words      | The supporting headline's length is [optimal/too long/short].    | Aim for a word count of [x] for better engagement.   |
-    | Keyword Relevance     | [High/Moderate/Low]          | Keywords used are [not sufficiently/sufficiently] relevant.      | Incorporate more relevant keywords like [y].         |
-    | Common Words          | [Number] common words        | Utilization of common words [enhances/detracts from] impact.     | Adjust common word usage to improve clarity.         |
-    | Uncommon Words        | [Number] uncommon words      | Uncommon words help [distinguish/muddle] the message.            | Use uncommon words to [highlight/clarify] message.   |
-    | Power Words           | [Number] power words         | Power words [effectively/ineffectively] persuade the audience.   | Refine the use of power words for better impact.     |
-    | Emotional Words       | [Number] emotional words     | Emotional expression is [strong/weak], affecting impact.         | Enhance/reduce emotional wording for desired effect. |
-    | Sentiment             | [Positive/Negative/Neutral]  | Sentiment of the headline [aligns/conflicts] with main content.  | Adjust sentiment to [complement/contrast] main tone. |
-    | Reading Grade Level   | [Grade level] required       | The complexity suits [or does not suit] the intended audience.   | Modify to [simplify/complexify] reading level.       |
-    **Part 3: Revised Headline Suggestions**
-    Offer alternative headlines that enhance effectiveness based on the detailed analysis.
-    """
+---
+
+### **Instructions:**  
+
+#### **Step 1: Supporting Headline Extraction & Context**  
+For the given **image or video**, extract and **clearly identify the supporting headline**:  
+
+1. **Supporting Headline Identification:**  
+   - Extract the **exact text** of the supporting headline.  
+   - If the content is **non-English**, translate it into **English** before analysis.  
+
+---
+
+### **Step 2: Supporting Headline Effectiveness Analysis**  
+Analyze the extracted **supporting headline** based on the following **marketing and linguistic criteria**:  
+
+- **Each criterion should be rated on a scale of 1 to 5** (in increments of 0.5).  
+- Provide a **clear, concise explanation** for the rating.  
+- Offer **specific, actionable recommendations** for improvement.  
+
+---
+
+#### **Structured Table Format for Supporting Headline Analysis**  
+
+**Headline being analyzed:** _[Supporting Headline]_  
+
+| **Criterion**            | **Assessment**               | **Explanation (Strengths & Weaknesses)** | **Suggested Improvement** |
+|--------------------------|-----------------------------|------------------------------------------|---------------------------|
+| **Word Count**           | _[X words]_                 | _The headline has [X] words, making it [appropriate/too short/too long]._ | _Consider adjusting to [Y] words for optimal impact._ |
+| **Keyword Relevance**    | _[High/Moderate/Low]_       | _The headline [includes/misses] relevant keywords such as [X]._ | _Incorporate [more/specific] keywords like [Y]._ |
+| **Common Words**        | _[Number]_                   | _Common words [enhance/reduce] readability and appeal._ | _[Increase/reduce] the use of common words._ |
+| **Uncommon Words**      | _[Number]_                   | _Uncommon words make the headline [stand out/confusing]._ | _Balance [common/uncommon] words for clarity._ |
+| **Power Words**         | _[Number]_                   | _Power words [create urgency/may overwhelm] the reader._ | _Use power words [more sparingly/more effectively]._ |
+| **Emotional Words**     | _[Number]_                   | _Emotional tone is [effective/overdone/subtle]._ | _Adjust the emotional tone by [modifying X]._ |
+| **Sentiment**           | _[Positive/Negative/Neutral]_ | _The sentiment is [not aligning well/matching] with the image._ | _Match the sentiment more closely with the image._ |
+| **Reading Grade Level** | _[Grade level]_              | _The headline is [too complex/simple] for the target audience._ | _Adapt the reading level to [simplify/complexify]._ |
+
+---
+
+### **Step 3: Improved Supporting Headline Suggestions**  
+Generate **three alternative optimized headlines**, ensuring:  
+
+- **Improved clarity, engagement, and emotional impact**.  
+- **Better alignment with the marketing message and audience expectations**.  
+
+**Structured Table Format for Headline Suggestions:**  
+
+| **Option** | **Suggested Headline** | **Rationale for Improvement** |
+|-----------|----------------------|-----------------------------|
+| **Option 1** | _[New Headline]_ | _Explain how this version improves clarity, engagement, or relevance._ |
+| **Option 2** | _[New Headline]_ | _Describe how this variation strengthens customer focus or emotional appeal._ |
+| **Option 3** | _[New Headline]_ | _Explain why this alternative is more compelling than the original._ |
+
+---
+
+### **Final Summary & Recommendations**  
+
+1. **Overall Supporting Headline Effectiveness Score** (Average of all ratings).  
+2. **Key Strengths:** Highlight what works well.  
+3. **Critical Areas for Improvement:** Summarize **weaknesses and how to fix them**.  
+4. **Next Steps:** Offer a **step-by-step strategy** to **refine and test the improved headlines**.
+"""
         try:
             if is_image:
                 image = Image.open(io.BytesIO(uploaded_file.read()))
@@ -1382,35 +2235,68 @@ Your task is to assess the image headline's effectiveness based on various lingu
 
     def meta_profile(uploaded_file, is_image=True):
         prompt = f"""
-Based on the following targeting elements for Facebook, please describe 4 persona types
-that are most likely to respond to the add. Please present these in a table (Persona Type,
-Description). Once you have identified these, create 4 personas (including names) who
-would be likely to purchase this product, and describe how you would expect them to react
-to it detailing the characteristics. Present each persona with a table (Persona Type,
-Description, Analysis) of the characteristics and analysis. Please include each of the
-characteristic that can be selected in the Facebook targeting, and what you would select.
+### **Objective:**  
+Identify **4 key persona types** based on **Facebook's targeting parameters** and analyze how they would respond to an advertisement. Provide structured insights, including demographic, behavioral, and interest-based details, along with a **detailed persona analysis.**  
 
-Location: Target users based on countries, states, cities, or even specific addresses and zip
-codes.
-Age: Select the age range of the audience.
-Gender: Target ads specifically to men, women, or all genders.
-Languages: Target users based on the languages they speak.
-Interests: Based on user activities, liked pages, and closely related topics. This includes
-interests in entertainment, fitness, hobbies, and more.
+---
 
-Behaviors: Includes user behavior based on device usage, travel patterns, purchase
-behavior, and more.
-Purchase Behavior: Target users who have made purchases in specific categories.
-Device Usage: Target based on the devices used to access Facebook, like mobiles, tablets,
-or desktops.
-Connections to Your Pages, Apps, or Events: Target users who have already interacted with
-your business on Facebook or exclude them to find new audiences.
-Target users based on important life events like anniversaries, birthdays, recently moved,
-newly engaged, or having a baby.
-Education Level: Target users based on their educational background.
-Education Fields of Study: Target users based on their educational background.
-Job Title: Target professionals based on their job information.
-Job Title Industries: Target professionals based on their job information.
+### **Instructions:**  
+
+#### **Step 1: Persona Type Identification**  
+- Based on **Facebook targeting options**, define **4 persona types** that are most likely to respond to the ad.  
+- Present the personas in a structured table format:  
+
+---
+
+#### **Table 1: Persona Type Identification**  
+| **Persona Type** | **Description** |  
+|-----------------|---------------|  
+| **[Persona Type 1]** | _Detailed description of this audience segment, including key interests, behaviors, and demographics._ |  
+| **[Persona Type 2]** | _Detailed description of this audience segment, including key interests, behaviors, and demographics._ |  
+| **[Persona Type 3]** | _Detailed description of this audience segment, including key interests, behaviors, and demographics._ |  
+| **[Persona Type 4]** | _Detailed description of this audience segment, including key interests, behaviors, and demographics._ |  
+
+---
+
+#### **Step 2: Persona Development**  
+For each of the **4 personas**, develop a **detailed customer profile**, including **name, characteristics, and expected ad response**.  
+- Present the information in a structured table format.  
+
+---
+
+#### **Table 2: Detailed Persona Analysis**  
+
+| **Persona Name** | **Persona Type** | **Description** | **Analysis (How they would react to the ad)** |  
+|-----------------|----------------|----------------|--------------------------------|  
+| **[Persona 1 Name]** | _[Persona Type]_ | _[Detailed demographic and interest-based details]_ | _[How this persona would engage with the ad, their likely behavior, and purchase intent]_ |  
+| **[Persona 2 Name]** | _[Persona Type]_ | _[Detailed demographic and interest-based details]_ | _[How this persona would engage with the ad, their likely behavior, and purchase intent]_ |  
+| **[Persona 3 Name]** | _[Persona Type]_ | _[Detailed demographic and interest-based details]_ | _[How this persona would engage with the ad, their likely behavior, and purchase intent]_ |  
+| **[Persona 4 Name]** | _[Persona Type]_ | _[Detailed demographic and interest-based details]_ | _[How this persona would engage with the ad, their likely behavior, and purchase intent]_ |  
+
+---
+
+### **Step 3: Facebook Targeting Parameters for Each Persona**  
+For each persona, specify **which Facebook targeting options** should be selected.  
+
+| **Persona Name** | **Targeting Criteria** | **Selected Options** |  
+|-----------------|----------------|----------------|  
+| **[Persona 1 Name]** | Location | _[Specify targeted countries, cities, or zip codes]_ |  
+|  | Age Range | _[Specify selected age bracket]_ |  
+|  | Gender | _[Targeted gender: Men/Women/All]_ |  
+|  | Language | _[Targeted language preferences]_ |  
+|  | Interests | _[Pages liked, entertainment, fitness, hobbies, etc.]_ |  
+|  | Behaviors | _[Device usage, travel, purchase behavior, etc.]_ |  
+|  | Purchase Behavior | _[Categories of past purchases]_ |  
+|  | Job Title | _[Specific job titles or industries]_ |  
+| **[Persona 2 Name]** | _(Repeat for each persona)_ | _(Customized targeting options)_ |  
+
+---
+
+### **Final Recommendations & Summary**  
+
+1. **Which persona is the most valuable target for the ad?**  
+2. **Which targeting parameters are the most effective for achieving conversions?**  
+3. **How should the ad be adjusted to maximize engagement based on the persona insights?**
 """
         try:
             if is_image:
@@ -1441,34 +2327,73 @@ Job Title Industries: Target professionals based on their job information.
         
     def linkedin_profile(uploaded_file, is_image=True):
         prompt = f"""
-Based on the following targeting elements for Linkedin, please describe 4 persona types that
-are most likely to respond to the add. Please present these in a table (Persona Type,
-Description). Once you have identified these, create 4 personas (including names) who
-would be likely to purchase this product, and describe how you would expect them to react
-to it detailing the characteristics. Present each persona with a table (Persona Type,
-Description, Analysis) of the characteristics and analysis. Please include each of the
-characteristic that can be selected in the Linkedin targeting, and what you would select.
+### **Objective:**  
+Identify **4 key persona types** based on **LinkedIn’s targeting parameters** and analyze how they would respond to an advertisement. Provide structured insights, including demographic, behavioral, and professional attributes, along with a **detailed persona analysis** for marketing effectiveness.
 
-Location: Country, city, or region.
-Age: Though LinkedIn does not directly allow age and gender targeting, these can be
-inferred through other demographic details.
-Gender: Though LinkedIn does not directly allow age and gender targeting, these can be
-inferred through other demographic details.
-Company Industry: Reach professionals in particular industries.
-Company Size: Target companies based on the number of employees.
-Job Functions: Target users with specific job functions within companies.
-Job Seniority: From entry-level to senior executives and managers.
-Job Titles: Specific job titles, reaching users with particular roles.
-Years of Experience: Reach users based on how long they’ve been in the professional
-workforce.
-Schools: Alumni of specific educational institutions.
-Degrees: Users who hold specific degrees.
-Fields of Study: Users who studied specific subjects.
-Skills: Users who have listed specific skills on their profiles.
-Member Groups: Target members of LinkedIn groups related to professional interests.
-Interests: Based on content users interact with or their listed interests.
-Traits: Includes aspects like member traits, which can reflect user activities and behaviors on
-LinkedIn.
+---
+
+### **Instructions:**  
+
+#### **Step 1: Persona Type Identification**  
+- Based on **LinkedIn’s targeting options**, define **4 persona types** that are most likely to respond to the ad.  
+- Present the personas in a structured table format:  
+
+---
+
+#### **Table 1: Persona Type Identification**  
+| **Persona Type** | **Description** |  
+|-----------------|---------------|  
+| **[Persona Type 1]** | _Detailed description of this professional segment, including key industries, roles, and behaviors._ |  
+| **[Persona Type 2]** | _Detailed description of this professional segment, including key industries, roles, and behaviors._ |  
+| **[Persona Type 3]** | _Detailed description of this professional segment, including key industries, roles, and behaviors._ |  
+| **[Persona Type 4]** | _Detailed description of this professional segment, including key industries, roles, and behaviors._ |  
+
+---
+
+#### **Step 2: Persona Development**  
+For each of the **4 personas**, develop a **detailed customer profile**, including **name, characteristics, and expected ad response**.  
+- Present the information in a structured table format.  
+
+---
+
+#### **Table 2: Detailed Persona Analysis**  
+
+| **Persona Name** | **Persona Type** | **Description** | **Analysis (How they would react to the ad)** |  
+|-----------------|----------------|----------------|--------------------------------|  
+| **[Persona 1 Name]** | _[Persona Type]_ | _[Detailed professional background, skills, and behaviors]_ | _[How this persona would engage with the ad, their likely response, and purchase intent]_ |  
+| **[Persona 2 Name]** | _[Persona Type]_ | _[Detailed professional background, skills, and behaviors]_ | _[How this persona would engage with the ad, their likely response, and purchase intent]_ |  
+| **[Persona 3 Name]** | _[Persona Type]_ | _[Detailed professional background, skills, and behaviors]_ | _[How this persona would engage with the ad, their likely response, and purchase intent]_ |  
+| **[Persona 4 Name]** | _[Persona Type]_ | _[Detailed professional background, skills, and behaviors]_ | _[How this persona would engage with the ad, their likely response, and purchase intent]_ |  
+
+---
+
+### **Step 3: LinkedIn Targeting Parameters for Each Persona**  
+For each persona, specify **which LinkedIn targeting options** should be selected.  
+
+| **Persona Name** | **Targeting Criteria** | **Selected Options** |  
+|-----------------|----------------|----------------|  
+| **[Persona 1 Name]** | Location | _[Specify targeted country, city, or region]_ |  
+|  | Company Industry | _[Specify industry type]_ |  
+|  | Company Size | _[Target specific company sizes]_ |  
+|  | Job Function | _[Specify job function, e.g., Marketing, IT, Sales]_ |  
+|  | Job Seniority | _[Specify experience level, e.g., entry-level, director, executive]_ |  
+|  | Job Title | _[Target specific job titles]_ |  
+|  | Years of Experience | _[Target professionals based on experience]_ |  
+|  | Schools | _[Target alumni of specific institutions]_ |  
+|  | Degrees | _[Specify relevant degree qualifications]_ |  
+|  | Fields of Study | _[Target professionals based on academic background]_ |  
+|  | Skills | _[Specify LinkedIn-listed skills]_ |  
+|  | Member Groups | _[Target professionals based on group memberships]_ |  
+|  | Interests | _[Specify LinkedIn content interaction and topic interests]_ |  
+| **[Persona 2 Name]** | _(Repeat for each persona)_ | _(Customized targeting options)_ |  
+
+---
+
+### **Final Recommendations & Summary**  
+
+1. **Which persona is the most valuable target for the ad?**  
+2. **Which targeting parameters are the most effective for achieving engagement and conversions?**  
+3. **How should the ad messaging and visual content be optimized to align with the persona insights?**
 """
         try:
             if is_image:
@@ -1499,34 +2424,73 @@ LinkedIn.
         
     def x_profile(uploaded_file, is_image=True):
         prompt = f"""
-Based on the following targeting elements for X, please describe 4 persona types that are
-most likely to respond to the ad. Please present these in a table (Persona Type,
-Description). Once you have identified these, create 4 personas (including names) who
-would be likely to purchase this product, and describe how you would expect them to react
-to it detailing the characteristics. Present each persona with a table (Persona Type,
-Description, Analysis) of the characteristics and analysis. Please include each of the
-characteristics that can be selected in the X targeting, and what you would select.
+### **Objective:**  
+Identify **4 key persona types** based on **X’s targeting parameters** and analyze how they would respond to an advertisement. Provide structured insights, including demographic, behavioral, and engagement attributes, along with a **detailed persona analysis** for marketing effectiveness.
 
-Location: Target users by country, region, or metro area. More granular targeting, such as
-city or postal code is also available.
-Gender: You can select audiences based on gender.
-Language: Target users based on the language they speak.
-Interests: Target users based on their interests, which are inferred from their activities and
-the topics they engage with on X.
-Events: Target ads around specific events, both global and local, that generate significant
-engagement on the platform.
-Behaviors: Target based on user behaviors and actions, such as what they tweet or engage
-with.
-Keywords: Target users based on keywords in their tweets or tweets they engage with. This
-can be particularly useful for capturing intent and interest in real-time.
-Topics: Engage users who are part of conversations around predefined or custom topics.
-Device: Target users based on the devices or operating systems they use to access X.
+---
 
-Carrier: Target users based on their mobile carrier, which can be useful for mobile-specific
-campaigns.
-Geography: Targeting based on user location can be fine-tuned to match the cultural context
-and regional norms. 
+### **Instructions:**  
+
+#### **Step 1: Persona Type Identification**  
+- Based on **X’s targeting options**, define **4 persona types** that are most likely to engage with the ad.  
+- Present the personas in a structured table format:  
+
+---
+
+#### **Table 1: Persona Type Identification**  
+| **Persona Type** | **Description** |  
+|-----------------|---------------|  
+| **[Persona Type 1]** | _Detailed description of this audience segment, including interests, behaviors, and engagement patterns._ |  
+| **[Persona Type 2]** | _Detailed description of this audience segment, including interests, behaviors, and engagement patterns._ |  
+| **[Persona Type 3]** | _Detailed description of this audience segment, including interests, behaviors, and engagement patterns._ |  
+| **[Persona Type 4]** | _Detailed description of this audience segment, including interests, behaviors, and engagement patterns._ |  
+
+---
+
+#### **Step 2: Persona Development**  
+For each of the **4 personas**, develop a **detailed customer profile**, including **name, characteristics, and expected ad response**.  
+- Present the information in a structured table format.  
+
+---
+
+#### **Table 2: Detailed Persona Analysis**  
+
+| **Persona Name** | **Persona Type** | **Description** | **Analysis (How they would react to the ad)** |  
+|-----------------|----------------|----------------|--------------------------------|  
+| **[Persona 1 Name]** | _[Persona Type]_ | _[Detailed demographic, behavioral, and interest-based attributes]_ | _[How this persona would engage with the ad, their likely response, and intent]_ |  
+| **[Persona 2 Name]** | _[Persona Type]_ | _[Detailed demographic, behavioral, and interest-based attributes]_ | _[How this persona would engage with the ad, their likely response, and intent]_ |  
+| **[Persona 3 Name]** | _[Persona Type]_ | _[Detailed demographic, behavioral, and interest-based attributes]_ | _[How this persona would engage with the ad, their likely response, and intent]_ |  
+| **[Persona 4 Name]** | _[Persona Type]_ | _[Detailed demographic, behavioral, and interest-based attributes]_ | _[How this persona would engage with the ad, their likely response, and intent]_ |  
+
+---
+
+### **Step 3: X Targeting Parameters for Each Persona**  
+For each persona, specify **which X targeting options** should be selected.  
+
+| **Persona Name** | **Targeting Criteria** | **Selected Options** |  
+|-----------------|----------------|----------------|  
+| **[Persona 1 Name]** | Location | _[Specify targeted country, region, or metro area]_ |  
+|  | Gender | _[Specify male, female, or all genders]_ |  
+|  | Language | _[Target users based on language preferences]_ |  
+|  | Interests | _[Specify interest categories inferred from engagement patterns]_ |  
+|  | Events | _[Target users engaging with relevant global/local events]_ |  
+|  | Behaviors | _[Target based on user behaviors such as tweets, engagements, retweets, etc.]_ |  
+|  | Keywords | _[Target keywords from tweets and engagement trends]_ |  
+|  | Topics | _[Engage users in predefined or custom topic conversations]_ |  
+|  | Device | _[Specify device targeting (mobile, desktop, OS, etc.)]_ |  
+|  | Carrier | _[Target based on mobile carrier (if relevant)]_ |  
+|  | Geography | _[Ensure cultural context and regional targeting alignment]_ |  
+| **[Persona 2 Name]** | _(Repeat for each persona)_ | _(Customized targeting options)_ |  
+
+---
+
+### **Final Recommendations & Summary**  
+
+1. **Which persona is the most valuable target for the ad?**  
+2. **Which targeting parameters are the most effective for engagement and conversions?**  
+3. **How should the ad messaging and visual content be optimized to align with the persona insights?**
 """
+
         try:
             if is_image:
                 image = Image.open(io.BytesIO(uploaded_file.read()))
@@ -1556,96 +2520,55 @@ and regional norms.
         
     def Personality_Trait_Assessment(uploaded_file, is_image=True):
         prompt = f"""
-Personality traits table:
+### **Objective:**  
+Evaluate content using **various personality trait models**, analyzing how different personalities would respond to it. Provide structured insights with **scoring, analysis, and recommendations** in a table format. Include a **summary and overall recommendations** at the end.  
 
-If the content is non-english, translate the content to English. PLease evaluate the content against these principles in a table with a score for each element, from 1-5, in increments of 0.5, based on how well each personality will respond to the content. Please also include columns for analysis and  recommendations. At the end, pLease also include an overall summary and overall recommendations.
+---
 
-Main Personality Trait Models
-1. The Big Five Personality Traits (Five-Factor Model) - OCEAN/CANOE
-Overview: This is the most widely accepted and researched personality model, often referred to by the acronyms OCEAN or CANOE. It identifies five broad dimensions of personality.
-Traits:
-Openness to Experience: Imagination, creativity, curiosity, and a preference for novelty and variety.
-Conscientiousness: Organization, dependability, discipline, and goal-directed behavior.
-Extraversion: Sociability, assertiveness, excitement-seeking, and positive emotionality.
-Agreeableness: Compassion, cooperation, trust, and kindness towards others.
-Neuroticism: Tendency towards emotional instability, anxiety, moodiness, and sadness.
-2. Eysenck’s Three-Factor Model (PEN Model)
-Overview: Developed by Hans Eysenck, this model proposes that personality is based on three major dimensions.
-Traits:
-Psychoticism: Aggressiveness, impulsivity, and a lack of empathy.
-Extraversion: Sociability, liveliness, and activity.
-Neuroticism: Emotional instability, anxiety, and moodiness.
-3. HEXACO Model
-Overview: An extension of the Big Five model, HEXACO adds a sixth factor to the personality traits.
-Traits:
-Honesty-Humility: Sincerity, fairness, modesty, and a lack of greed.
-Emotionality: Similar to Neuroticism but also includes sentimentality and dependence.
-Extraversion: Sociability, assertiveness, and enthusiasm.
-Agreeableness: Patience, forgiveness, and cooperation.
-Conscientiousness: Organization, diligence, and reliability.
-Openness to Experience: Aesthetic appreciation, inquisitiveness, and creativity.
-4. Cattell’s 16 Personality Factors (16PF)
-Overview: Developed by Raymond Cattell, this model identifies 16 primary factors that describe human personality.
-Traits: Some key traits include warmth, reasoning, emotional stability, dominance, liveliness, rule-consciousness, social boldness, sensitivity, and vigilance.
-5. Myers-Briggs Type Indicator (MBTI)
-Overview: Based on Carl Jung’s theory of psychological types, the MBTI identifies personality types based on four dichotomies.
-Traits:
-Extraversion (E) vs. Introversion (I): Focus on the outer world vs. inner world.
-Sensing (S) vs. Intuition (N): Focus on concrete information vs. abstract concepts.
-Thinking (T) vs. Feeling (F): Decision-making based on logic vs. emotions.
-Judging (J) vs. Perceiving (P): Preference for structure vs. flexibility.
-6. The Dark Triad
-Overview: This model examines three negative personality traits that are often associated with manipulative and antisocial behavior.
-Traits:
-Machiavellianism: Manipulativeness, deceitfulness, and a focus on personal gain.
-Narcissism: Excessive self-love, entitlement, and a need for admiration.
-Psychopathy: Lack of empathy, impulsivity, and antisocial behaviors.
-7. Cloninger’s Temperament and Character Inventory (TCI)
-Overview: Developed by Robert Cloninger, this model distinguishes between temperament (automatic responses) and character (self-concept).
-Traits:
-Novelty Seeking: Impulsiveness and a tendency towards excitement.
-Harm Avoidance: Caution and a tendency to avoid risk.
-Reward Dependence: Reliance on social approval and sensitivity to social cues.
-Persistence: Perseverance in spite of frustration and fatigue.
-8. Enneagram of Personality
-Overview: The Enneagram identifies nine distinct personality types, each with unique motivations, fears, and growth paths. It emphasizes personal development and self-awareness.
-Types:
-Reformer (Type 1): Perfectionistic, principled, self-controlled.
-Helper (Type 2): Caring, generous, people-pleasing.
-Achiever (Type 3): Success-oriented, adaptable, driven.
-Individualist (Type 4): Sensitive, expressive, introspective.
-Investigator (Type 5): Analytical, innovative, private.
-Loyalist (Type 6): Committed, responsible, anxious.
-Enthusiast (Type 7): Spontaneous, versatile, distractible.
-Challenger (Type 8): Confident, assertive, confrontational.
-Peacemaker (Type 9): Easygoing, agreeable, complacent.
-9. DISC Personality Model
-Overview: The DISC model categorizes behavior into four primary traits, focusing on how individuals respond to various situations and interact with others.
-Traits:
-Dominance (D): Assertive, results-oriented, and driven.
-Influence (I): Sociable, enthusiastic, and persuasive.
-Steadiness (S): Cooperative, patient, and supportive.
-Conscientiousness (C): Analytical, detail-oriented, and systematic.
-10. Keirsey Temperament Sorter
-Overview: Based on the MBTI, the Keirsey Temperament Sorter groups the 16 personality types into four temperaments, each with distinct communication and behavior styles.
-Temperaments:
-Artisan: Spontaneous, adaptable, and action-oriented.
-Guardian: Dependable, detail-focused, and community-minded.
-Idealist: Empathetic, enthusiastic, and driven by personal growth.
-Rational: Strategic, logical, and problem-solving.
-11. Revised NEO Personality Inventory (NEO-PI-R)
-Overview: An extension of the Big Five model, the NEO-PI-R provides a more detailed assessment of the five factors, breaking them down into six facets each, for a deeper personality analysis.
-Facets: Provides finer granularity of traits such as anxiety, excitement-seeking, and orderliness within each of the Big Five categories.
-12. Jungian Archetypes
-Overview: Based on Carl Jung's theories, this model identifies universal, archetypal characters that are present in the collective unconscious and influence human behavior.
-Archetypes:
-The Hero: Represents courage, strength, and resilience.
-The Caregiver: Nurturing, supportive, and protective.
-The Explorer: Seeks adventure, discovery, and new experiences.
-The Rebel: Challenges authority, seeks change, and breaks rules.
-The Lover: Values relationships, passion, and connection.
-The Creator: Driven by imagination, innovation, and artistry.
-"""
+### **Instructions:**  
+
+#### **Step 1: Content Translation (If Applicable)**  
+- If the content is **not in English**, translate it to **English** before proceeding with the analysis.  
+
+---
+
+#### **Step 2: Personality Trait-Based Evaluation**  
+- Assess the content based on **12 different personality models**, each containing unique traits.  
+- Present results in a structured table format, including **score (1-5 in increments of 0.5), analysis, and improvement recommendations**.  
+
+---
+
+#### **Table Format for Personality Trait Evaluation**  
+
+| **Personality Model** | **Trait** | **Score (1-5)** | **Analysis** | **Recommendation** |  
+|----------------------|----------|---------------|------------|------------------|  
+| **Big Five (OCEAN)** | Openness to Experience | _[Score]_ | _[Analysis of how well content aligns with this trait]_ | _[How to enhance content appeal to this trait]_ |  
+|  | Conscientiousness | _[Score]_ | _[Analysis]_ | _[Recommendation]_ |  
+|  | Extraversion | _[Score]_ | _[Analysis]_ | _[Recommendation]_ |  
+|  | Agreeableness | _[Score]_ | _[Analysis]_ | _[Recommendation]_ |  
+|  | Neuroticism | _[Score]_ | _[Analysis]_ | _[Recommendation]_ |  
+| **Eysenck’s PEN Model** | Psychoticism | _[Score]_ | _[Analysis]_ | _[Recommendation]_ |  
+|  | Extraversion | _[Score]_ | _[Analysis]_ | _[Recommendation]_ |  
+|  | Neuroticism | _[Score]_ | _[Analysis]_ | _[Recommendation]_ |  
+| **HEXACO Model** | Honesty-Humility | _[Score]_ | _[Analysis]_ | _[Recommendation]_ |  
+|  | Emotionality | _[Score]_ | _[Analysis]_ | _[Recommendation]_ |  
+| **Cattell’s 16PF** | Select Key Traits | _[Score]_ | _[Analysis]_ | _[Recommendation]_ |  
+| **MBTI** | Extraversion vs. Introversion | _[Score]_ | _[Analysis]_ | _[Recommendation]_ |  
+|  | Sensing vs. Intuition | _[Score]_ | _[Analysis]_ | _[Recommendation]_ |  
+| **Dark Triad** | Machiavellianism | _[Score]_ | _[Analysis]_ | _[Recommendation]_ |  
+| **Enneagram** | Type 1: Reformer | _[Score]_ | _[Analysis]_ | _[Recommendation]_ |  
+|  | Type 2: Helper | _[Score]_ | _[Analysis]_ | _[Recommendation]_ |  
+| **DISC Model** | Dominance | _[Score]_ | _[Analysis]_ | _[Recommendation]_ |  
+|  | Influence | _[Score]_ | _[Analysis]_ | _[Recommendation]_ |  
+| **Keirsey Temperaments** | Artisan | _[Score]_ | _[Analysis]_ | _[Recommendation]_ |  
+| **Jungian Archetypes** | The Hero | _[Score]_ | _[Analysis]_ | _[Recommendation]_ |  
+
+---
+
+#### **Step 3: Summary & Overall Recommendations**  
+- **Summarize** which personality types respond best and which are least engaged.  
+- Provide **key improvements** to make the content more **universally effective** or tailored for **specific personality-driven audiences**.
+    """
         try:
             if is_image:
                 image = Image.open(io.BytesIO(uploaded_file.read()))
@@ -1675,79 +2598,51 @@ The Creator: Driven by imagination, innovation, and artistry.
         
     def BMTI_Analysis(uploaded_file, is_image=True):
         prompt = f"""
-If the content is non-english, translate the content to English. PLease evaluate the content against these personality types in a table with a score for how well each would perceive and respond to the content, from 1-5, in increments of 0.5. Please also include columns for analysis and  recommendations. At the end, please also include an overall summary and overall recommendations.
+### **Objective:**  
+Evaluate the content based on **MBTI personality types**, analyzing how different types would perceive and respond to it. Provide structured insights with **scoring, analysis, and recommendations** in a **table format**. Include a **summary and overall recommendations** at the end.  
 
-The Myers-Briggs Type Indicator (MBTI) consists of 16 personality types, each a combination of four dichotomies:
+---
 
-Extraversion (E) vs. Introversion (I): Focus on the outer world vs. the inner world.
-Sensing (S) vs. Intuition (N): Focus on concrete details vs. abstract concepts.
-Thinking (T) vs. Feeling (F): Decision-making based on logic vs. emotions.
-Judging (J) vs. Perceiving (P): Preference for structure vs. spontaneity.
-The 16 MBTI Personality Types
-ISTJ - The Inspector
+### **Instructions:**  
 
-Introverted, Sensing, Thinking, Judging
-Practical, fact-minded, and responsible.
-ISFJ - The Protector
+#### **Step 1: Content Translation (If Applicable)**  
+- If the content is **not in English**, first **translate it into English** before proceeding with the analysis.  
 
-Introverted, Sensing, Feeling, Judging
-Kind, conscientious, and dedicated to serving others.
-INFJ - The Advocate
+---
 
-Introverted, Intuitive, Feeling, Judging
-Idealistic, insightful, and driven by personal values.
-INTJ - The Architect
+#### **Step 2: MBTI Personality Type Evaluation**  
+- Assess the content based on **16 MBTI personality types**.  
+- Provide a **score (1-5 in increments of 0.5)** for each type, evaluating how well they would engage with the content.  
+- Present results in a **structured table** including **analysis and recommendations**.  
 
-Introverted, Intuitive, Thinking, Judging
-Strategic, logical, and determined innovators.
-ISTP - The Virtuoso
+---
 
-Introverted, Sensing, Thinking, Perceiving
-Bold, practical, and skilled at handling tools and situations.
-ISFP - The Adventurer
+#### **Table Format for MBTI Content Evaluation**  
 
-Introverted, Sensing, Feeling, Perceiving
-Flexible, charming, and live in the moment.
-INFP - The Mediator
+| **MBTI Personality Type** | **Score (1-5)** | **Analysis** | **Recommendation** |  
+|--------------------------|---------------|------------|------------------|  
+| **ISTJ – The Inspector** | _[Score]_ | _[Analysis of how this type perceives the content]_ | _[How to refine content for this type]_ |  
+| **ISFJ – The Protector** | _[Score]_ | _[Analysis]_ | _[Recommendation]_ |  
+| **INFJ – The Advocate** | _[Score]_ | _[Analysis]_ | _[Recommendation]_ |  
+| **INTJ – The Architect** | _[Score]_ | _[Analysis]_ | _[Recommendation]_ |  
+| **ISTP – The Virtuoso** | _[Score]_ | _[Analysis]_ | _[Recommendation]_ |  
+| **ISFP – The Adventurer** | _[Score]_ | _[Analysis]_ | _[Recommendation]_ |  
+| **INFP – The Mediator** | _[Score]_ | _[Analysis]_ | _[Recommendation]_ |  
+| **INTP – The Logician** | _[Score]_ | _[Analysis]_ | _[Recommendation]_ |  
+| **ESTP – The Entrepreneur** | _[Score]_ | _[Analysis]_ | _[Recommendation]_ |  
+| **ESFP – The Entertainer** | _[Score]_ | _[Analysis]_ | _[Recommendation]_ |  
+| **ENFP – The Campaigner** | _[Score]_ | _[Analysis]_ | _[Recommendation]_ |  
+| **ENTP – The Debater** | _[Score]_ | _[Analysis]_ | _[Recommendation]_ |  
+| **ESTJ – The Executive** | _[Score]_ | _[Analysis]_ | _[Recommendation]_ |  
+| **ESFJ – The Consul** | _[Score]_ | _[Analysis]_ | _[Recommendation]_ |  
+| **ENFJ – The Protagonist** | _[Score]_ | _[Analysis]_ | _[Recommendation]_ |  
+| **ENTJ – The Commander** | _[Score]_ | _[Analysis]_ | _[Recommendation]_ |  
 
-Introverted, Intuitive, Feeling, Perceiving
-Idealistic, creative, and driven by core values.
-INTP - The Logician
+---
 
-Introverted, Intuitive, Thinking, Perceiving
-Analytical, curious, and enjoy exploring ideas and concepts.
-ESTP - The Entrepreneur
-
-Extraverted, Sensing, Thinking, Perceiving
-Energetic, spontaneous, and enjoy living on the edge.
-ESFP - The Entertainer
-
-Extraverted, Sensing, Feeling, Perceiving
-Fun-loving, sociable, and love the spotlight.
-ENFP - The Campaigner
-
-Extraverted, Intuitive, Feeling, Perceiving
-Enthusiastic, imaginative, and enjoy exploring possibilities.
-ENTP - The Debater
-
-Extraverted, Intuitive, Thinking, Perceiving
-Quick-witted, innovative, and love intellectual challenges.
-ESTJ - The Executive
-
-Extraverted, Sensing, Thinking, Judging
-Organized, direct, and enjoy taking charge of situations.
-ESFJ - The Consul
-
-Extraverted, Sensing, Feeling, Judging
-Caring, sociable, and value harmony in relationships.
-ENFJ - The Protagonist
-
-Extraverted, Intuitive, Feeling, Judging
-Charismatic, inspiring, and love helping others reach their potential.
-ENTJ - The Commander
-
-Extraverted, Intuitive, Thinking, Judging
-Bold, strategic, and love to lead.
+#### **Step 3: Summary & Overall Recommendations**  
+- **Summarize** which MBTI personality types are **most and least likely to engage** with the content.  
+- **Provide key improvements** to enhance engagement across **multiple personality types** or refine content for **specific audiences**.
 """
         try:
             if is_image:
@@ -1779,77 +2674,113 @@ Bold, strategic, and love to lead.
         
     def Image_Analysis(uploaded_file, is_image=True):
         prompt = f"""
-For each aspect listed below, provide a score from 1 to 5 in increments of 0.5 (1 being low, 5 being high) and an explanation for each aspect, along with suggestions for improvement. The results should be presented in a table format with the columns: Aspect, Score, Explanation, and Improvement. After the table, provide an explanation with suggestions for overall improvement. Here are the aspects to consider:
+### **Objective:**  
+Evaluate the provided **image** against multiple marketing and design principles. Each aspect should be scored **from 1 to 5 in increments of 0.5** (1 being low, 5 being high) and **include an explanation and suggested improvements**.  
 
-Visual Appeal
-Impact: Attracts attention and conveys emotions.
-Analysis: Assess color scheme, composition, clarity, and aesthetic quality.
-Application: Ensure the image is clear, visually appealing, and professionally designed.
+- The results should be presented in a **structured table format** with the following columns:  
+  **Aspect | Score | Explanation | Suggested Improvement**  
+- After the table, provide an **overall summary** with **key recommendations for improvement**.  
 
-Relevance
-Impact: Resonates with the target audience.
-Analysis: Determine if the image matches audience preferences, context, and brand alignment.
-Application: Align the image with the audience’s interests and brand values.
+---
 
-Emotional Impact
-Impact: Evokes desired emotions.
-Analysis: Analyze the emotional resonance of the image.
-Application: Use storytelling and relatable scenarios to connect emotionally with the audience.
+### **Evaluation Criteria:**  
 
-Message Clarity
-Impact: Communicates the intended message effectively.
-Analysis: Ensure the main subject is clear and the image is not cluttered.
-Application: Focus on the key message and keep the design simple and straightforward.
+#### **1. Visual Appeal**  
+- **Impact:** Attracts attention and conveys emotions.  
+- **Analysis:** Assess **color scheme, composition, clarity, and aesthetic quality**.  
+- **Application:** Ensure the image is **visually appealing, high-quality, and professionally designed**.  
 
-Engagement Potential
-Impact: Captures and retains audience attention.
-Analysis: Evaluate attention-grabbing aspects and interaction potential.
-Application: Use compelling visuals and narratives to encourage interaction.
+#### **2. Relevance**  
+- **Impact:** Resonates with the **target audience**.  
+- **Analysis:** Determine if the image **aligns with audience preferences, brand messaging, and context**.  
+- **Application:** Ensure the image **matches the audience’s interests, expectations, and brand identity**.  
 
-Brand Recognition
-Impact: Enhances brand recall and association.
-Analysis: Check for visible and well-integrated brand elements.
-Application: Use brand colors, logos, and consistent style to reinforce brand identity.
+#### **3. Emotional Impact**  
+- **Impact:** Evokes **intended emotions** in viewers.  
+- **Analysis:** Examine how the **visual elements and composition** contribute to emotional resonance.  
+- **Application:** Incorporate **storytelling and relatable scenarios** to enhance emotional connection.  
 
-Cultural Sensitivity
-Impact: Respects and represents cultural norms and diversity.
-Analysis: Assess inclusivity, cultural appropriateness, and global appeal.
-Application: Ensure the image is inclusive and culturally sensitive.
+#### **4. Message Clarity**  
+- **Impact:** Effectively communicates the **main message**.  
+- **Analysis:** Ensure the **main subject is clear** and the design is **not cluttered**.  
+- **Application:** Maintain a **simple, well-structured design** that directs attention to the core message.  
 
-Technical Quality
-Impact: Maintains high resolution and professional editing.
-Analysis: Evaluate resolution, lighting, and post-processing quality.
-Application: Use high-resolution images with proper lighting and professional editing.
+#### **5. Engagement Potential**  
+- **Impact:** Captures and retains audience **interest**.  
+- **Analysis:** Evaluate elements that **draw attention and encourage interaction**.  
+- **Application:** Utilize **compelling visuals, storytelling, and dynamic elements** to increase engagement.  
 
-Color
-Impact: Influences mood, perception, and attention.
-Analysis: Analyze the psychological impact of the colors used.
-Application: Use colors purposefully to evoke desired emotions and enhance brand recognition.
+#### **6. Brand Recognition**  
+- **Impact:** Enhances **brand recall** and association.  
+- **Analysis:** Assess whether **branding elements (logos, colors, fonts) are well-integrated**.  
+- **Application:** Maintain a **consistent brand style** for stronger **brand identity reinforcement**.  
 
-Typography
-Impact: Affects readability and engagement.
-Analysis: Assess font choice, size, placement, and readability.
-Application: Ensure typography complements the image and enhances readability.
+#### **7. Cultural Sensitivity**  
+- **Impact:** Ensures the image **respects cultural norms and diversity**.  
+- **Analysis:** Check for **cultural appropriateness, inclusivity, and potential misinterpretations**.  
+- **Application:** Ensure **visual representation aligns with a diverse audience and cultural nuances**.  
 
-Symbolism
-Impact: Conveys complex ideas quickly.
-Analysis: Examine the use of symbols and icons.
-Application: Use universally recognized symbols that align with the ad’s message.
+#### **8. Technical Quality**  
+- **Impact:** Maintains **professional editing and high resolution**.  
+- **Analysis:** Evaluate **sharpness, lighting, and post-processing quality**.  
+- **Application:** Use **high-resolution images** with **proper lighting and editing** for a polished look.  
 
-Contrast
-Impact: Highlights important elements and improves visibility.
-Analysis: Check the contrast between different elements.
-Application: Use contrast to draw attention to key parts of the image.
+#### **9. Color Usage**  
+- **Impact:** Influences **mood, perception, and attention**.  
+- **Analysis:** Examine the **psychological effects of the chosen colors**.  
+- **Application:** Use colors that **evoke intended emotions** and align with the **brand identity**.  
 
-Layout Balance
-Impact: Ensures the image is visually balanced and pleasing to the eye.
-Analysis: Assess the distribution of elements within the image to ensure they are evenly balanced.
-Application: Arrange elements so that the visual weight is evenly distributed, avoiding clutter and ensuring harmony.
+#### **10. Typography**  
+- **Impact:** Affects **readability and engagement**.  
+- **Analysis:** Assess **font choice, size, placement, and overall readability**.  
+- **Application:** Ensure typography is **easy to read and visually harmonious** with the design.  
 
-Hierarchy
-Impact: Guides the viewer’s eye through the most important elements first.
-Analysis: Evaluate the visual hierarchy to ensure the most important elements stand out.
-Application: Use size, color, and placement to create a clear visual hierarchy, directing attention to key messages or elements.
+#### **11. Symbolism**  
+- **Impact:** Conveys **complex ideas quickly**.  
+- **Analysis:** Examine the **use of symbols, icons, or imagery** for enhanced message delivery.  
+- **Application:** Utilize **recognizable and meaningful symbols** aligned with the brand and message.  
+
+#### **12. Contrast**  
+- **Impact:** Highlights **important elements** and enhances visibility.  
+- **Analysis:** Evaluate **contrast between text, visuals, and background**.  
+- **Application:** Ensure **strong contrast** to improve readability and **focus on key elements**.  
+
+#### **13. Layout Balance**  
+- **Impact:** Creates a **visually balanced composition**.  
+- **Analysis:** Assess the **distribution of elements** to maintain harmony.  
+- **Application:** Avoid **clutter and imbalance** by distributing elements **evenly and strategically**.  
+
+#### **14. Hierarchy**  
+- **Impact:** Guides the viewer’s **attention effectively**.  
+- **Analysis:** Evaluate whether the **most important elements stand out first**.  
+- **Application:** Use **size, color, and positioning** to create a clear **visual hierarchy**.  
+
+---
+
+### **Structured Table for Analysis**  
+
+| **Aspect**           | **Score (1-5)** | **Explanation** | **Suggested Improvement** |  
+|----------------------|---------------|----------------|--------------------------|  
+| **Visual Appeal**    | _[Score]_      | _[Analysis]_   | _[Recommendation]_       |  
+| **Relevance**       | _[Score]_      | _[Analysis]_   | _[Recommendation]_       |  
+| **Emotional Impact** | _[Score]_      | _[Analysis]_   | _[Recommendation]_       |  
+| **Message Clarity**  | _[Score]_      | _[Analysis]_   | _[Recommendation]_       |  
+| **Engagement**       | _[Score]_      | _[Analysis]_   | _[Recommendation]_       |  
+| **Brand Recognition**| _[Score]_      | _[Analysis]_   | _[Recommendation]_       |  
+| **Cultural Sensitivity** | _[Score]_  | _[Analysis]_   | _[Recommendation]_       |  
+| **Technical Quality**| _[Score]_      | _[Analysis]_   | _[Recommendation]_       |  
+| **Color Usage**      | _[Score]_      | _[Analysis]_   | _[Recommendation]_       |  
+| **Typography**       | _[Score]_      | _[Analysis]_   | _[Recommendation]_       |  
+| **Symbolism**        | _[Score]_      | _[Analysis]_   | _[Recommendation]_       |  
+| **Contrast**        | _[Score]_       | _[Analysis]_   | _[Recommendation]_       |  
+| **Layout Balance**  | _[Score]_       | _[Analysis]_   | _[Recommendation]_       |  
+| **Hierarchy**       | _[Score]_       | _[Analysis]_   | _[Recommendation]_       |  
+
+---
+
+### **Final Summary & Recommendations**  
+- Provide an **overall summary** of the image’s **strengths and weaknesses**.  
+- Identify **key areas that need improvement** and suggest **general enhancements**.
 """
         try:
             if is_image:
@@ -1880,98 +2811,113 @@ Application: Use size, color, and placement to create a clear visual hierarchy, 
         
     def Image_Analysis_2(uploaded_file, is_image=True):
         prompt = f"""
-If the content is non-english, translate the content to English. PLease evaluate the image against these principles:
+### **Objective:**  
+Evaluate the **image** against multiple marketing and design principles. Each aspect should be scored **from 1 to 5 in increments of 0.5** (1 being low, 5 being high), with an **explanation and suggested improvements**.  
 
-1. Emotional Appeal
-Does the image evoke a strong emotional response?
-What specific emotions are triggered (e.g., happiness, nostalgia, excitement, urgency)?
-How might these emotions influence the viewer's perception of the brand or product?
-How well does the image align with the intended emotional tone of the campaign?
-Does the emotional tone match the target audience's expectations and values?
-2. Eye Attraction
-Does the image grab attention immediately?
-Which elements (color, subject, composition) are most effective in drawing the viewer’s attention?
-Is there anything in the image that distracts from the main focal point?
-Is there a clear focal point in the image that naturally draws the viewer's eye?
-How effectively does the focal point communicate the key message or subject?
-3. Visual Appeal
-How aesthetically pleasing is the image overall?
-Are the elements of balance, symmetry, and composition well-executed?
-Does the image use any unique or creative visual techniques that enhance its appeal?
-Are the visual elements harmonious and balanced?
-Do any elements feel out of place or clash with the overall design?
-4. Text Overlay (Clarity, Emotional Connection, Readability)
-Is the text overlay easily readable?
-Is there sufficient contrast between the text and the background?
-Are font size, style, and color appropriate for readability?
-Does the text complement the image?
-Does it enhance the emotional connection with the audience?
-Is the messaging clear, concise, and impactful?
-Is the text aligned with the brand's identity?
-Does it maintain consistency with the brand’s tone and voice?
-5. Contrast and Clarity
-Is there adequate contrast between different elements of the image?
-How well do the foreground and background elements distinguish themselves?
-Does the contrast help highlight the key message or subject?
-Is the image clear and sharp?
-Are all important details easy to distinguish?
-Does the image suffer from any blurriness or pixelation?
-6. Visual Hierarchy
-Is there a clear visual hierarchy guiding the viewer’s eye?
-Are the most important elements (e.g., brand name, product, call to action) placed prominently?
-How effectively does the hierarchy direct attention from one element to the next?
-Are key elements ordered in terms of importance?
-Does the visual flow help reinforce the intended message?
-7. Negative Space
-Is negative space used effectively to balance the composition?
-Does the negative space help focus attention on the key elements?
-Is there enough negative space to avoid clutter without making the image feel empty?
-Does the use of negative space enhance the overall clarity of the message?
-How does it contribute to the image’s visual hierarchy and readability?
-8. Color Psychology
-Are the colors used in the image appropriate for the message and target audience?
-Do the colors evoke the intended emotional response (e.g., trust, excitement, calm)?
-Are any colors potentially off-putting or conflicting for the audience?
-How well do the colors align with the brand’s color palette?
-Are they consistent with the brand’s identity and overall messaging?
-Does the color scheme contribute to or detract from brand recognition?
-9. Depth and Texture
-Does the image have a sense of depth and texture?
-Are shadows, gradients, or layering techniques used effectively to create a three-dimensional feel?
-How does the depth or texture contribute to the realism and engagement of the image?
-Is the texture or depth distracting or enhancing?
-Does it add value to the visual appeal, or does it complicate the message?
-10. Brand Consistency
-Is the image consistent with the brand’s visual identity?
-Are color schemes, fonts, and overall style in line with the brand guidelines?
-Does the image reinforce the brand’s core values and messaging?
-Does the image maintain a coherent connection to previous branding efforts?
-Is there a risk of confusing the audience with a departure from established brand aesthetics?
-11. Psychological Triggers
-Does the image use any psychological triggers effectively?
-Are elements like scarcity, social proof, or authority present to encourage a desired action?
-How well do these triggers align with the target audience’s motivations and behaviors?
-Are the psychological triggers subtle or overt?
-Does the image risk appearing manipulative, or is the influence balanced and respectful?
-12. Emotional Connection
-How strong is the emotional connection between the image and the target audience?
-Does the image resonate with the audience’s values, desires, or pain points?
-Is the connection likely to inspire action or loyalty?
-Is the emotional connection authentic?
-Does it feel genuine, or is there a risk of the audience perceiving it as forced or inauthentic?
-13. Suitable Effect Techniques
-Are any special effects or filters used in the image?
-Do they enhance the overall message and visual appeal?
-Are the effects aligned with the brand’s identity and the image’s purpose?
-Do these effects support the key message and theme?
-Is there a risk of the effects distracting from or diluting the message?
-14. Key Message and Subject
-Is the key message of the image clear and easily understood at a glance?
-Is the message prominent, or does it get lost in other elements?
-How well does the image communicate its purpose or call to action?
-Is the subject of the image (product, service, idea) highlighted appropriately?
-Does the subject stand out as the main focus?
-Is there a clear connection between the subject and the intended message?
+- Present the results in a **structured table format** with columns:  
+  **Aspect | Score | Explanation | Suggested Improvement**  
+- After the table, provide an **overall summary** with **key recommendations for improvement**.  
+
+---
+
+### **Evaluation Criteria:**  
+
+#### **1. Emotional Appeal**  
+- **Impact:** Does the image evoke a strong emotional response?  
+- **Analysis:** Identify the **emotions triggered** (e.g., happiness, nostalgia, excitement, urgency).  
+- **Application:** Ensure the emotional tone **aligns with the campaign’s goal and the target audience’s expectations**.  
+
+#### **2. Eye Attraction**  
+- **Impact:** Does the image grab attention immediately?  
+- **Analysis:** Identify which **visual elements** (color, subject, composition) are most effective.  
+- **Application:** Optimize the focal point to **draw and maintain viewer attention**.  
+
+#### **3. Visual Appeal**  
+- **Impact:** How aesthetically pleasing is the image overall?  
+- **Analysis:** Assess balance, **symmetry, composition, and creative visual techniques**.  
+- **Application:** Ensure **harmonious elements** that enhance brand perception.  
+
+#### **4. Text Overlay (Clarity, Emotional Connection, Readability)**  
+- **Impact:** Is the text readable and well-integrated?  
+- **Analysis:** Assess **contrast, font style, placement, and messaging impact**.  
+- **Application:** Improve readability and emotional resonance **without overwhelming the design**.  
+
+#### **5. Contrast and Clarity**  
+- **Impact:** Highlights important elements and improves visibility.  
+- **Analysis:** Check if **foreground and background elements** are distinct.  
+- **Application:** Adjust contrast to **improve message visibility and clarity**.  
+
+#### **6. Visual Hierarchy**  
+- **Impact:** Guides the viewer’s **eye movement** naturally.  
+- **Analysis:** Ensure the **key message, product, or CTA** is prioritized.  
+- **Application:** Use **size, color, and placement** to direct attention effectively.  
+
+#### **7. Negative Space**  
+- **Impact:** Enhances balance and focus.  
+- **Analysis:** Ensure negative space **prevents clutter and improves readability**.  
+- **Application:** Optimize spacing to **improve clarity and organization**.  
+
+#### **8. Color Psychology**  
+- **Impact:** Influences **mood, perception, and attention**.  
+- **Analysis:** Examine how the colors **evoke emotions and reinforce branding**.  
+- **Application:** Use colors strategically to **strengthen brand identity and emotional response**.  
+
+#### **9. Depth and Texture**  
+- **Impact:** Enhances realism and engagement.  
+- **Analysis:** Evaluate **shadows, gradients, and layering techniques**.  
+- **Application:** Ensure texture and depth **add value without complicating the message**.  
+
+#### **10. Brand Consistency**  
+- **Impact:** Reinforces **brand recognition and trust**.  
+- **Analysis:** Check if branding elements (**logo, fonts, colors**) are well-integrated.  
+- **Application:** Maintain **consistent brand aesthetics** across all marketing assets.  
+
+#### **11. Psychological Triggers**  
+- **Impact:** Encourages desired actions.  
+- **Analysis:** Identify triggers like **scarcity, authority, or social proof**.  
+- **Application:** Use subtle psychological cues **without appearing manipulative**.  
+
+#### **12. Emotional Connection**  
+- **Impact:** Strengthens audience engagement.  
+- **Analysis:** Does the image **align with audience values and desires**?  
+- **Application:** Use **authentic messaging** that resonates with the target demographic.  
+
+#### **13. Suitable Effect Techniques**  
+- **Impact:** Enhances message delivery.  
+- **Analysis:** Are **filters, lighting, or special effects** beneficial or distracting?  
+- **Application:** Ensure effects **support the message rather than overshadow it**.  
+
+#### **14. Key Message and Subject**  
+- **Impact:** Clearly communicates the intended message.  
+- **Analysis:** Is the message **easily understood at a glance**?  
+- **Application:** Ensure the **main subject stands out** and supports the **intended action**.  
+
+---
+
+### **Structured Table for Analysis**  
+
+| **Aspect**           | **Score (1-5)** | **Explanation** | **Suggested Improvement** |  
+|----------------------|---------------|----------------|--------------------------|  
+| **Emotional Appeal** | _[Score]_      | _[Analysis]_   | _[Recommendation]_       |  
+| **Eye Attraction**   | _[Score]_      | _[Analysis]_   | _[Recommendation]_       |  
+| **Visual Appeal**    | _[Score]_      | _[Analysis]_   | _[Recommendation]_       |  
+| **Text Overlay**     | _[Score]_      | _[Analysis]_   | _[Recommendation]_       |  
+| **Contrast & Clarity** | _[Score]_    | _[Analysis]_   | _[Recommendation]_       |  
+| **Visual Hierarchy** | _[Score]_      | _[Analysis]_   | _[Recommendation]_       |  
+| **Negative Space**   | _[Score]_      | _[Analysis]_   | _[Recommendation]_       |  
+| **Color Psychology** | _[Score]_      | _[Analysis]_   | _[Recommendation]_       |  
+| **Depth & Texture**  | _[Score]_      | _[Analysis]_   | _[Recommendation]_       |  
+| **Brand Consistency**| _[Score]_      | _[Analysis]_   | _[Recommendation]_       |  
+| **Psychological Triggers** | _[Score]_ | _[Analysis]_   | _[Recommendation]_       |  
+| **Emotional Connection** | _[Score]_  | _[Analysis]_   | _[Recommendation]_       |  
+| **Effect Techniques**| _[Score]_      | _[Analysis]_   | _[Recommendation]_       |  
+| **Key Message & Subject** | _[Score]_ | _[Analysis]_   | _[Recommendation]_       |  
+
+---
+
+### **Final Summary & Recommendations**  
+- Provide an **overall summary** of the **image’s strengths and weaknesses**.  
+- Identify **key areas that need improvement** and suggest **general enhancements**.
 """
         try:
             if is_image:
@@ -2002,99 +2948,114 @@ Is there a clear connection between the subject and the intended message?
         
     def Image_Analysis_2_table(uploaded_file, is_image=True):
         prompt = f"""
-If the content is non-english, translate the content to English. PLease evaluate the image against these principles in a table with a score for each element, from 1-5, in increments of 0.5. Please also include columns for analysis and  recommendations:
+### **Objective:**  
+Evaluate the **image** against multiple **marketing, design, and psychological** principles. Each aspect should be scored **from 1 to 5 in increments of 0.5** (1 being low, 5 being excellent), with an **explanation and suggested improvements**.  
 
-1. Emotional Appeal
-Does the image evoke a strong emotional response?
-What specific emotions are triggered (e.g., happiness, nostalgia, excitement, urgency)?
-How might these emotions influence the viewer's perception of the brand or product?
-How well does the image align with the intended emotional tone of the campaign?
-Does the emotional tone match the target audience's expectations and values?
-2. Eye Attraction
-Does the image grab attention immediately?
-Which elements (color, subject, composition) are most effective in drawing the viewer’s attention?
-Is there anything in the image that distracts from the main focal point?
-Is there a clear focal point in the image that naturally draws the viewer's eye?
-How effectively does the focal point communicate the key message or subject?
-3. Visual Appeal
-How aesthetically pleasing is the image overall?
-Are the elements of balance, symmetry, and composition well-executed?
-Does the image use any unique or creative visual techniques that enhance its appeal?
-Are the visual elements harmonious and balanced?
-Do any elements feel out of place or clash with the overall design?
-4. Text Overlay (Clarity, Emotional Connection, Readability)
-Is the text overlay easily readable?
-Is there sufficient contrast between the text and the background?
-Are font size, style, and color appropriate for readability?
-Does the text complement the image?
-Does it enhance the emotional connection with the audience?
-Is the messaging clear, concise, and impactful?
-Is the text aligned with the brand's identity?
-Does it maintain consistency with the brand’s tone and voice?
-5. Contrast and Clarity
-Is there adequate contrast between different elements of the image?
-How well do the foreground and background elements distinguish themselves?
-Does the contrast help highlight the key message or subject?
-Is the image clear and sharp?
-Are all important details easy to distinguish?
-Does the image suffer from any blurriness or pixelation?
-6. Visual Hierarchy
-Is there a clear visual hierarchy guiding the viewer’s eye?
-Are the most important elements (e.g., brand name, product, call to action) placed prominently?
-How effectively does the hierarchy direct attention from one element to the next?
-Are key elements ordered in terms of importance?
-Does the visual flow help reinforce the intended message?
-7. Negative Space
-Is negative space used effectively to balance the composition?
-Does the negative space help focus attention on the key elements?
-Is there enough negative space to avoid clutter without making the image feel empty?
-Does the use of negative space enhance the overall clarity of the message?
-How does it contribute to the image’s visual hierarchy and readability?
-8. Color Psychology
-Are the colors used in the image appropriate for the message and target audience?
-Do the colors evoke the intended emotional response (e.g., trust, excitement, calm)?
-Are any colors potentially off-putting or conflicting for the audience?
-How well do the colors align with the brand’s color palette?
-Are they consistent with the brand’s identity and overall messaging?
-Does the color scheme contribute to or detract from brand recognition?
-9. Depth and Texture
-Does the image have a sense of depth and texture?
-Are shadows, gradients, or layering techniques used effectively to create a three-dimensional feel?
-How does the depth or texture contribute to the realism and engagement of the image?
-Is the texture or depth distracting or enhancing?
-Does it add value to the visual appeal, or does it complicate the message?
-10. Brand Consistency
-Is the image consistent with the brand’s visual identity?
-Are color schemes, fonts, and overall style in line with the brand guidelines?
-Does the image reinforce the brand’s core values and messaging?
-Does the image maintain a coherent connection to previous branding efforts?
-Is there a risk of confusing the audience with a departure from established brand aesthetics?
-11. Psychological Triggers
-Does the image use any psychological triggers effectively?
-Are elements like scarcity, social proof, or authority present to encourage a desired action?
-How well do these triggers align with the target audience’s motivations and behaviors?
-Are the psychological triggers subtle or overt?
-Does the image risk appearing manipulative, or is the influence balanced and respectful?
-12. Emotional Connection
-How strong is the emotional connection between the image and the target audience?
-Does the image resonate with the audience’s values, desires, or pain points?
-Is the connection likely to inspire action or loyalty?
-Is the emotional connection authentic?
-Does it feel genuine, or is there a risk of the audience perceiving it as forced or inauthentic?
-13. Suitable Effect Techniques
-Are any special effects or filters used in the image?
-Do they enhance the overall message and visual appeal?
-Are the effects aligned with the brand’s identity and the image’s purpose?
-Do these effects support the key message and theme?
-Is there a risk of the effects distracting from or diluting the message?
-14. Key Message and Subject
-Is the key message of the image clear and easily understood at a glance?
-Is the message prominent, or does it get lost in other elements?
-How well does the image communicate its purpose or call to action?
-Is the subject of the image (product, service, idea) highlighted appropriately?
-Does the subject stand out as the main focus?
-Is there a clear connection between the subject and the intended message?
-"""
+- Present the results in a **structured table format** with columns:  
+  **Aspect | Score | Explanation | Suggested Improvement**  
+- After the table, provide an **overall summary** with **key recommendations for improvement**.  
+
+---
+
+### **Evaluation Criteria:**  
+
+#### **1. Emotional Appeal**  
+- **Impact:** Does the image evoke a strong emotional response?  
+- **Analysis:** Identify the **emotions triggered** (e.g., happiness, nostalgia, excitement, urgency).  
+- **Application:** Ensure the emotional tone **aligns with the campaign’s goal and the target audience’s expectations**.  
+
+#### **2. Eye Attraction**  
+- **Impact:** Does the image grab attention immediately?  
+- **Analysis:** Identify which **visual elements** (color, subject, composition) are most effective.  
+- **Application:** Optimize the focal point to **draw and maintain viewer attention**.  
+
+#### **3. Visual Appeal**  
+- **Impact:** How aesthetically pleasing is the image overall?  
+- **Analysis:** Assess balance, **symmetry, composition, and creative visual techniques**.  
+- **Application:** Ensure **harmonious elements** that enhance brand perception.  
+
+#### **4. Text Overlay (Clarity, Emotional Connection, Readability)**  
+- **Impact:** Is the text readable and well-integrated?  
+- **Analysis:** Assess **contrast, font style, placement, and messaging impact**.  
+- **Application:** Improve readability and emotional resonance **without overwhelming the design**.  
+
+#### **5. Contrast and Clarity**  
+- **Impact:** Highlights important elements and improves visibility.  
+- **Analysis:** Check if **foreground and background elements** are distinct.  
+- **Application:** Adjust contrast to **improve message visibility and clarity**.  
+
+#### **6. Visual Hierarchy**  
+- **Impact:** Guides the viewer’s **eye movement** naturally.  
+- **Analysis:** Ensure the **key message, product, or CTA** is prioritized.  
+- **Application:** Use **size, color, and placement** to direct attention effectively.  
+
+#### **7. Negative Space**  
+- **Impact:** Enhances balance and focus.  
+- **Analysis:** Ensure negative space **prevents clutter and improves readability**.  
+- **Application:** Optimize spacing to **improve clarity and organization**.  
+
+#### **8. Color Psychology**  
+- **Impact:** Influences **mood, perception, and attention**.  
+- **Analysis:** Examine how the colors **evoke emotions and reinforce branding**.  
+- **Application:** Use colors strategically to **strengthen brand identity and emotional response**.  
+
+#### **9. Depth and Texture**  
+- **Impact:** Enhances realism and engagement.  
+- **Analysis:** Evaluate **shadows, gradients, and layering techniques**.  
+- **Application:** Ensure texture and depth **add value without complicating the message**.  
+
+#### **10. Brand Consistency**  
+- **Impact:** Reinforces **brand recognition and trust**.  
+- **Analysis:** Check if branding elements (**logo, fonts, colors**) are well-integrated.  
+- **Application:** Maintain **consistent brand aesthetics** across all marketing assets.  
+
+#### **11. Psychological Triggers**  
+- **Impact:** Encourages desired actions.  
+- **Analysis:** Identify triggers like **scarcity, authority, or social proof**.  
+- **Application:** Use subtle psychological cues **without appearing manipulative**.  
+
+#### **12. Emotional Connection**  
+- **Impact:** Strengthens audience engagement.  
+- **Analysis:** Does the image **align with audience values and desires**?  
+- **Application:** Use **authentic messaging** that resonates with the target demographic.  
+
+#### **13. Suitable Effect Techniques**  
+- **Impact:** Enhances message delivery.  
+- **Analysis:** Are **filters, lighting, or special effects** beneficial or distracting?  
+- **Application:** Ensure effects **support the message rather than overshadow it**.  
+
+#### **14. Key Message and Subject**  
+- **Impact:** Clearly communicates the intended message.  
+- **Analysis:** Is the message **easily understood at a glance**?  
+- **Application:** Ensure the **main subject stands out** and supports the **intended action**.  
+
+---
+
+### **Structured Table for Analysis**  
+
+| **Aspect**           | **Score (1-5)** | **Explanation** | **Suggested Improvement** |  
+|----------------------|---------------|----------------|--------------------------|  
+| **Emotional Appeal** | _[Score]_      | _[Analysis]_   | _[Recommendation]_       |  
+| **Eye Attraction**   | _[Score]_      | _[Analysis]_   | _[Recommendation]_       |  
+| **Visual Appeal**    | _[Score]_      | _[Analysis]_   | _[Recommendation]_       |  
+| **Text Overlay**     | _[Score]_      | _[Analysis]_   | _[Recommendation]_       |  
+| **Contrast & Clarity** | _[Score]_    | _[Analysis]_   | _[Recommendation]_       |  
+| **Visual Hierarchy** | _[Score]_      | _[Analysis]_   | _[Recommendation]_       |  
+| **Negative Space**   | _[Score]_      | _[Analysis]_   | _[Recommendation]_       |  
+| **Color Psychology** | _[Score]_      | _[Analysis]_   | _[Recommendation]_       |  
+| **Depth & Texture**  | _[Score]_      | _[Analysis]_   | _[Recommendation]_       |  
+| **Brand Consistency**| _[Score]_      | _[Analysis]_   | _[Recommendation]_       |  
+| **Psychological Triggers** | _[Score]_ | _[Analysis]_   | _[Recommendation]_       |  
+| **Emotional Connection** | _[Score]_  | _[Analysis]_   | _[Recommendation]_       |  
+| **Effect Techniques**| _[Score]_      | _[Analysis]_   | _[Recommendation]_       |  
+| **Key Message & Subject** | _[Score]_ | _[Analysis]_   | _[Recommendation]_       |  
+
+---
+
+### **Final Summary & Recommendations**  
+- Provide an **overall summary** of the **image’s strengths and weaknesses**.  
+- Identify **key areas that need improvement** and suggest **general enhancements**.
+    """
         try:
             if is_image:
                 image = Image.open(io.BytesIO(uploaded_file.read()))
@@ -2124,42 +3085,90 @@ Is there a clear connection between the subject and the intended message?
         
     def flash_analysis(uploaded_file, is_image=True):
         prompt = f"""
-        Imagine you are a visual content analyst reviewing a marketing asset ({'image' if is_image else 'video'}) for a client. Your goal is to provide a detailed, objective description that captures essential information relevant to marketing decisions.
+### **Objective:**  
+Analyze a **marketing asset** ({'image' if is_image else 'video'}) for a **detailed, structured, and marketing-focused** evaluation. The goal is to provide **objective insights** that help in making informed **marketing decisions**.
 
-        Instructions:
+---
 
-        1. Detailed Description:
-            - For images:
-                - Describe the prominent visual elements (objects, people, animals, settings).
-                - Note the dominant colors and their overall effect.
-                - Mention any text, its content, font style, size, and placement.
-                - Describe the composition and layout of the elements.
-            - For videos:
-                - Describe the key scenes, actions, and characters.
-                - Note the visual style, color palette, and editing techniques.
-                - Mention any text overlays, captions, or speech, transcribing if possible.
-                - Identify the background music or sound effects, if present.
+### **Evaluation Criteria:**  
 
-        2. Cultural References and Symbolism:
-            - Identify any cultural references, symbols, or visual metaphors that could be significant to the target audience.
-            - Explain how these elements might be interpreted or resonate with the audience.
+#### **1. Detailed Description**  
+✅ **For Images:**  
+   - **Visual Elements:** Describe the prominent objects, people, animals, or settings.  
+   - **Color Palette & Mood:** Identify dominant colors and their effect on perception.  
+   - **Text Elements:** Describe any visible text, font style, size, and placement.  
+   - **Composition & Layout:** Analyze how elements are positioned and balanced.  
 
-        3. Marketing Implications:
-            - Briefly summarize the potential marketing implications based on the visual and textual elements.
-            - Consider how the asset might appeal to different demographics or interests.
-            - Mention any potential positive or negative associations it may evoke.
+✅ **For Videos:**  
+   - **Key Scenes & Actions:** Describe what happens in the most representative frames.  
+   - **Visual Style & Color Scheme:** Identify editing techniques and thematic consistency.  
+   - **Text Overlays & Captions:** Transcribe any visible text or spoken content.  
+   - **Audio Elements:** Note background music, sound effects, and voiceovers.  
 
-        4. Additional Notes:
-            - If analyzing a video, focus on the most representative frame(s) for the initial description.
-            - Mention any significant changes or variations in visuals or text throughout the video.
+---
 
-        Please ensure your description is:
+#### **2. Cultural References and Symbolism**  
+✅ **Cultural Sensitivity & Meaning:**  
+   - Identify **symbols, gestures, or references** that may have **cultural significance**.  
+   - Consider how these elements **align with the target audience’s values and perceptions**.  
 
-        - Objective: Focus on factual details and avoid subjective interpretations or opinions.
-        - Detailed: Provide enough information for the client to understand the asset's visual and textual content.
-        - Marketing-Oriented: Highlight elements that are relevant to marketing strategy and decision-making.
-        - Consistent: Provide similar descriptions for the same asset, regardless of how many times you analyze it.
-        """ 
+✅ **Marketing Implications:**  
+   - How might these cultural cues **influence brand perception**?  
+   - Are there any potential **risks or misinterpretations** in global or diverse markets?  
+
+---
+
+#### **3. Marketing Implications**  
+✅ **Target Audience Alignment:**  
+   - How does the content appeal to **different demographics, interests, and emotions**?  
+   - Does the design reinforce a **positive brand identity and message**?  
+
+✅ **Brand Impact & Emotional Connection:**  
+   - Does the asset create a strong **emotional response** that encourages engagement?  
+   - Are there any **positive or negative associations** that could affect the brand?  
+
+✅ **Conversion Potential:**  
+   - Does the content **clearly support the marketing objective** (awareness, engagement, conversion)?  
+   - How effective is the **call to action (CTA), if present**?  
+
+---
+
+#### **4. Additional Notes (For Videos)**  
+✅ **Key Frame Selection:**  
+   - Identify **the most visually impactful frames** for initial assessment.  
+   - Mention **any significant transitions, cuts, or scene variations**.  
+
+✅ **Overall Content Consistency:**  
+   - Ensure **visual and textual elements** align with the **brand’s tone, style, and messaging**.  
+   - Highlight **potential inconsistencies** that could affect the asset’s effectiveness.  
+
+---
+
+### **Presentation Format**  
+
+#### **Structured Report Output:**  
+**Section 1: Visual & Textual Breakdown**  
+- **Asset Type:** [Image/Video]  
+- **Primary Elements:** [List of key objects, people, settings]  
+- **Color & Mood:** [Description of dominant colors & their effect]  
+- **Text Presence:** [List of all visible text, font style, and placement]  
+- **Composition & Layout:** [Analysis of element positioning & balance]  
+
+**Section 2: Cultural References & Symbolism**  
+- **Cultural Elements:** [Any relevant cultural themes, colors, or symbols]  
+- **Potential Interpretations:** [How these might be perceived by different audiences]  
+- **Marketing Considerations:** [Any risks or opportunities related to cultural context]  
+
+**Section 3: Marketing Implications**  
+- **Target Audience Fit:** [How the asset aligns with key demographics]  
+- **Brand Reinforcement:** [Does it align with brand messaging?]  
+- **Call to Action Effectiveness:** [Does it encourage engagement or conversion?]  
+- **Potential Risks & Opportunities:** [Any elements that could help or hurt marketing effectiveness]  
+
+**Section 4: Final Insights & Recommendations**  
+- **Overall Effectiveness Score:** [1-5 scale]  
+- **Improvement Areas:** [Clear, actionable suggestions for enhancement]
+"""
         try:
             if is_image:
                 image = Image.open(io.BytesIO(uploaded_file.read()))
@@ -2185,61 +3194,102 @@ Is there a clear connection between the subject and the intended message?
             st.error(f"Failed to read or process the media: {e}")
             return None
     def motivation(uploaded_file, is_image=True):
-        prompt = """
-When evaluating whether a piece of content would motivate someone to act or make a purchase based on Self-Determination Theory (SDT), the focus should be on how the content satisfies the audience's psychological needs for autonomy, competence, and relatedness. These needs are crucial drivers of intrinsic motivation, which can lead to more genuine and lasting engagement, including purchasing behavior.
+        prompt = f"""
+### **Objective:**  
+Evaluate a **marketing asset** ({'image' if is_image else 'video'}) using **Self-Determination Theory (SDT)** to determine its ability to **motivate audience action and purchase decisions**. The analysis will assess how well the content satisfies three core psychological needs: **Autonomy, Competence, and Relatedness**—which drive intrinsic motivation.
 
+---
 
-For each aspect listed below, provide a score from 1 to 5 in increments of 0.5 (1 being low, 5 being high) and an explanation for each aspect, along with suggestions for improvement. The results should be presented in a table format with the columns: Aspect, Score, Explanation, Improvement. After the table, provide a concise explanation with suggestions for overall improvement. Here are the aspects to consider:
+### **Evaluation Method:**  
 
-Autonomy (The need to feel in control and have choices)
-Does the content provide the audience with a sense of choice or control in their decision-making process?
+For each **SDT principle**, assign a score from **1 to 5** (increments of **0.5**), with **1 being low and 5 being high**. Provide a concise **explanation** and **specific recommendations for improvement**. Present findings in a **structured table** format.  
 
-Does the content allow the consumer to feel that they are making their own decision, rather than being pressured?
-Are there options or customizable features presented that emphasize personal control over the purchase?
-How well does the content empower the audience to make an informed decision?
+At the end of the evaluation, compute a **Motivational Score**, which is weighted as follows:  
+- **Autonomy:** 50% of total score  
+- **Competence:** 30% of total score  
+- **Relatedness:** 20% of total score  
 
-Is the content transparent, providing clear, unbiased information that helps the consumer feel confident in making their own choice?
-Does it respect the audience’s intelligence and autonomy by avoiding manipulative language or fear-based tactics?
-Does the content acknowledge the audience’s unique preferences and needs?
+---
 
-Is the messaging personalized, recognizing the individual’s preferences, lifestyle, or circumstances, so they feel that their choice aligns with their own values?
-Competence (The need to feel effective and capable)
-Does the content make the audience feel capable of successfully using the product or service?
+### **Evaluation Criteria**  
 
-Is the product or service presented in a way that highlights how easy it is to use or implement, thus reducing potential feelings of inadequacy or uncertainty?
-Are benefits and usage instructions clearly explained, helping the audience feel confident in their ability to derive value from the purchase?
-Does the content help the audience understand how the product can improve their life or solve their problem?
+#### **1. Autonomy (The Need for Control & Choice)**  
+✅ **Decision Empowerment**  
+- Does the content allow consumers to feel in control of their decision?  
+- Is the messaging **transparent** and **unbiased**, avoiding pressure tactics?  
 
-Is it clear how the product enhances the consumer’s skills, knowledge, or capabilities, making them feel more competent or accomplished?
-Does the content showcase success stories or examples that demonstrate the audience’s potential for success with the product?
+✅ **Customization & Personalization**  
+- Does the content offer **options or customizable features**?  
+- Does it acknowledge **individual preferences and lifestyles**?  
 
-Are there testimonials, case studies, or examples that show how others (similar to the target audience) have successfully used the product, enhancing the feeling of "I can do this too"?
-Relatedness (The need to feel connected to others or a community)
-Does the content create a sense of belonging or connection to a community?
+✅ **Respect for Audience Intelligence**  
+- Does the content avoid **manipulative language or fear-based tactics**?  
+- Is the tone empowering rather than coercive?  
 
-Does the content emphasize social proof, like reviews or user-generated content, making the audience feel that they are part of a group of satisfied customers?
-Is there a sense of alignment with a community or cause, where purchasing the product helps the audience feel connected to others who share similar values or interests?
-How well does the content build emotional resonance and human connection?
+---
 
-Does the content evoke feelings of trust, warmth, or empathy that make the audience feel emotionally connected to the brand, product, or other users?
-Is the brand portrayed as approachable and supportive, fostering a relationship rather than a transactional interaction?
-Does the content align with the audience’s values, helping them feel understood and connected to a larger purpose?
+#### **2. Competence (The Need to Feel Effective & Capable)**  
+✅ **Ease of Use & Understanding**  
+- Does the content make the audience feel confident in using the product/service?  
+- Are instructions or **benefits clearly explained**?  
 
-Does the messaging reflect the values, desires, or social identity of the audience, making them feel that the purchase is aligned with their personal goals or societal causes?
-General SDT-Aligned Questions for Content Assessment
-Does the content create a balance between external incentives (promotions, discounts) and intrinsic motivation (personal values, empowerment) to make the purchase?
+✅ **Problem-Solving & Skill Enhancement**  
+- Does the product **solve a problem or improve the audience’s capabilities**?  
+- Is the value of the product communicated effectively?  
 
-Does it avoid over-relying on extrinsic motivators (e.g., discounts, fear of missing out) in favor of encouraging personal satisfaction and long-term benefits?
-How well does the content foster a sense of long-term value rather than pushing for an immediate transaction?
+✅ **Social Proof & Success Stories**  
+- Are there **testimonials, case studies, or real-life examples** that reinforce confidence?  
+- Does the content demonstrate **how others have successfully used the product**?  
 
-Is the audience encouraged to consider how the product will satisfy deeper, more lasting needs (autonomy, competence, relatedness) rather than just surface-level wants?
-Does the content help the audience see how the purchase will improve their life in a meaningful way?
+---
 
-Does it connect the product to the audience’s internal motivations, such as self-improvement, connection to others, or greater self-sufficiency?
-By asking these questions, you can determine if the content appeals to intrinsic motivations, which are more likely to lead to sustainable customer engagement and purchasing decisions, in line with Self-Determination Theory.
+#### **3. Relatedness (The Need for Connection & Social Belonging)**  
+✅ **Community & Social Validation**  
+- Does the content create a **sense of belonging** through customer reviews or user-generated content?  
+- Does it align with a **community, cause, or shared interest**?  
 
-At the end of the table, please add a summary "Motivational Score" which is based on 50% of the Autonomy Score, 30% of the Competence Score and 20% of the Relatedness Score.
-        """
+✅ **Emotional Resonance**  
+- Does the content build **trust, warmth, and empathy** with the audience?  
+- Is the **brand voice supportive and relationship-driven** rather than transactional?  
+
+✅ **Alignment with Audience Values**  
+- Does the messaging **reflect audience beliefs, aspirations, and social identity**?  
+- How well does it **connect to a larger purpose** that matters to the target audience?  
+
+---
+
+### **Final Score Calculation**  
+✅ **Motivational Score Formula:**  
+- **50% of Autonomy Score**  
+- **30% of Competence Score**  
+- **20% of Relatedness Score**  
+
+✅ **Final Recommendations & Action Plan**  
+- Highlight key areas **for optimization** to improve engagement and conversion.  
+- Offer **specific marketing strategy suggestions** aligned with SDT principles.  
+
+---
+
+### **Presentation Format**  
+
+#### **Structured Report Output:**  
+**Section 1: Content Breakdown**  
+- **Asset Type:** [Image/Video]  
+- **Primary Messaging Focus:** [Description of core content message]  
+- **Emotional & Motivational Themes:** [Overview of how the content drives action]  
+
+**Section 2: SDT-Based Evaluation**  
+| Aspect         | Score (1-5) | Explanation | Suggested Improvement |  
+|--------------|------------|-------------|------------------------|  
+| **Autonomy** | _[Score]_ | _[Reasoning]_ | _[Enhancement Idea]_ |  
+| **Competence** | _[Score]_ | _[Reasoning]_ | _[Enhancement Idea]_ |  
+| **Relatedness** | _[Score]_ | _[Reasoning]_ | _[Enhancement Idea]_ |  
+
+**Section 3: Final Insights**  
+- **Motivational Score:** _[Weighted Calculation]_  
+- **Overall Effectiveness:** _[Summary of how well the content encourages audience action]_  
+- **Optimization Strategy:** _[Key recommendations for refinement]_ 
+"""
         try:
             if is_image:
                 image = Image.open(io.BytesIO(uploaded_file.read()))
@@ -2316,7 +3366,7 @@ At the end of the table, please add a summary "Motivational Score" which is base
             st.error(f"An error occurred while processing the media: {e}")
         return None  # Return None to signal an error occurred
 # --- Streamlit App ---
-st.title("Media Analysis AI Assistant with gemini-2.0-flash-thinking-exp-01-21")
+st.title("Marketing Media Analysis AI Assistant with gemini-2.5-pro-preview-03-25")
 
 # --- Sidebar ---
 with st.sidebar:
@@ -2384,7 +3434,7 @@ for uploaded_file in uploaded_files:
         if is_image:
             image = Image.open(uploaded_file)
             image = resize_image(image)  # Resize for display
-            st.image(image, caption="Uploaded Image",  use_container_width=True)
+            st.image(image, caption="Uploaded Image", use_container_width='auto')
         else:
             st.video(uploaded_file, format="video/mp4")
 
@@ -2635,7 +3685,7 @@ def compare_all_images(images, filenames, model, custom_prompt=None):
         return None
 
 # Initialize the Streamlit app
-st.title("Image Comparison AI Assistant")
+st.title("Marketing Image Comparison AI Assistant with Gemini-2.5-pro-preview-03-25")
 
 # File Uploader for Multiple Images
 uploaded_files = st.file_uploader(
