@@ -32,14 +32,15 @@ else:
     # Define generation configuration
     generation_config = {
         "temperature": 0.1,
-        "top_p": 0.8,
-        "max_output_tokens": 8192,
+        "top_p": 1.0,
+        "top_k": 1,
+        "max_output_tokens": 65536,
         "response_mime_type": "text/plain",
     }
 
     # Initialize Generative AI model with generation configuration
     model = genai.GenerativeModel(
-        model_name="gemini-1.5-flash",
+        model_name="gemini-2.5-flash-preview-04-17",
         generation_config=generation_config,
     )
 
@@ -2315,7 +2316,7 @@ At the end of the table, please add a summary "Motivational Score" which is base
             st.error(f"An error occurred while processing the media: {e}")
         return None  # Return None to signal an error occurred
 # --- Streamlit App ---
-st.title("Marketing Media Analysis AI Assistant with Gemini-1.5-flash")
+st.title("Marketing Media Analysis AI Assistant with gemini-2.5-flash-preview-04-17")
 
 # --- Sidebar ---
 with st.sidebar:
@@ -2634,7 +2635,7 @@ def compare_all_images(images, filenames, model, custom_prompt=None):
         return None
 
 # Initialize the Streamlit app
-st.title("Marketing Image Comparison AI Assistant with Gemini-1.5-flash")
+st.title("Marketing Image Comparison AI Assistant with gemini-2.5-flash-preview-04-17")
 
 # File Uploader for Multiple Images
 uploaded_files = st.file_uploader(
