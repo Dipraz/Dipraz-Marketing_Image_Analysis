@@ -2384,7 +2384,7 @@ for uploaded_file in uploaded_files:
         if is_image:
             image = Image.open(uploaded_file)
             image = resize_image(image)  # Resize for display
-            st.image(image, caption="Uploaded Image", use_column_width='auto')
+            st.image(image, caption="Uploaded Image", use_container_width='auto')
         else:
             st.video(uploaded_file, format="video/mp4")
 
