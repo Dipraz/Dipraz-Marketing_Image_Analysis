@@ -87,7 +87,7 @@ def analyze_video(uploaded_video, prompt, temperature, top_p, max_tokens):
                 emotional_intensity = np.random.rand(10)
                 st.line_chart(emotional_intensity)
 
-            if st.button("💾 Save Analysis to File"):
+            if st.button("📂 Save Analysis to File"):
                 with open("analysis_output.txt", "w") as f:
                     f.write(output_text)
                 st.success("Analysis saved as analysis_output.txt")
@@ -120,9 +120,10 @@ def main():
         if uploaded_video:
             st.video(uploaded_video)
 
-        if uploaded_video and user_prompt:
-            if st.button("Analyze Video"):
-                analyze_video(uploaded_video, user_prompt, temperature, top_p, max_tokens)
+        analyze_button = st.button("Analyze Video", disabled=not (uploaded_video and user_prompt))
+
+        if analyze_button:
+            analyze_video(uploaded_video, user_prompt, temperature, top_p, max_tokens)
 
 if __name__ == "__main__":
     main()
