@@ -11,7 +11,7 @@ import imageio
 import json
 import xml.etree.ElementTree as ET
 import base64
-
+from video import analyze_video
 # Load environment variables from .env file
 load_dotenv()
 
