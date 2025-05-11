@@ -29,68 +29,30 @@ def initialize_vertex_ai():
     os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = credentials_path
     vertexai.init(project=st.secrets["gcp"]["project_id"], location="us-central1")
 
-def analyze_video(uploaded_video, prompt, temperature, top_p, max_tokens):
+def analyze_video(video_file, prompt, temperature=1.0, top_p=0.95, max_tokens=4096):
     try:
-        initialize_vertex_ai()
+        st.info("Running Gemini video analysis...")
 
-        if isinstance(uploaded_video, bytes):
-            video_bytes = uploaded_video
-        else:
-            video_bytes = uploaded_video.read()
-        encoded_video = base64.b64encode(video_bytes).decode('utf-8')
+        # Save video to temp file
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as temp_video:
+            temp_video.write(video_file.read())
+            temp_video_path = temp_video.name
 
-        progress_bar = st.progress(0)
-        progress_info = st.info("Starting analysis... This might take a few moments.")
+        # Load video into Gemini API (as Part)
+        model = GenerativeModel("gemini-1.5-pro-preview-0409")
+        video_part = Part.from_uri(temp_video_path, mime_type="video/mp4")
 
-        video_part = Part.from_data(
-            mime_type=uploaded_video.type,
-            data=base64.b64decode(encoded_video),
+        response = model.generate_content(
+            [prompt, video_part],
+            generation_config={
+                "temperature": temperature,
+                "top_p": top_p,
+                "max_output_tokens": max_tokens
+            }
         )
-        text_part = prompt
 
-        generation_config = {
-            "max_output_tokens": max_tokens,
-            "temperature": temperature,
-            "top_p": top_p,
-        }
-
-        model = GenerativeModel("gemini-1.5-flash-002")
-
-        start_time = time.time()
-        with st.spinner('Analyzing the video... This might take a few moments.'):
-            responses = model.generate_content(
-                [video_part, text_part],
-                generation_config=generation_config,
-                safety_settings=[],
-                stream=True,
-            )
-
-            output_text = ""
-            placeholder = st.empty()
-            for i, response in enumerate(responses):
-                output_text += response.text
-                placeholder.text_area("Current Analysis", value=output_text, height=150)
-                progress = min((i + 1) / 10, 1.0)
-                progress_bar.progress(progress)
-                time.sleep(0.1)
-
-            st.success("Analysis Complete!")
-            end_time = time.time()
-            st.info(f"The analysis took approximately {end_time - start_time:.2f} seconds.")
-            st.markdown("### Analysis Result:")
-            st.write(output_text)
-
-            if "emotion" in prompt.lower():
-                st.markdown("### Emotional Intensity Over Time:")
-                emotional_intensity = np.random.rand(10)
-                st.line_chart(emotional_intensity)
-
-            if st.button("📂 Save Analysis to File"):
-                with open("analysis_output.txt", "w") as f:
-                    f.write(output_text)
-                st.success("Analysis saved as analysis_output.txt")
+        st.success("Video Analysis Complete:")
+        st.markdown(response.text)
 
     except Exception as e:
-        st.error(f"An error occurred: {str(e)}")
-        st.error("Detailed traceback:")
-        st.text(traceback.format_exc())
+        st.error(f"❌ An error occurred during video analysis: {e}")
