@@ -2683,3 +2683,17 @@ if uploaded_files and len(uploaded_files) >= 2:
 
 elif uploaded_files and len(uploaded_files) < 2:
     st.warning("Please upload at least two images for comparison.")
+
+# Sidebar button for video analysis
+with st.sidebar:
+    st.subheader("🎥 Video Analysis")
+    video_uploaded = st.file_uploader("Upload a video for analysis", type=["mp4", "mov", "avi", "mkv", "webm"], key="video")
+    user_prompt_video = st.text_area("Enter your prompt for the video analysis", key="video_prompt")
+
+    if video_uploaded:
+        st.video(video_uploaded)
+
+    analyze_video_button = st.button("Analyze Video", disabled=not (video_uploaded and user_prompt_video))
+
+    if analyze_video_button:
+        analyze_video(video_uploaded, user_prompt_video, temperature=1.0, top_p=0.95, max_tokens=4096)
