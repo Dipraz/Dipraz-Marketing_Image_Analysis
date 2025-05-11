@@ -2704,3 +2704,18 @@ with st.sidebar:
         except Exception as e:
             st.error(f"An error occurred during video analysis: {e}")
             st.error("Please check the uploaded video and prompt format.")
+# Sidebar settings (ensure these are present)
+temperature = st.sidebar.slider("Temperature", min_value=0.0, max_value=2.0, value=1.0, step=0.1)
+top_p = st.sidebar.slider("Top P", min_value=0.0, max_value=1.0, value=0.95, step=0.05)
+max_tokens = st.sidebar.slider("Max Output Tokens", min_value=1000, max_value=8192, value=8192, step=500)
+
+# Video analysis tab
+if st.button("Analyze Video", key="analyze_video_btn") and video_uploaded and user_prompt_video.strip():
+    with st.spinner("Analyzing video..."):
+        try:
+            result = analyze_video(video_uploaded, user_prompt_video)  # ✅ No extra args!
+            if result:
+                st.write("## Video Analysis Result:")
+                st.markdown(result)
+        except Exception as e:
+            st.error(f"An error occurred: {e}")
