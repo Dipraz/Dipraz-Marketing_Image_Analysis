@@ -1,3 +1,4 @@
+
 import streamlit as st
 from dotenv import load_dotenv
 import os
@@ -11,7 +12,7 @@ import imageio
 import json
 import xml.etree.ElementTree as ET
 import base64
-from video import analyze_video
+
 # Load environment variables from .env file
 load_dotenv()
 
@@ -2683,39 +2684,3 @@ if uploaded_files and len(uploaded_files) >= 2:
 
 elif uploaded_files and len(uploaded_files) < 2:
     st.warning("Please upload at least two images for comparison.")
-
-# Sidebar button for video analysis
-with st.sidebar:
-    st.subheader("🎥 Video Analysis")
-    video_uploaded = st.file_uploader("Upload a video for analysis", type=["mp4", "mov", "avi", "mkv", "webm"], key="video")
-    user_prompt_video = st.text_area("Enter your prompt for the video analysis", key="video_prompt")
-
-    if video_uploaded:
-        st.video(video_uploaded)
-
-    analyze_video_button = st.button("Analyze Video", disabled=not (video_uploaded and user_prompt_video))
-
-    if analyze_video_button:
-        # Debugging: Print the input values to check what is being passed
-        st.write(f"Analyzing video with prompt: {user_prompt_video}")
-        try:
-            # Call analyze_video without unnecessary arguments like temperature, top_p, max_tokens
-            analyze_video(video_uploaded, user_prompt_video)
-        except Exception as e:
-            st.error(f"An error occurred during video analysis: {e}")
-            st.error("Please check the uploaded video and prompt format.")
-# Sidebar settings (ensure these are present)
-temperature = st.sidebar.slider("Temperature", min_value=0.0, max_value=2.0, value=1.0, step=0.1)
-top_p = st.sidebar.slider("Top P", min_value=0.0, max_value=1.0, value=0.95, step=0.05)
-max_tokens = st.sidebar.slider("Max Output Tokens", min_value=1000, max_value=8192, value=8192, step=500)
-
-# Video analysis tab
-if st.button("Analyze Video", key="analyze_video_btn") and video_uploaded and user_prompt_video.strip():
-    with st.spinner("Analyzing video..."):
-        try:
-            result = analyze_video(video_uploaded, user_prompt_video)  # ✅ No extra args!
-            if result:
-                st.write("## Video Analysis Result:")
-                st.markdown(result)
-        except Exception as e:
-            st.error(f"An error occurred: {e}")
