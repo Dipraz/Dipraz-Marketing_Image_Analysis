@@ -97,6 +97,47 @@ def analyze_video(uploaded_video, prompt, temperature, top_p, max_tokens):
         st.error("Detailed traceback:")
         st.text(traceback.format_exc())
 
+import streamlit as st
+import base64
+from google.cloud import aiplatform
+from vertexai.preview.generative_models import GenerativeModel, Part
+
+# Existing initialization
+aiplatform.init(project="your-project-id", location="us-central1")
+model = GenerativeModel("gemini-1.5-flash-001")
+
+def analyze_video_inline(video_file, prompt):
+    """Analyze video by passing it inline to Gemini."""
+    video_data = video_file.read()
+    video_encoded = base64.b64encode(video_data).decode("utf-8")
+    video_part = Part.from_data(data=video_data, mime_type=video_file.type)
+    response = model.generate_content([prompt, video_part])
+    return response.text
+
+def main():
+    st.title("Image and Video Analysis with Gemini")
+    analysis_type = st.radio("Select analysis type:", ["Image", "Video"])
+
+    if analysis_type == "Image":
+        # Existing image analysis code
+        uploaded_file = st.file_uploader("Upload an image", type=["png", "jpg", "jpeg"])
+        prompt = st.text_area("Enter your prompt:")
+        if st.button("Analyze Image") and uploaded_file and prompt:
+            image_part = Part.from_data(uploaded_file.read(), mime_type=f"image/{uploaded_file.type.split('/')[-1]}")
+            response = model.generate_content([prompt, image_part])
+            st.write(response.text)
+
+    elif analysis_type == "Video":
+        uploaded_video = st.file_uploader("Upload a video", type=["mp4", "avi", "mov"])
+        prompt = st.text_area("Enter your prompt for the video:")
+        if st.button("Analyze Video") and uploaded_video and prompt:
+            with st.spinner("Analyzing video..."):
+                result = analyze_video_inline(uploaded_video, prompt)
+                st.write("Video Analysis Result:")
+                st.write(result)
+
+if __name__ == "__main__":
+    main()
 def main():
     st.set_page_config(page_title="Marketing Media Analysis AI Assistant", layout="wide")
     st.title("🧠 Marketing Media Analysis AI Assistant")
