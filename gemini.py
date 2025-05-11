@@ -2696,4 +2696,10 @@ with st.sidebar:
     analyze_video_button = st.button("Analyze Video", disabled=not (video_uploaded and user_prompt_video))
 
     if analyze_video_button:
-        analyze_video(video_uploaded, user_prompt_video, temperature=1.0, top_p=0.95, max_tokens=4096)
+        # Debugging: Print the input values to check what is being passed
+        st.write(f"Analyzing video with prompt: {user_prompt_video}")
+        try:
+            analyze_video(video_uploaded, user_prompt_video, temperature=1.0, top_p=0.95, max_tokens=4096)
+        except Exception as e:
+            st.error(f"An error occurred during video analysis: {e}")
+            st.error("Please check the uploaded video and prompt format.")
