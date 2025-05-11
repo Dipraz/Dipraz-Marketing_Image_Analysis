@@ -2683,38 +2683,3 @@ if uploaded_files and len(uploaded_files) >= 2:
 
 elif uploaded_files and len(uploaded_files) < 2:
     st.warning("Please upload at least two images for comparison.")
-
-from video import analyze_video  # Ensure this import is present
-
-def main():
-    st.set_page_config(page_title="Marketing Media Analysis AI Assistant", layout="wide")
-    st.title("🧠 Marketing Media Analysis AI Assistant")
-
-    # Sidebar navigation
-    analysis_type = st.sidebar.radio("Choose Analysis Type", ["Image Analysis", "Video Analysis"])
-
-    # Shared sidebar config
-    temperature = st.sidebar.slider("Temperature", 0.0, 2.0, 1.0, 0.1)
-    top_p = st.sidebar.slider("Top P", 0.0, 1.0, 0.95, 0.05)
-    max_tokens = st.sidebar.slider("Max Output Tokens", 1000, 8192, 4096, 500)
-
-    if analysis_type == "Image Analysis":
-        st.subheader("Coming Soon: Image Analysis using Gemini")
-        st.info("The image analysis feature is under development.")
-
-    elif analysis_type == "Video Analysis":
-        st.subheader("🎥 Video Analysis with Vertex AI")
-
-        uploaded_video = st.file_uploader("Upload a video for analysis", type=["mp4", "mov", "avi", "mkv", "webm"], key="video")
-        user_prompt = st.text_area("Enter your prompt for the video analysis", key="video_prompt")
-
-        if uploaded_video:
-            st.video(uploaded_video)
-
-        analyze_button = st.button("Analyze Video", disabled=not (uploaded_video and user_prompt))
-
-        if analyze_button:
-            analyze_video(uploaded_video, user_prompt, temperature, top_p, max_tokens)
-
-
-
