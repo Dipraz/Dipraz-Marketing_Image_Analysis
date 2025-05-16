@@ -26,7 +26,7 @@ with st.expander("🔎 General Media Analysis (Prompt + Any File)", expanded=Tru
     if uploaded_images:
         st.markdown("🖼️ **Preview of Uploaded Images:**")
         for img in uploaded_images:
-            st.image(img, caption=img.name, use_column_width=True)
+            st.image(img, caption=img.name, use_container_width=True)
 
     prompt = st.text_area("Enter your custom prompt for analysis:", height=200, key="gen_prompt")
 
@@ -71,7 +71,7 @@ if media_files:
     st.markdown("🖼️ **Preview of Uploaded Media Images:**")
     for media in media_files:
         if any(media.name.lower().endswith(ext) for ext in image_extensions):
-            st.image(media, caption=media.name, use_column_width=True)
+            st.image(media, caption=media.name, use_container_width=True)
 
 compliance_prompt = st.text_area(
     "🔧 Optional: Custom compliance prompt (e.g., 'Highlight all ad claims that may violate health disclaimers')",
