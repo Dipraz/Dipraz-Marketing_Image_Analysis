@@ -2,7 +2,6 @@ import streamlit as st
 import google.generativeai as genai
 import os
 from dotenv import load_dotenv
-import base64
 
 # Load environment variables
 load_dotenv()
@@ -12,6 +11,7 @@ google_api_key = os.getenv("GOOGLE_API_KEY")
 genai.configure(api_key=google_api_key)
 model = genai.GenerativeModel('gemini-2.5-flash-preview-04-17')
 
+st.set_page_config(page_title="Multimodal Compliance AI", layout="wide")
 st.title("📊 Multimodal Document & Compliance Analysis with Gemini 2.5 Flash")
 
 # -----------------------------
@@ -21,6 +21,12 @@ with st.expander("🔎 General Media Analysis (Prompt + Any File)", expanded=Tru
     uploaded_images = st.file_uploader("Upload Images", type=["jpg", "jpeg", "png"], accept_multiple_files=True, key="gen_images")
     uploaded_pdfs = st.file_uploader("Upload PDF Books", type=["pdf"], accept_multiple_files=True, key="gen_pdfs")
     uploaded_media = st.file_uploader("Upload Regulatory Media (e.g., TXT, CSV, etc.)", accept_multiple_files=True, key="gen_media")
+
+    # ✅ Show image previews for general analysis
+    if uploaded_images:
+        st.markdown("🖼️ **Preview of Uploaded Images:**")
+        for img in uploaded_images:
+            st.image(img, caption=img.name, use_column_width=True)
 
     prompt = st.text_area("Enter your custom prompt for analysis:", height=200, key="gen_prompt")
 
@@ -59,7 +65,19 @@ st.subheader("🛡️ Compliance Checker: Compare Media Against Regulations")
 rulebooks = st.file_uploader("📚 Upload Rulebooks (PDF)", type=["pdf"], accept_multiple_files=True, key="rules")
 media_files = st.file_uploader("🖼️ Upload Media Files (Images, PDFs, PPTX, etc.)", accept_multiple_files=True, key="media")
 
-compliance_prompt = st.text_area("🔧 Optional: Custom compliance prompt (e.g., 'Highlight all ad claims that may violate health disclaimers')", height=150, key="compliance_prompt")
+# ✅ Show image previews in compliance section
+if media_files:
+    image_extensions = ["jpg", "jpeg", "png"]
+    st.markdown("🖼️ **Preview of Uploaded Media Images:**")
+    for media in media_files:
+        if any(media.name.lower().endswith(ext) for ext in image_extensions):
+            st.image(media, caption=media.name, use_column_width=True)
+
+compliance_prompt = st.text_area(
+    "🔧 Optional: Custom compliance prompt (e.g., 'Highlight all ad claims that may violate health disclaimers')",
+    height=150,
+    key="compliance_prompt"
+)
 
 if st.button("Analyze for Compliance"):
     if not (rulebooks and media_files):
@@ -69,11 +87,9 @@ if st.button("Analyze for Compliance"):
         if compliance_prompt:
             base_context.append(compliance_prompt)
 
-        # Add rulebooks
         for rule_pdf in rulebooks:
             base_context.append({"mime_type": "application/pdf", "data": rule_pdf.getvalue()})
 
-        # Add media files
         for media in media_files:
             base_context.append({"mime_type": media.type, "data": media.getvalue()})
 
@@ -90,7 +106,11 @@ if st.button("Analyze for Compliance"):
 st.markdown("---")
 st.subheader("💬 Ask a Question Based on Rulebooks")
 
-query = st.text_input("Enter your question about the rules (e.g., 'Are health-related claims allowed in product ads?')", key="rule_query")
+query = st.text_input(
+    "Enter your question about the rules (e.g., 'Are health-related claims allowed in product ads?')",
+    key="rule_query"
+)
+
 if st.button("Ask Rulebook", key="query_button"):
     if not rulebooks:
         st.warning("Please upload rulebooks first.")
