@@ -2321,7 +2321,7 @@ st.title("Marketing Media Analysis AI Assistant with gemini-2.5-flash-lite-previ
 # --- Sidebar ---
 with st.sidebar:
     st.header("Analysis Options")
-    tabs = st.tabs(["Basic", "Detailed", "Headlines", "Persona", "Others"])
+    tabs = st.tabs([ "Basic", "Detailed", "Headlines", "Persona", "Others"])
 
     # Analysis buttons within each tab
     with tabs[0]:  # Basic
