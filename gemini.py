@@ -1,4 +1,3 @@
-
 import streamlit as st
 from dotenv import load_dotenv
 import os
@@ -2317,7 +2316,7 @@ At the end of the table, please add a summary "Motivational Score" which is base
             st.error(f"An error occurred while processing the media: {e}")
         return None  # Return None to signal an error occurred
 # --- Streamlit App ---
-st.title("Marketing Media Analysis AI Assistant with gemini-2.5-flash-preview-04-17")
+st.title("Marketing Media Analysis AI Assistant with Gemini-2.0-Flash")
 
 # --- Sidebar ---
 with st.sidebar:
@@ -2636,7 +2635,7 @@ def compare_all_images(images, filenames, model, custom_prompt=None):
         return None
 
 # Initialize the Streamlit app
-st.title("Marketing Image Comparison AI Assistant with gemini-2.5-flash-preview-04-17")
+st.title("Marketing Image Comparison AI Assistant with Gemini-2.0-Flash")
 
 # File Uploader for Multiple Images
 uploaded_files = st.file_uploader(
@@ -2684,4 +2683,5 @@ if uploaded_files and len(uploaded_files) >= 2:
 
 elif uploaded_files and len(uploaded_files) < 2:
     st.warning("Please upload at least two images for comparison.")
+
 
