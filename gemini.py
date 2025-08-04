@@ -35,13 +35,13 @@ else:
         "temperature": 0.1,
         "top_p": 1.0,
         "top_k": 1,
-        "max_output_tokens": 65536,
+        "max_output_tokens": 1049576,
         "response_mime_type": "text/plain",
     }
 
     # Initialize Generative AI model with generation configuration
     model = genai.GenerativeModel(
-        model_name="gemini-2.5-flash-preview-04-17",
+        model_name="gemini-2.0-flash",
         generation_config=generation_config,
     )
 
@@ -2684,3 +2684,4 @@ if uploaded_files and len(uploaded_files) >= 2:
 
 elif uploaded_files and len(uploaded_files) < 2:
     st.warning("Please upload at least two images for comparison.")
+
