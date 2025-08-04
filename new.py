@@ -9,10 +9,10 @@ google_api_key = os.getenv("GOOGLE_API_KEY")
 
 # Configure Gemini API
 genai.configure(api_key=google_api_key)
-model = genai.GenerativeModel("gemini-2.0-flash")
+model = genai.GenerativeModel(""gemini-2.5-flash"")
 
 st.set_page_config(page_title="Multimodal Compliance AI", layout="wide")
-st.title("📊 Multimodal Document & Compliance Analysis with Gemini 2.0 Flash")
+st.title("📊 Multimodal Document & Compliance Analysis with Gemini 2.5 Flash")
 
 # -----------------------------
 # 🔍 Generic Analysis Section
@@ -65,7 +65,7 @@ st.subheader("🛡️ Compliance Checker: Compare Media Against Regulations")
 rulebooks = st.file_uploader("📚 Upload Rulebooks (PDF)", type=["pdf"], accept_multiple_files=True, key="rules")
 media_files = st.file_uploader("🖼️ Upload Media Files (Images, PDFs, PPTX, etc.)", accept_multiple_files=True, key="media")
 
-# ✅ Show image previews in compliance section
+# ✅ Show image previews in the compliance section
 if media_files:
     image_extensions = ["jpg", "jpeg", "png"]
     st.markdown("🖼️ **Preview of Uploaded Media Images:**")
@@ -127,4 +127,5 @@ if st.button("Ask Rulebook", key="query_button"):
             st.markdown(response.text)
         except Exception as e:
             st.error(f"❌ Error while querying rulebook: {e}")
+
 
