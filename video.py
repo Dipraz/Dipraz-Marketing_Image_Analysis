@@ -99,7 +99,7 @@ def analyze_video(uploaded_video, prompt, temperature, top_p, max_tokens):
 
 def main():
     st.set_page_config(page_title="Marketing Media Analysis AI Assistant", layout="wide")
-    st.title("🧠 Marketing Media Analysis AI Assistant")
+    st.title("🧠 Marketing Media Analysis AI Assistant with Gemini-2.0-Flash")
 
     tab1, tab2 = st.tabs(["🖼️ Image Analysis", "🎥 Video Analysis"])
 
@@ -126,4 +126,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
