@@ -38,7 +38,7 @@ else:
     }
     
     model = genai.GenerativeModel(
-      model_name="gemini-2.5-pro-preview-03-25",
+      model_name="gemini-2.5-flash",
       generation_config=generation_config,
     )
 
@@ -3733,3 +3733,4 @@ if uploaded_files and len(uploaded_files) >= 2:
 
 elif uploaded_files and len(uploaded_files) < 2:
     st.warning("Please upload at least two images for comparison.")
+
