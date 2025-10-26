@@ -56,7 +56,7 @@ def analyze_video(uploaded_video, prompt, temperature, top_p, max_tokens):
             "top_p": top_p,
         }
 
-        model = GenerativeModel("gemini-2.0-flash")
+        model = GenerativeModel("gemini-flash-lite-latest")
 
         start_time = time.time()
         with st.spinner('Analyzing the video... This might take a few moments.'):
@@ -126,5 +126,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
